@@ -11,13 +11,14 @@ function onlyNumbers(value: string, maxLength: number) {
   return value.replace(/\D/g, "").slice(0, maxLength);
 }
 
-function formatCpf(value: string) {
-  const numbers = onlyNumbers(value, 11);
+function formatCnpj(value: string) {
+  const numbers = onlyNumbers(value, 14);
 
   return numbers
-    .replace(/^(\d{3})(\d)/, "$1.$2")
-    .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-    .replace(/\.(\d{3})(\d)/, ".$1-$2");
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/\.(\d{3})(\d)/, ".$1/$2")
+    .replace(/(\d{4})(\d)/, "$1-$2");
 }
 
 function formatBirthDate(value: string) {
@@ -38,19 +39,89 @@ function formatPhone(value: string) {
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
-  const [cpf, setCpf] = useState("");
+  const [companyLegalName, setCompanyLegalName] = useState("");
+  const [cnpj, setCnpj] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [documentName, setDocumentName] = useState("");
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [feedbackIsError, setFeedbackIsError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
-    setDocumentName(event.target.files?.[0]?.name ?? "");
+    const file = event.target.files?.[0] ?? null;
+    setDocumentFile(file);
+    setDocumentName(file?.name ?? "");
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
+    setFeedback("");
+
+    if (!termsAccepted) {
+      setFeedbackIsError(true);
+      setFeedback("Leia e aceite os Termos de Uso e a Política de Privacidade.");
+      return;
+    }
+
+    if (!documentFile) {
+      setFeedbackIsError(true);
+      setFeedback("Envie o documento RG ou CNH.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("fullName", fullName);
+    formData.set("companyLegalName", companyLegalName);
+    formData.set("cnpj", cnpj);
+    formData.set("birthDate", birthDate);
+    formData.set("phone", phone);
+    formData.set("email", email);
+    formData.set("termsAccepted", String(termsAccepted));
+    formData.set("document", documentFile);
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/auth/cadastro", {
+        method: "POST",
+        body: formData,
+      });
+      const payload = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.message ?? "Não foi possível criar o cadastro.");
+      }
+
+      setFeedbackIsError(false);
+      setFeedback(
+        payload.message ??
+          "Cadastro criado. Confira seu e-mail para definir sua senha.",
+      );
+      setFullName("");
+      setCompanyLegalName("");
+      setCnpj("");
+      setBirthDate("");
+      setPhone("");
+      setEmail("");
+      setDocumentFile(null);
+      setDocumentName("");
+      setTermsAccepted(false);
+      form.reset();
+    } catch (error) {
+      setFeedbackIsError(true);
+      setFeedback(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível criar o cadastro.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -82,20 +153,35 @@ export default function RegisterPage() {
               onChange={(event) => setFullName(event.target.value)}
               placeholder="Digite"
               autoComplete="name"
+              required
             />
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="cpf">Cpf</label>
+            <label htmlFor="company-legal-name">Razão social</label>
             <input
-              id="cpf"
+              id="company-legal-name"
               type="text"
-              value={cpf}
-              onChange={(event) => setCpf(formatCpf(event.target.value))}
-              placeholder="ex: 000.000.000-00"
+              value={companyLegalName}
+              onChange={(event) => setCompanyLegalName(event.target.value)}
+              placeholder="Digite"
+              autoComplete="organization"
+              required
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="cnpj">CNPJ</label>
+            <input
+              id="cnpj"
+              type="text"
+              value={cnpj}
+              onChange={(event) => setCnpj(formatCnpj(event.target.value))}
+              placeholder="ex: 00.000.000/0000-00"
               inputMode="numeric"
-              maxLength={14}
+              maxLength={18}
               autoComplete="off"
+              required
             />
           </div>
 
@@ -112,6 +198,7 @@ export default function RegisterPage() {
               inputMode="numeric"
               maxLength={10}
               autoComplete="bday"
+              required
             />
           </div>
 
@@ -126,6 +213,7 @@ export default function RegisterPage() {
               inputMode="tel"
               maxLength={13}
               autoComplete="tel"
+              required
             />
           </div>
 
@@ -138,6 +226,7 @@ export default function RegisterPage() {
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Digite"
               autoComplete="email"
+              required
             />
           </div>
 
@@ -151,8 +240,9 @@ export default function RegisterPage() {
               id="document"
               className={styles.fileInput}
               type="file"
-              accept="image/*,.pdf"
+              accept="application/pdf,image/jpeg,image/png"
               onChange={handleDocumentChange}
+              required
             />
           </div>
 
@@ -182,8 +272,18 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <button className={styles.submitButton} type="submit">
-            Avançar
+          {feedback ? (
+            <p
+              className={styles.formFeedback}
+              role={feedbackIsError ? "alert" : "status"}
+              data-error={feedbackIsError}
+            >
+              {feedback}
+            </p>
+          ) : null}
+
+          <button className={styles.submitButton} type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Enviando..." : "Avançar"}
           </button>
         </form>
       </section>

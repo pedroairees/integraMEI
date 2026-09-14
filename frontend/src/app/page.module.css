@@ -249,8 +249,26 @@
   background: #15305f;
 }
 
+.loginButton:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .loginButton:active {
   transform: scale(0.98);
+}
+
+.formFeedback {
+  margin: 14px 0 -4px;
+  color: var(--brand-navy);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+
+.formFeedback[data-error="true"] {
+  color: #ae1b1b;
 }
 
 .divider {

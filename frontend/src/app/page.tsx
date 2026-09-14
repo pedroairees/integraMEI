@@ -5,6 +5,8 @@ import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
+import { getBrowserSupabaseClient } from "@/src/lib/supabase/browser";
+
 import styles from "./page.module.css";
 
 export default function LoginPage() {
@@ -12,6 +14,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [feedbackIsError, setFeedbackIsError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleCnpjChange(value: string) {
     const numbers = value.replace(/\D/g, "").slice(0, 14);
@@ -25,8 +30,54 @@ export default function LoginPage() {
     setCnpj(formatted);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFeedback("");
+
+    if (cnpj.replace(/\D/g, "").length !== 14 || !password) {
+      setFeedbackIsError(true);
+      setFeedback("Informe um CNPJ válido e sua senha.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cnpj, password, rememberMe }),
+      });
+      const payload = (await response.json()) as {
+        message?: string;
+        session?: { access_token: string; refresh_token: string };
+      };
+
+      if (!response.ok || !payload.session) {
+        throw new Error(payload.message ?? "Não foi possível entrar.");
+      }
+
+      const supabase = getBrowserSupabaseClient();
+      const { error } = await supabase.auth.setSession({
+        access_token: payload.session.access_token,
+        refresh_token: payload.session.refresh_token,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setFeedbackIsError(false);
+      setFeedback("Login realizado com sucesso.");
+      setPassword("");
+    } catch (error) {
+      setFeedbackIsError(true);
+      setFeedback(
+        error instanceof Error ? error.message : "Não foi possível entrar.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -87,6 +138,7 @@ export default function LoginPage() {
                 maxLength={18}
                 autoComplete="username"
                 inputMode="numeric"
+                required
               />
             </div>
           </div>
@@ -113,6 +165,7 @@ export default function LoginPage() {
                   setPassword(event.target.value)
                 }
                 autoComplete="current-password"
+                required
               />
 
               <button
@@ -157,9 +210,20 @@ export default function LoginPage() {
           <button
             type="submit"
             className={styles.loginButton}
+            disabled={isSubmitting}
           >
-            Entrar
+            {isSubmitting ? "Entrando..." : "Entrar"}
           </button>
+
+          {feedback ? (
+            <p
+              className={styles.formFeedback}
+              role={feedbackIsError ? "alert" : "status"}
+              data-error={feedbackIsError}
+            >
+              {feedback}
+            </p>
+          ) : null}
         </form>
 
         <p className={styles.divider}>

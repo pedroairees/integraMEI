@@ -1,0 +1,113 @@
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 15, 34, 0.56) 28.308%,
+      rgba(128, 198, 243, 0.79) 90.978%
+    ),
+    #001326;
+}
+
+.card {
+  width: min(480px, 100%);
+  padding: 48px;
+  border-radius: 36px;
+  background: #ffffff;
+  color: #1b3a70;
+}
+
+.card h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.card > p {
+  margin: 16px 0 32px;
+  color: #354866;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.form {
+  display: grid;
+  gap: 8px;
+}
+
+.form label {
+  margin-top: 10px;
+  color: #000000;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.form input {
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #cdcdcd;
+  border-radius: 10px;
+  color: #1b3a70;
+  font: inherit;
+}
+
+.form input:focus-visible,
+.form button:focus-visible,
+.card > a:focus-visible {
+  outline: 3px solid rgba(19, 81, 180, 0.4);
+  outline-offset: 2px;
+}
+
+.form button {
+  height: 52px;
+  margin-top: 28px;
+  border: 0;
+  border-radius: 10px;
+  background: #1c3a70;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.feedback {
+  margin: 16px 0 0;
+  color: #1b3a70;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.feedback[data-error="true"] {
+  color: #ae1b1b;
+}
+
+.card > a {
+  display: inline-block;
+  margin-top: 26px;
+  color: #1b3a70;
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 16px;
+  }
+
+  .card {
+    padding: 32px 24px;
+    border-radius: 28px;
+  }
+
+  .card h1 {
+    font-size: 28px;
+  }
+}
