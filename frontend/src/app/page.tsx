@@ -1,12 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  UserRound,
-} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { type FormEvent, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import styles from "./page.module.css";
 
@@ -30,25 +27,26 @@ export default function LoginPage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    console.log("CNPJ:", cnpj);
-    console.log("Senha:", password);
-    console.log("Lembrar de mim:", rememberMe);
   }
 
   return (
     <main className={styles.page}>
       <section className={styles.loginCard}>
-        <div className={styles.logoContainer}>
-          <img
-            src="/logo.svg"
+        <div className={styles.logoCrop}>
+          <Image
+            src="/assets/integramei-logo.png"
             alt="IntegraMEI"
             className={styles.logo}
+            width={489}
+            height={343}
+            priority
           />
         </div>
 
         <div className={styles.heading}>
-          <h1>IntegraMEI</h1>
+          <h1>
+            Integ<span>ra</span><strong>MEI</strong>
+          </h1>
 
           <p>
             Seu assistente financeiro
@@ -66,14 +64,20 @@ export default function LoginPage() {
           onSubmit={handleSubmit}
         >
           <div className={styles.inputGroup}>
+            <label className={styles.srOnly} htmlFor="cnpj">
+              CNPJ
+            </label>
             <div className={styles.inputWrapper}>
-              <UserRound
-                size={14}
-                strokeWidth={2}
+              <Image
+                src="/assets/remember-checkbox.svg"
+                alt=""
                 className={styles.inputIcon}
+                width={32}
+                height={32}
               />
 
               <input
+                id="cnpj"
                 type="text"
                 placeholder="CNPJ"
                 value={cnpj}
@@ -82,19 +86,26 @@ export default function LoginPage() {
                 }
                 maxLength={18}
                 autoComplete="username"
+                inputMode="numeric"
               />
             </div>
           </div>
 
           <div className={styles.inputGroup}>
+            <label className={styles.srOnly} htmlFor="password">
+              Senha
+            </label>
             <div className={styles.inputWrapper}>
-              <LockKeyhole
-                size={14}
-                strokeWidth={2}
+              <Image
+                src="/assets/cnpj-icon.svg"
+                alt=""
                 className={styles.inputIcon}
+                width={31}
+                height={31}
               />
 
               <input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Senha"
                 value={password}
@@ -138,12 +149,9 @@ export default function LoginPage() {
               <span>Lembrar de mim</span>
             </label>
 
-            <a
-              href="#"
-              className={styles.forgotPassword}
-            >
+            <Link className={styles.forgotPassword} href="/recuperar-senha">
               Esqueci minha senha
-            </a>
+            </Link>
           </div>
 
           <button
@@ -154,16 +162,13 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className={styles.divider}>
+        <p className={styles.divider}>
           <span>ou</span>
-        </div>
+        </p>
 
-        <a
-          href="#"
-          className={styles.createAccount}
-        >
+        <Link className={styles.createAccount} href="/cadastro">
           Criar conta
-        </a>
+        </Link>
       </section>
     </main>
   );
