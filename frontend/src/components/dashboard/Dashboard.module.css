@@ -1,0 +1,920 @@
+.page {
+  --navy: #1b3a70;
+  --title: rgba(0, 0, 0, 0.62);
+  --muted: rgba(0, 0, 0, 0.44);
+  --card-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 77px 24px 62px;
+  color: #000;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 15, 34, 0.56) 28.308%,
+      rgba(128, 198, 243, 0.79) 90.978%
+    ),
+    #001326;
+  font-feature-settings:
+    "lnum" 1,
+    "pnum" 1;
+}
+
+.shell {
+  width: min(1285px, 100%);
+  min-height: 885px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 259px minmax(0, 1fr);
+  border-radius: 32px;
+  background: #fff;
+}
+
+.page :is(a, button, [tabindex]):focus-visible {
+  outline: 3px solid #67aade;
+  outline-offset: 4px;
+}
+.skipLink {
+  position: absolute;
+  top: 8px;
+  left: 24px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 6px;
+  transform: translateY(-150%);
+  z-index: 5;
+}
+.skipLink:focus {
+  transform: none;
+}
+.sidebar {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 39px 22px 90px;
+  border-radius: 32px;
+  box-shadow: var(--card-shadow);
+}
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 35px;
+  text-decoration: none;
+  transform: translateX(-13px);
+}
+.logoCrop {
+  display: block;
+  position: relative;
+  width: 90px;
+  height: 99px;
+  overflow: hidden;
+}
+.logo {
+  position: absolute;
+  width: 250.48%;
+  height: 159.12%;
+  max-width: none;
+  top: -8.83%;
+  left: -74.81%;
+}
+.brandName {
+  margin-top: 5px;
+  font-size: 25px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.brandName > span {
+  color: #1c396f;
+}
+.brandName strong {
+  color: #67aade;
+}
+.navigation {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.navItem,
+.activeItem {
+  width: 204px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 15px;
+  border: 0;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--navy);
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+}
+.navItem:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+}
+.navItem:hover {
+  background: #edf4fb;
+}
+.activeItem {
+  background: #1c3a6f;
+  color: #fff;
+}
+.menuIcon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: grid;
+  place-items: center;
+}
+.menuIcon > img {
+  object-fit: contain;
+}
+.menuIcon .alarmInner {
+  position: absolute;
+  top: 8px;
+  left: 7px;
+}
+.logoutArea {
+  margin-top: auto;
+  align-self: center;
+  padding-top: 48px;
+}
+.logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 161px;
+  min-height: 36px;
+  padding: 5px;
+  border: 1px solid var(--navy);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--navy);
+  font-size: 15px;
+  font-weight: 400;
+  cursor: pointer;
+}
+.logout:hover {
+  background: #edf4fb;
+}
+.logout:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+.logoutError {
+  max-width: 185px;
+  font-size: 12px;
+  color: #ae1b1b;
+}
+.content {
+  min-width: 0;
+  padding: 29px 85px 20px 62px;
+}
+.greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.header h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 37px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.header > p {
+  margin: 9px 0 22px;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 24px;
+}
+.notifications {
+  position: relative;
+  flex-shrink: 0;
+}
+.notificationButton {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+.notificationButton:hover {
+  background: #f3f5f8;
+}
+.notificationPanel {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 260px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #cdcdcd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--card-shadow);
+  color: var(--navy);
+  font-size: 14px;
+  line-height: 1.5;
+  z-index: 2;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px 81px;
+}
+.metric {
+  min-height: 119px;
+  padding: 14px 31px 16px 43px;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+}
+.metric h2,
+.chartHeading h2,
+.bottomCard h2 {
+  margin: 0;
+  color: var(--title);
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 700;
+}
+.metricValue,
+.positiveValue {
+  margin: 9px 0 10px;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 700;
+}
+.positiveValue,
+.positive {
+  color: #4caf50;
+}
+.negative {
+  color: #f00;
+}
+.comparison {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 20px;
+  white-space: nowrap;
+  font-weight: 400;
+}
+.targetValues {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 9px 12px 19px 0;
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 700;
+}
+.targetValues p {
+  margin: 0;
+}
+.targetProgress {
+  display: block;
+  width: calc(100% + 12px);
+  height: 4px;
+  margin-left: -12px;
+  appearance: none;
+  overflow: hidden;
+  border: 0;
+  border-radius: 7px;
+  background: #d9d9d9;
+  color: var(--navy);
+}
+.targetProgress::-webkit-progress-bar {
+  background: #d9d9d9;
+  border-radius: 7px;
+}
+.targetProgress::-webkit-progress-value {
+  background: var(--navy);
+  border-radius: 7px;
+}
+.targetProgress::-moz-progress-bar {
+  background: var(--navy);
+  border-radius: 7px;
+}
+.evolution {
+  margin-top: 28px;
+  min-height: 226px;
+  padding: 21px 5px 25px 20px;
+}
+.chartHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 46px 0 25px;
+  margin-bottom: 17px;
+}
+.period {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 1px 7px 1px 13px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  color: rgba(0, 0, 0, 0.86);
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.chartScroll {
+  overflow-x: auto;
+}
+.evolutionChart {
+  position: relative;
+  width: 100%;
+  min-width: 849px;
+  height: 137px;
+  padding-left: 43px;
+}
+.yAxis {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 32px;
+  display: grid;
+  gap: 10px;
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 600;
+  text-align: right;
+}
+.plot {
+  position: relative;
+  height: 113px;
+  background: rgba(122, 122, 122, 0.04);
+  overflow: hidden;
+}
+.gridLine {
+  position: absolute;
+  left: 0;
+  width: 97.52%;
+  height: 1px;
+  background: rgba(27, 58, 112, 0.2);
+}
+.chartSegment {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.segmentImage {
+  position: relative;
+  display: block;
+  height: 1px;
+  flex-shrink: 0;
+}
+.chartPoint {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+}
+.xAxis {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 6px;
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.bottomCharts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 81px;
+  margin-top: 33px;
+}
+.bottomCard {
+  min-height: 180px;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  padding: 16px 12px 16px;
+}
+.bottomCard h2 {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.bottomCard h2 > span {
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 400;
+}
+.marginGauge {
+  display: block;
+  margin: 16px auto 13px;
+  object-fit: contain;
+}
+.marginCaption {
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 700;
+  color: #09a633;
+}
+.donut {
+  width: 226px;
+  height: 108px;
+  position: relative;
+  margin: 16px auto 0;
+}
+.donutSlices {
+  position: absolute;
+  width: 106px;
+  height: 99px;
+  left: 75px;
+  top: 0;
+}
+.donutSlices img {
+  position: absolute;
+}
+.sliceZ {
+  left: 0;
+  top: 1px;
+}
+.sliceX {
+  left: 53px;
+  top: 0;
+}
+.sliceY {
+  left: 53px;
+  top: 48px;
+}
+.labelZ,
+.labelX,
+.labelY {
+  position: absolute;
+  color: #333;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+.donut small {
+  display: block;
+  font-size: 10px;
+  line-height: 14px;
+}
+.labelZ {
+  left: 14px;
+  top: 19px;
+}
+.labelX {
+  right: 0;
+  top: 1px;
+}
+.labelY {
+  right: 2px;
+  bottom: 0;
+}
+.labelZ::after,
+.labelX::before,
+.labelY::before {
+  content: "";
+  position: absolute;
+  width: 29px;
+  height: 1px;
+  background: #bcbcbc;
+}
+.labelZ::after {
+  left: 34px;
+  top: 23px;
+  transform: rotate(22deg);
+}
+.labelX::before {
+  right: 30px;
+  top: 20px;
+  transform: rotate(-16deg);
+}
+.labelY::before {
+  right: 30px;
+  top: 6px;
+  transform: rotate(22deg);
+}
+.demoNotice {
+  margin: 14px 0 -30px;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  color: #082344;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-size: 13px;
+}
+.filters label,
+.goalEditor label {
+  display: grid;
+  gap: 6px;
+}
+.filters input,
+.filters select,
+.goalEditor input,
+.period {
+  max-width: 100%;
+  min-height: 36px;
+  border: 1px solid #bdc8d6;
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: white;
+  color: #1b3a70;
+  font: inherit;
+}
+.filters .compareToggle {
+  display: flex;
+  align-items: center;
+  max-width: 190px;
+}
+.compareToggle input {
+  width: 18px;
+  height: 18px;
+}
+.filters button,
+.goalEditor button,
+.detailPanel button,
+.notice button {
+  border: 1px solid #1b3a70;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #1b3a70;
+  background: white;
+  cursor: pointer;
+  font: inherit;
+}
+.filters button:hover,
+.goalEditor button:hover,
+.detailPanel button:hover {
+  background: #edf4fb;
+}
+.filters button:disabled,
+.goalEditor button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.notice,
+.insights {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #36465d;
+  overflow-wrap: anywhere;
+}
+.notice {
+  padding: 12px;
+}
+.insights {
+  margin-top: 24px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #f1f6fb;
+}
+.comparison {
+  white-space: normal;
+}
+.goalEditor {
+  margin-top: 14px;
+  font-size: 13px;
+}
+.goalEditor form {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+}
+.goalEditor summary,
+.liveChart summary {
+  cursor: pointer;
+  color: #1b3a70;
+}
+.liveChart {
+  margin: 0;
+  width: 100%;
+  overflow-x: auto;
+}
+.liveChart svg {
+  width: 100%;
+  min-width: 580px;
+  display: block;
+}
+.liveChart figcaption {
+  margin: 8px 0;
+  color: #36465d;
+  font-size: 13px;
+}
+.liveChart circle,
+.liveDonut circle {
+  cursor: pointer;
+  pointer-events: stroke;
+}
+.liveChart circle:focus-visible,
+.liveDonut circle:focus-visible {
+  stroke: #ed9e00;
+  stroke-width: 5;
+  outline: none;
+}
+.liveDonut {
+  display: block;
+  width: 160px;
+  max-width: 100%;
+  margin: 12px auto;
+}
+.legend {
+  list-style: none;
+  padding: 0;
+  font-size: 13px;
+}
+.legend li {
+  margin-top: 8px;
+}
+.legend button {
+  text-align: left;
+  background: none;
+  color: #1b3a70;
+  border: 0;
+  font: inherit;
+  padding: 6px;
+  cursor: pointer;
+}
+.legend button[aria-pressed="true"] {
+  background: #edf4fb;
+  border-radius: 4px;
+}
+.legend span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+.liveGauge {
+  display: block;
+  width: 180px;
+  max-width: 100%;
+  margin: 20px auto 0;
+}
+.detailPanel {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f1f6fb;
+  border-radius: 8px;
+}
+.detailPanel h2 {
+  font-size: 17px;
+}
+.detailPanel ul {
+  padding-left: 16px;
+}
+.detailPanel li {
+  margin: 8px 0;
+}
+.page table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.page th,
+.page td {
+  padding: 8px;
+  border-bottom: 1px solid #d5dfeb;
+}
+.dataNotice {
+  margin-top: 24px;
+  font-size: 12px;
+  color: #526175;
+}
+.notificationPanel {
+  max-height: 320px;
+  overflow-y: auto;
+}
+.page :is(input, select, summary):focus-visible {
+  outline: 3px solid #67aade;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1250px) {
+  .page {
+    padding: 32px 24px;
+  }
+  .shell {
+    grid-template-columns: 230px minmax(0, 1fr);
+  }
+  .sidebar {
+    padding-inline: 14px;
+  }
+  .content {
+    padding-inline: 32px;
+  }
+  .metrics,
+  .bottomCharts {
+    column-gap: 28px;
+  }
+  .metric {
+    padding-inline: 24px;
+  }
+  .bottomCard h2 {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    white-space: normal;
+  }
+  .header > p {
+    font-size: 18px;
+  }
+  .chartHeading {
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 950px) {
+  .shell {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+  .sidebar {
+    padding-inline: 12px;
+  }
+  .brand {
+    transform: none;
+  }
+  .navItem,
+  .activeItem {
+    width: 100%;
+    padding-inline: 10px;
+    gap: 8px;
+    font-size: 14px;
+  }
+  .content {
+    padding-inline: 24px;
+  }
+  .metrics,
+  .bottomCharts {
+    column-gap: 18px;
+  }
+  .metric {
+    padding-inline: 16px;
+  }
+  .metric h2,
+  .chartHeading h2,
+  .bottomCard h2 {
+    font-size: 17px;
+  }
+  .comparison {
+    font-size: 12px;
+  }
+  .metricValue,
+  .positiveValue,
+  .targetValues {
+    font-size: 18px;
+  }
+  .donut {
+    transform: scale(0.85);
+    transform-origin: top center;
+    width: 226px;
+    margin-left: calc(50% - 113px);
+  }
+  .evolution {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 16px;
+  }
+  .shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-radius: 24px;
+  }
+  .sidebar {
+    border-radius: 24px 24px 0 0;
+    padding: 20px 20px 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  }
+  .brand {
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .logoCrop {
+    width: 40px;
+    height: 44px;
+  }
+  .brandName {
+    margin-top: 0;
+    font-size: 23px;
+  }
+  .navigation {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 4px;
+  }
+  .navItem,
+  .activeItem {
+    flex: 0 0 auto;
+    width: auto;
+  }
+  .logoutArea {
+    padding-top: 16px;
+    align-self: flex-end;
+  }
+  .logout {
+    width: auto;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  .content {
+    padding: 24px 20px;
+  }
+  .header h1 {
+    font-size: 26px;
+  }
+  .header > p {
+    margin-bottom: 22px;
+    font-size: 16px;
+  }
+  .metrics,
+  .bottomCharts {
+    gap: 20px;
+  }
+  .bottomCharts {
+    margin-top: 20px;
+  }
+  .evolution {
+    min-height: 0;
+    margin-top: 28px;
+    padding: 0;
+  }
+  .chartHeading {
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .notificationPanel {
+    width: min(260px, 70vw);
+  }
+  .demoNotice {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics,
+  .bottomCharts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .metric {
+    padding-inline: 28px;
+  }
+  .comparison {
+    font-size: 14px;
+  }
+  .bottomCard h2 {
+    font-size: 17px;
+  }
+  .bottomCard h2 > span {
+    font-size: 13px;
+  }
+  .donut {
+    transform: none;
+  }
+}

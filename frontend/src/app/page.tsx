@@ -5,8 +5,6 @@ import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
-import { getBrowserSupabaseClient } from "@/src/lib/supabase/browser";
-
 import styles from "./page.module.css";
 
 export default function LoginPage() {
@@ -50,26 +48,17 @@ export default function LoginPage() {
       });
       const payload = (await response.json()) as {
         message?: string;
-        session?: { access_token: string; refresh_token: string };
+        success?: boolean;
       };
 
-      if (!response.ok || !payload.session) {
+      if (!response.ok || !payload.success) {
         throw new Error(payload.message ?? "Não foi possível entrar.");
-      }
-
-      const supabase = getBrowserSupabaseClient();
-      const { error } = await supabase.auth.setSession({
-        access_token: payload.session.access_token,
-        refresh_token: payload.session.refresh_token,
-      });
-
-      if (error) {
-        throw error;
       }
 
       setFeedbackIsError(false);
       setFeedback("Login realizado com sucesso.");
       setPassword("");
+      window.location.replace("/dashboard");
     } catch (error) {
       setFeedbackIsError(true);
       setFeedback(

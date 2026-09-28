@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 
 import { getServerSupabaseClient } from "@/src/lib/supabase/server";
+import { getSessionSupabaseClient } from "@/src/lib/supabase/session";
+import { REMEMBER_COOKIE, sessionCookieOptions } from "@/src/lib/supabase/session-options";
 
 export const runtime = "nodejs";
 
@@ -9,7 +11,11 @@ const INVALID_CREDENTIALS = "CNPJ ou senha inválidos.";
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { cnpj?: unknown; password?: unknown };
+    if (request.headers.get("origin") !== new URL(request.url).origin) {
+      return NextResponse.json({ message: "Origem da solicitação inválida." }, { status: 403 });
+    }
+
+    const body = (await request.json()) as { cnpj?: unknown; password?: unknown; rememberMe?: unknown };
     const cnpj = typeof body.cnpj === "string" ? body.cnpj.replace(/\D/g, "") : "";
     const password = typeof body.password === "string" ? body.password : "";
 
@@ -49,31 +55,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: INVALID_CREDENTIALS }, { status: 401 });
     }
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-    if (!url || !publishableKey) {
-      throw new Error("As credenciais públicas do Supabase não estão configuradas.");
-    }
-
-    const authClient = createClient(url, publishableKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false,
-      },
-    });
+    const remember = body.rememberMe === true;
+    const authClient = await getSessionSupabaseClient({ remember });
     const { data, error } = await authClient.auth.signInWithPassword({
       email: user.email,
       password,
     });
 
-    if (error || !data.session) {
+    if (error || !data.session || !data.user.email_confirmed_at) {
       return NextResponse.json({ message: INVALID_CREDENTIALS }, { status: 401 });
     }
 
+    (await cookies()).set(REMEMBER_COOKIE, String(remember), sessionCookieOptions({}, remember));
+
     return NextResponse.json(
-      { session: data.session },
+      { success: true },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch {
