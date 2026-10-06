@@ -97,6 +97,7 @@ const user = {
   user_metadata: { nome_completo: "Usuário Teste" },
 };
 const sessions = new Map();
+const invoiceFiles = new Map();
 const refreshTokens = new Set();
 const refreshReplays = new Map();
 
@@ -133,7 +134,11 @@ const authServer = createServer(async (req, res) => {
       // Supabase permits concurrent refresh reuse for 10 seconds (SSR + API).
       // https://supabase.com/docs/guides/auth/sessions
       const replay = refreshReplays.get(body.refresh_token);
-      if (replay && Date.now() - replay.at < 10000 && refreshTokens.has(replay.session.refresh_token)) {
+      if (
+        replay &&
+        Date.now() - replay.at < 10000 &&
+        refreshTokens.has(replay.session.refresh_token)
+      ) {
         return send(200, replay.session);
       }
       if (!refreshTokens.has(body.refresh_token))
@@ -143,7 +148,10 @@ const authServer = createServer(async (req, res) => {
         });
       refreshTokens.delete(body.refresh_token);
       const refreshed = session();
-      refreshReplays.set(body.refresh_token, { at: Date.now(), session: refreshed });
+      refreshReplays.set(body.refresh_token, {
+        at: Date.now(),
+        session: refreshed,
+      });
       return send(200, refreshed);
     }
     if (
@@ -166,9 +174,89 @@ const authServer = createServer(async (req, res) => {
     res.writeHead(204);
     return res.end();
   }
+  if (url.pathname.startsWith("/storage/v1/object/")) {
+    if (!sessions.has(token)) return send(403, { message: "Unauthorized" });
+    if (
+      (req.method === "DELETE" &&
+        url.pathname === "/storage/v1/object/invoice-documents") ||
+      url.pathname === "/storage/v1/object/list/invoice-documents"
+    ) {
+      let raw = "";
+      for await (const chunk of req) raw += chunk;
+      const body = JSON.parse(raw);
+      if (req.method === "DELETE") {
+        for (const path of body.prefixes) {
+          if (!path.startsWith(`${user.id}/${companyId}/`))
+            return send(403, { message: "Denied" });
+          const note = financialRows.notas_fiscais.find(
+            (row) => row.caminho_arquivo === path,
+          );
+          if (
+            note &&
+            (!note.exclusao_solicitada_em || !note.exclusao_justificativa)
+          )
+            return send(403, { message: "Not deleting" });
+          invoiceFiles.delete(path);
+        }
+        return send(
+          200,
+          body.prefixes.map((name) => ({ name })),
+        );
+      }
+      if (!body.prefix.startsWith(`${user.id}/${companyId}`))
+        return send(403, { message: "Denied" });
+      return send(
+        200,
+        [...invoiceFiles.keys()]
+          .filter((path) => path.startsWith(body.prefix + "/"))
+          .map((path) => ({ name: path.split("/").at(-1) }))
+          .filter((item) => !body.search || item.name.includes(body.search)),
+      );
+    }
+    const path = decodeURIComponent(
+      url.pathname.replace(
+        /^\/storage\/v1\/object\/(authenticated\/)?invoice-documents\//,
+        "",
+      ),
+    );
+    if (!path.startsWith(`${user.id}/${companyId}/`))
+      return send(403, { message: "Denied" });
+    if (req.method === "POST") {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      invoiceFiles.set(path, {
+        data: Buffer.concat(chunks),
+        mime: req.headers["content-type"],
+      });
+      return send(200, { Key: `invoice-documents/${path}` });
+    }
+    const file = invoiceFiles.get(path);
+    if (req.method === "GET" && file) {
+      res.writeHead(200, { "Content-Type": file.mime });
+      return res.end(file.data);
+    }
+    return send(404, { message: "Not found" });
+  }
   if (url.pathname.startsWith("/rest/v1/")) {
     if (token !== "test-server-key" && !sessions.has(token))
       return send(403, { message: "Unauthorized" });
+    if (req.method === "POST" && url.pathname === "/rest/v1/notas_fiscais") {
+      let raw = "";
+      for await (const chunk of req) raw += chunk;
+      const body = JSON.parse(raw);
+      if (body.enviado_por !== user.id || body.empresa_id !== companyId)
+        return send(403, { message: "Denied" });
+      if (
+        financialRows.notas_fiscais.some(
+          (row) => row.hash_arquivo === body.hash_arquivo,
+        )
+      )
+        return send(409, { code: "23505" });
+      body.exclusao_solicitada_em = null;
+      body.exclusao_justificativa = null;
+      financialRows.notas_fiscais.push(body);
+      return send(201, body);
+    }
     if (req.method === "PATCH" && url.pathname === "/rest/v1/empresas") {
       let raw = "";
       for await (const chunk of req) raw += chunk;
@@ -210,9 +298,42 @@ const authServer = createServer(async (req, res) => {
           return String(value) >= condition.slice(4);
         if (condition.startsWith("lt."))
           return String(value) < condition.slice(3);
+        if (condition === "is.null") return value == null;
+        if (condition === "not.is.null") return value != null;
         return true;
       }),
     );
+    if (req.method === "DELETE" && url.pathname === "/rest/v1/notas_fiscais") {
+      if (
+        found.some(
+          (row) =>
+            row.enviado_por !== user.id ||
+            !row.exclusao_solicitada_em ||
+            !row.exclusao_justificativa ||
+            invoiceFiles.has(row.caminho_arquivo),
+        )
+      )
+        return send(403, { message: "Denied" });
+      financialRows.notas_fiscais = financialRows.notas_fiscais.filter(
+        (row) => !found.includes(row),
+      );
+    }
+    if (req.method === "PATCH" && url.pathname === "/rest/v1/notas_fiscais") {
+      let raw = "";
+      for await (const chunk of req) raw += chunk;
+      const body = JSON.parse(raw);
+      for (const row of found) {
+        if (row.enviado_por !== user.id)
+          return send(403, { message: "Denied" });
+        if (
+          body.exclusao_solicitada_em &&
+          (!body.exclusao_justificativa ||
+            body.exclusao_justificativa.trim().length < 10)
+        )
+          return send(400, { message: "Reason required" });
+        Object.assign(row, body);
+      }
+    }
     const offset = Number(url.searchParams.get("offset") ?? 0),
       limit = Number(url.searchParams.get("limit") ?? 500);
     found = found.slice(offset, offset + limit);
@@ -229,6 +350,30 @@ const authServer = createServer(async (req, res) => {
 await new Promise((resolve) => authServer.listen(39401, "127.0.0.1", resolve));
 const backend = await buildApp(
   createSessionResolver("http://127.0.0.1:39401", "test-publishable-key"),
+  {
+    invoiceReader: {
+      read: async (file) => {
+        if (file.toString().includes("unreadable"))
+          throw new Error("Simulated OCR failure");
+        return {
+          supplier: "Fornecedor E2E",
+          cnpj: file.toString().includes("revenue")
+            ? "12345678000195"
+            : "98765432000198",
+          recipientCnpj: file.toString().includes("revenue")
+            ? "98765432000198"
+            : file.toString().includes("ambiguous")
+              ? null
+              : "12345678000195",
+          operation: "sale",
+          date: `${month}-01`,
+          total: 89.9,
+          number: "123",
+          items: ["Insumo de teste"],
+        };
+      },
+    },
+  },
 );
 await backend.listen({ port: 3337, host: "127.0.0.1" });
 const app = spawn(

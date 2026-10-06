@@ -57,7 +57,7 @@ export class SupabaseDashboardRepository implements DashboardRepository {
         502,
         "Não foi possível carregar a empresa. Verifique se a migração do dashboard foi aplicada.",
       );
-    const [sales, expenses, categories, items, supplies, alerts] =
+    const [sales, expenses, categories, items, supplies, alerts, posted] =
       await Promise.all([
         all<Sale>(
           db
@@ -74,6 +74,7 @@ export class SupabaseDashboardRepository implements DashboardRepository {
             .select("id,data_emissao,valor_total,tipo,categoria_id")
             .eq("empresa_id", id)
             .eq("status", "confirmed")
+            .eq("natureza", "cost")
             .gte("data_emissao", start)
             .lt("data_emissao", end)
             .order("id"),
@@ -112,11 +113,19 @@ export class SupabaseDashboardRepository implements DashboardRepository {
               throw new AppError(502, "Não foi possível carregar os alertas.");
             return r.data as Alert[];
           }),
+        all<Expense & { natureza: "revenue" | "cost" }>(db
+          .from("notas_fiscais")
+          .select("id,natureza,data_emissao,valor_total,tipo,categoria_id")
+          .eq("empresa_id", id)
+          .not("lancado_financeiro_em", "is", null)
+          .is("exclusao_solicitada_em", null)
+          .gte("data_emissao", start).lt("data_emissao", end).order("id")),
       ]);
     return {
       company: company.data as Company,
-      sales,
-      expenses,
+      sales: [...sales, ...posted.filter(n => n.natureza === "revenue").map(n => ({ id: n.id, data: n.data_emissao, valor_total: n.valor_total }))],
+      // A note later confirmed by the inventory workflow must still count once.
+      expenses: [...new Map([...expenses, ...posted.filter(n => n.natureza === "cost")].map(n => [n.id, n])).values()],
       categories,
       items,
       supplies,

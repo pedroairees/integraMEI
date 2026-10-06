@@ -5,6 +5,7 @@ import { FinancialChart } from "./FinancialChart";
 import { Notifications } from "./DashboardActions";
 import { currency, percentage, type DashboardData } from "./types";
 import styles from "./Dashboard.module.css";
+import { financialUpdateEvent } from "@/src/lib/financial-updates";
 
 const colors = [
   "#1b3a70",
@@ -59,6 +60,7 @@ export function DashboardPanel() {
   const [revision, setRevision] = useState(0);
   const [result, setResult] = useState<{
     key: string;
+    query?: string;
     data?: DashboardData;
     error?: string;
   }>({ key: "" });
@@ -79,7 +81,26 @@ export function DashboardPanel() {
   }).toString();
   const key = `${query}:${revision}`;
   const loading = result.key !== key;
-  const data = loading ? undefined : result.data;
+  const data = result.query === query ? result.data : undefined;
+  useEffect(() => {
+    let last = 0;
+    const refresh = () => {
+      if (document.visibilityState === "hidden" || Date.now() - last < 2000) return;
+      last = Date.now(); setRevision(v => v + 1);
+    };
+    const channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(financialUpdateEvent) : null;
+    if (channel) channel.onmessage = refresh;
+    window.addEventListener(financialUpdateEvent, refresh);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    const timer = window.setInterval(refresh, 30000);
+    return () => {
+      channel?.close(); window.clearInterval(timer);
+      window.removeEventListener(financialUpdateEvent, refresh);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
     fetch(`/api/backend/dashboard?${query}`, {
@@ -92,13 +113,15 @@ export function DashboardPanel() {
           throw Error(body.message ?? "Não foi possível carregar o painel.");
         return body as DashboardData;
       })
-      .then((data) => setResult({ key, data }))
+      .then((data) => { if (!controller.signal.aborted) setResult({ key, query, data }); })
       .catch((error) => {
         if (!controller.signal.aborted)
-          setResult({
+          setResult(previous => ({
             key,
+            query,
+            data: previous.query === query ? previous.data : undefined,
             error: error instanceof Error ? error.message : "Erro de conexão.",
-          });
+          }));
       });
     return () => controller.abort();
   }, [key, query]);
@@ -521,7 +544,7 @@ export function DashboardPanel() {
             </section>
           )}
           <p className={styles.dataNotice}>
-            Dados reais de {data.companyName}. Atualizado às{" "}
+            Dados reais de {data.companyName}, por data de emissão. Atualização automática a cada 30 segundos enquanto esta tela estiver visível. Atualizado às{" "}
             {new Date(data.updatedAt).toLocaleTimeString("pt-BR")}.
           </p>
         </>

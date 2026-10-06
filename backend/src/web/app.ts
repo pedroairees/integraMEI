@@ -3,6 +3,8 @@ import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
+import { registerInvoices } from "./invoices.ts";
+import type { InvoiceReader } from "../core/invoices/types.ts";
 import { AppError } from "../core/errors.ts";
 import {
   DashboardService,
@@ -27,7 +29,11 @@ declare module "fastify" {
 }
 export async function buildApp(
   resolveSession: ResolveSession,
-  options: { logger?: boolean; docs?: boolean } = {},
+  options: {
+    logger?: boolean;
+    docs?: boolean;
+    invoiceReader?: InvoiceReader;
+  } = {},
 ) {
   const app = Fastify({
     logger: options.logger
@@ -80,26 +86,30 @@ export async function buildApp(
         ? error.status
         : (error as { validation?: unknown }).validation
           ? 400
-          : (error as { statusCode?: number }).statusCode === 429
-            ? 429
+          : [413, 415, 429].includes(
+                (error as { statusCode?: number }).statusCode ?? 0,
+              )
+            ? (error as { statusCode: number }).statusCode
             : 500;
     if (status >= 500)
       request.log.error(
         { code: (error as { code?: string }).code, status },
         "Falha ao processar requisição",
       );
-    void reply
-      .code(status)
-      .send({
-        message:
-          error instanceof AppError
-            ? error.message
-            : status === 400
-              ? "Dados inválidos. Confira os filtros e valores informados."
-              : status === 429
-                ? "Muitas tentativas. Aguarde um minuto."
-                : "Não foi possível processar a solicitação agora.",
-      });
+    void reply.code(status).send({
+      message:
+        error instanceof AppError
+          ? error.message
+          : status === 400
+            ? "Dados inválidos. Confira os filtros e valores informados."
+            : status === 429
+              ? "Muitas tentativas. Aguarde um minuto."
+              : status === 413
+                ? "Arquivo muito grande. O limite é 5 MB por arquivo."
+                : status === 415
+                  ? "Formato de solicitação não suportado."
+                  : "Não foi possível processar a solicitação agora.",
+    });
   });
   app.get(
     "/health",
@@ -203,5 +213,6 @@ export async function buildApp(
       );
     },
   );
+  registerInvoices(app, options.invoiceReader);
   return app;
 }

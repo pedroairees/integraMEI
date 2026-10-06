@@ -1,0 +1,168 @@
+.hint {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #525c6e;
+}
+.error {
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  color: #525c6e;
+}
+.toolbar button,
+.actions button,
+.actions a,
+.more {
+  border: 1px solid #1c3a70;
+  background: white;
+  color: #1c3a70;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.toolbar button:focus-visible,
+.actions button:focus-visible,
+.actions a:focus-visible,
+.more:focus-visible {
+  outline: 3px solid #67aade;
+  outline-offset: 3px;
+}
+.actions button:hover,
+.actions a:hover {
+  background: #edf3fb;
+}
+.actions button:disabled,
+.toolbar button:disabled,
+.more:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.invoice {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 16px;
+  padding: 20px;
+  color: #1c3a70;
+}
+.filename {
+  margin: 0 0 14px;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+}
+.invoice dl {
+  margin: 0;
+  color: #333;
+}
+.invoice dt {
+  font-size: 13px;
+  margin-top: 8px;
+}
+.invoice dd {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+.badge {
+  font-size: 12px;
+  background: #edf3fb;
+  padding: 6px 9px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.actions .deleteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #b42318;
+  border-color: #b42318;
+}
+.actions .deleteButton:hover {
+  background: #fff0ee;
+}
+.more {
+  display: block;
+  margin: 16px auto;
+}
+.dialog {
+  border: 0;
+  border-radius: 12px;
+  padding: 28px;
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  color: #1c3a70;
+  background: white;
+  overflow-y: auto;
+}
+.dialog::backdrop {
+  background: rgb(0 15 35 / 55%);
+}
+.dialog h2 {
+  margin-top: 0;
+  font-size: 24px;
+}
+.dialog p {
+  line-height: 1.5;
+}
+.dialog fieldset {
+  border: 0;
+  padding: 0;
+  margin: 20px 0;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.dialog label {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+.dialog input,
+.dialog textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #adbbcf;
+  border-radius: 6px;
+  padding: 10px;
+  font: inherit;
+  background: white;
+  color: #243247;
+}
+.dialog input:focus-visible,
+.dialog textarea:focus-visible {
+  outline: 2px solid #155bcb;
+  outline-offset: 2px;
+}
+.dialog input:user-invalid,
+.dialog textarea:user-invalid {
+  border-color: #b42318;
+}
+.dialog .actions {
+  justify-content: flex-end;
+}
+.dialog button[type="submit"] {
+  color: white;
+  background: #1c3a70;
+}
+.dialog button[type="submit"].deleteButton {
+  background: #b42318;
+}
+.dialog button[type="submit"].deleteButton:hover:not(:disabled) {
+  background: #912018;
+}

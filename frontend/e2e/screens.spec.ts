@@ -53,7 +53,9 @@ for (const [route, title] of screens) {
     await expect(
       page.getByRole("link", { name: title, exact: true }),
     ).toHaveAttribute("aria-current", "page");
-    await expect(page.getByText(/Prévia das telas/)).toBeVisible();
+    if (route !== "notas-fiscais")
+      await expect(page.getByText(/Prévia das telas/)).toBeVisible();
+    else await expect(page.getByText(/Prévia das telas/)).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
     for (const width of [1440, 1024, 768, 390]) {
       await page.setViewportSize({ width, height: 1024 });
@@ -98,27 +100,6 @@ test("preview controls work locally without business requests or persistence", a
   page.on("request", (request) => {
     if (!["GET", "HEAD"].includes(request.method())) writes.push(request.url());
   });
-  await page.goto("/notas-fiscais");
-  await page.getByRole("button", { name: "Custos", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: /Últimas notas enviadas/ }),
-  ).toContainText("SAÍDAS");
-  await page
-    .getByLabel("Selecionar notas fiscais")
-    .setInputFiles({
-      name: "nota-exemplo.pdf",
-      mimeType: "application/pdf",
-      buffer: Buffer.from("%PDF-1.4\n%%EOF"),
-    });
-  await expect(page.getByRole("status")).toContainText("nada foi enviado");
-  await expect(
-    page.getByText("nota-exemplo.pdf", { exact: true }),
-  ).toBeVisible();
-  await page.getByLabel("Período das notas").selectOption("previous");
-  await expect(
-    page.getByText("Não há notas de exemplo para este período."),
-  ).toBeVisible();
-
   await page.goto("/insumos");
   await page.getByLabel("Produto", { exact: true }).fill("Farinha de Trigo");
   await page.getByRole("button", { name: "Pesquisar insumo" }).click();

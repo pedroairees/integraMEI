@@ -5,10 +5,13 @@ import type {
   Tenant,
 } from "../../core/dashboard/types.ts";
 import { SupabaseDashboardRepository } from "./repository.ts";
+import { SupabaseInvoiceRepository } from "./invoices.ts";
+import type { InvoiceRepository } from "../../core/invoices/types.ts";
 
 export interface SessionContext {
   tenant: Tenant;
   repository: DashboardRepository;
+  invoices?: InvoiceRepository;
 }
 export type ResolveSession = (token: string) => Promise<SessionContext>;
 export function createSessionResolver(
@@ -57,6 +60,11 @@ export function createSessionResolver(
         role: membership.data.papel,
       },
       repository: new SupabaseDashboardRepository(client),
+      invoices: new SupabaseInvoiceRepository(
+        client,
+        data.user.id,
+        membership.data.empresa_id,
+      ),
     };
   };
 }

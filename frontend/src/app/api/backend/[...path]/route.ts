@@ -1,6 +1,27 @@
 import { getSessionSupabaseClient } from "@/src/lib/supabase/session";
 
 // Transport adapter only. Financial rules and database queries live in backend/.
+async function limitedBody(request: Request, limit: number) {
+  const reader = request.body?.getReader();
+  if (!reader) return "";
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > limit) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+    return Buffer.concat(chunks).toString("utf8");
+  } finally {
+    reader.releaseLock();
+  }
+}
 async function forward(
   request: Request,
   context: { params: Promise<{ path: string[] }> },
@@ -12,8 +33,17 @@ async function forward(
     const allowed =
       (request.method === "GET" &&
         (route === "dashboard" ||
+          route === "invoices" ||
+          /^invoices\/[0-9a-f-]{36}\/file$/i.test(route) ||
           /^supplies\/[0-9a-f-]{36}\/history$/i.test(route))) ||
-      (request.method === "PATCH" && route === "dashboard/goal");
+      (request.method === "DELETE" &&
+        /^invoices\/[0-9a-f-]{36}$/i.test(route)) ||
+      (request.method === "PATCH" &&
+        (route === "dashboard/goal" ||
+          /^invoices\/[0-9a-f-]{36}$/i.test(route))) ||
+      (request.method === "POST" &&
+        (route === "invoices" ||
+          /^invoices\/[0-9a-f-]{36}\/(read|post)$/i.test(route)));
     if (!allowed)
       return Response.json(
         { message: "Rota não encontrada." },
@@ -49,8 +79,15 @@ async function forward(
       process.env.BACKEND_URL ??
       (process.env.NODE_ENV !== "production" ? "http://127.0.0.1:3333" : "");
     if (!base) throw new Error("Backend not configured");
-    const body = request.method === "PATCH" ? await request.text() : undefined;
-    if (body && body.length > 8192)
+    const limit =
+      route === "invoices"
+        ? 7 * 1024 * 1024
+        : route.startsWith("invoices/")
+          ? 128 * 1024
+          : 8192;
+    const body =
+      request.method !== "GET" ? await limitedBody(request, limit) : undefined;
+    if (body === null)
       return Response.json(
         { message: "Solicitação muito grande." },
         { status: 413, headers },
@@ -61,14 +98,29 @@ async function forward(
         method: request.method,
         headers: {
           Authorization: `Bearer ${session.access_token}`,
-          "Content-Type": "application/json",
+          ...(body ? { "Content-Type": "application/json" } : {}),
         },
-        body,
+        body: body || undefined,
         cache: "no-store",
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(
+          route.startsWith("invoices") ? 60000 : 20000,
+        ),
         redirect: "error",
       },
     );
+    if (route.endsWith("/file") && response.ok) {
+      return new Response(response.body, {
+        status: response.status,
+        headers: {
+          ...headers,
+          "Content-Type":
+            response.headers.get("Content-Type") || "application/octet-stream",
+          "Content-Disposition":
+            response.headers.get("Content-Disposition") || "attachment",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
     return new Response(
       response.status === 204 ? null : await response.text(),
       {
@@ -88,3 +140,5 @@ async function forward(
 }
 export const GET = forward;
 export const PATCH = forward;
+export const POST = forward;
+export const DELETE = forward;
