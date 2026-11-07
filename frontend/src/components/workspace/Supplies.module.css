@@ -1,0 +1,236 @@
+.root {
+  color: #1c3a70;
+  min-width: 0;
+}
+.root h2 {
+  font-size: 22px;
+  margin: 8px 0 16px;
+  overflow-wrap: anywhere;
+}
+.root p {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.root button {
+  border: 1px solid #1c3a70;
+  background: white;
+  color: #1c3a70;
+  border-radius: 7px;
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+.root button:hover {
+  background: #edf5fc;
+}
+.root button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.root button[aria-pressed="true"],
+.editor button[type="submit"] {
+  background: #1c3a70;
+  color: white;
+}
+.root label {
+  display: grid;
+  gap: 7px;
+  font-size: 14px;
+  min-width: 0;
+}
+.root input:not([type="checkbox"]),
+.root select {
+  min-width: 0;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #b9c9df;
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: #1c3a70;
+  background: white;
+  font: inherit;
+}
+.toolbar,
+.actions,
+.filters {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 20px 0;
+}
+.toolbar h2 {
+  margin: 0;
+  margin-right: auto;
+}
+.search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  flex: 1;
+}
+.search label {
+  flex: 1;
+}
+.catalog {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-block: 10px;
+}
+.catalog button {
+  text-align: left;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.catalog small {
+  font-size: 12px;
+}
+.editor {
+  border: 1px solid #b9c9df;
+  border-radius: 12px;
+  padding: 20px;
+  background: #f8fbff;
+  margin: 20px 0;
+}
+.editor fieldset {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  min-width: 0;
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+.editor p {
+  font-size: 13px;
+}
+.root .check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+  line-height: 1.6;
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: #1c3a70;
+  flex: none;
+}
+.notice {
+  padding: 14px 16px;
+  border-left: 3px solid #67aade;
+  background: #edf5fc;
+}
+.error {
+  color: #a11313;
+  padding: 12px;
+  border-left: 3px solid #a11313;
+  background: #fff4f4;
+}
+.filters label {
+  flex: 1;
+  min-width: min(100%, 160px);
+}
+.chart {
+  margin: 24px 0;
+}
+.chartScroll {
+  overflow: auto;
+}
+.chart svg {
+  display: block;
+  width: 100%;
+  min-width: 580px;
+  fill: #1c3a70;
+}
+.chart circle:focus-visible {
+  outline: 3px solid #111;
+}
+.chart figcaption {
+  font-size: 14px;
+  min-height: 45px;
+  margin-top: 10px;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  list-style: none;
+  gap: 12px;
+  font-size: 13px;
+}
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-wrap: anywhere;
+}
+.legend span {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: none;
+}
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.summary article {
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 3px 5px #0002;
+  overflow-wrap: anywhere;
+}
+.summary h3 {
+  font-size: 16px;
+  margin: 0 0 15px;
+}
+.summary strong {
+  font-size: 25px;
+}
+.summary p {
+  font-size: 13px;
+}
+.root details {
+  margin: 20px 0;
+}
+.root summary {
+  cursor: pointer;
+}
+.tableScroll {
+  overflow: auto;
+}
+.root table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.root td,
+.root th {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #d5dfeb;
+}
+@media (max-width: 700px) {
+  .search {
+    flex-basis: 100%;
+    width: 100%;
+  }
+  .summary {
+    grid-template-columns: 1fr;
+  }
+  .toolbar > button {
+    flex: 1;
+  }
+  .editor {
+    padding: 14px;
+  }
+}

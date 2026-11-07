@@ -43,6 +43,22 @@ test("empty dashboard is honest, has no percentages or fabricated projection", (
   assert.equal(d.goal.projection, null);
   assert.equal(d.evolution.length, 6);
 });
+
+test("reviewed drafts are reported separately and do not inflate financial metrics or charts", () => {
+  const source = empty();
+  source.pendingInvoices = [
+    { natureza: "revenue", data_emissao: "2026-09-01", valor_total: 450 },
+    { natureza: "revenue", data_emissao: "2026-09-02", valor_total: 390 },
+    { natureza: "cost", data_emissao: "2026-09-02", valor_total: 160.6 },
+    { natureza: "revenue", data_emissao: "2026-08-01", valor_total: 480 },
+  ];
+  const data = calculateDashboard(source, filter, now);
+  assert.deepEqual(data.pending, { count: 3, revenue: 840, costs: 160.6 });
+  assert.equal(data.metrics.revenue, 0);
+  assert.equal(data.metrics.costs, 0);
+  assert.ok(data.evolution.every((p) => p.value === 0));
+  assert.equal(data.distribution.length, 0);
+});
 test("RN-005: personal withdrawals never lower operational profit; scope only changes expense charts", () => {
   const s = empty();
   s.sales = [{ id: "s", data: "2026-09-01", valor_total: 100 }];

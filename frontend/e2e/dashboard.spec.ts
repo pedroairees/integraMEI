@@ -10,7 +10,7 @@ async function login(page: Page, remember = false) {
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
-    page.getByRole("heading", { name: "Olá, Usuário!" }),
+    page.getByRole("heading", { name: "Olá, Perfil!" }),
   ).toBeVisible();
 }
 
@@ -85,7 +85,7 @@ test("login opens dashboard; reload and logout enforce the session", async ({
   expect(authCookie?.expires).toBe(-1);
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: "Olá, Usuário!" }),
+    page.getByRole("heading", { name: "Olá, Perfil!" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Lucro Líquido" }),
@@ -120,7 +120,7 @@ test("remembered sessions persist and expired tokens refresh", async ({
   await page.reload();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
-    page.getByRole("heading", { name: "Olá, Usuário!" }),
+    page.getByRole("heading", { name: "Olá, Perfil!" }),
   ).toBeVisible();
   const after = (await context.cookies()).find((cookie) =>
     cookie.name.endsWith("-auth-token"),

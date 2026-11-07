@@ -4,6 +4,12 @@ import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { registerInvoices } from "./invoices.ts";
+import { registerSupplies } from "./supplies.ts";
+import { registerPricing } from "./pricing.ts";
+import { registerReports } from "./reports.ts";
+import { registerSettings } from "./settings.ts";
+import { smtpMailer } from "../infra/reports/mail.ts";
+import type { ReportMailer } from "../core/reports/types.ts";
 import type { InvoiceReader } from "../core/invoices/types.ts";
 import { AppError } from "../core/errors.ts";
 import {
@@ -33,6 +39,7 @@ export async function buildApp(
     logger?: boolean;
     docs?: boolean;
     invoiceReader?: InvoiceReader;
+    reportMailer?: ReportMailer;
   } = {},
 ) {
   const app = Fastify({
@@ -214,5 +221,9 @@ export async function buildApp(
     },
   );
   registerInvoices(app, options.invoiceReader);
+  registerSupplies(app);
+  registerPricing(app);
+  registerReports(app,options.reportMailer??smtpMailer());
+  registerSettings(app);
   return app;
 }

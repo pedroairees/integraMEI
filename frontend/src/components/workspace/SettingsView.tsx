@@ -1,45 +1,147 @@
 "use client";
-
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import {
+  settingsRequest,
+  phoneMask,
+  type AccountSettings,
+} from "./settings-api";
+import { SettingsSecurity } from "./SettingsSecurity";
 import styles from "./Screens.module.css";
-
-const notificationLabels = [
-  "Receber alertas por e-mail",
-  "Lembretes notas fiscais",
-  "Alertas de estoque baixo",
-];
+import css from "./Settings.module.css";
+const preferences = [
+  ["emailAlerts", "Receber alertas por e-mail"],
+  ["invoiceReminders", "Lembretes notas fiscais"],
+  ["lowStockAlerts", "Alertas de estoque baixo"],
+] as const;
 
 export function SettingsView() {
-  const [preferences, setPreferences] = useState([true, true, true]);
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  const router = useRouter();
+  const [account, setAccount] = useState<AccountSettings | null>(null);
+  const [reload, setReload] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    settingsRequest<AccountSettings>("", undefined, "GET", controller.signal)
+      .then((data) => {
+        if (!controller.signal.aborted) {
+          setAccount(data);
+          setMessage("");
+          setError(false);
+        }
+      })
+      .catch((err: Error) => {
+        if (!controller.signal.aborted) {
+          setMessage(err.message);
+          setError(true);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [reload]);
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!account || busy) return;
+    setBusy(true);
+    setMessage("");
+    setError(false);
+    try {
+      const {
+        fullName,
+        phone,
+        emailAlerts,
+        invoiceReminders,
+        lowStockAlerts,
+        timeZone,
+      } = account;
+      const saved = await settingsRequest<AccountSettings>(
+        "",
+        {
+          fullName: fullName.trim(),
+          phone: phone.replace(/\D/g, ""),
+          emailAlerts,
+          invoiceReminders,
+          lowStockAlerts,
+          timeZone,
+        },
+        "PATCH",
+      );
+      setAccount(saved);
+      setMessage("Configurações salvas na sua conta.");
+      router.refresh();
+    } catch (err) {
+      setError(true);
+      setMessage(
+        err instanceof Error ? err.message : "Não foi possível salvar.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+  if (loading)
+    return <p role="status">Carregando configurações da sua conta…</p>;
+  if (!account)
+    return (
+      <div>
+        <p role="alert" className={css.error}>
+          {message}
+        </p>
+        <button
+          type="button"
+          className={css.secondary}
+          onClick={() => {
+            setLoading(true);
+            setReload((n) => n + 1);
+          }}
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  const change = <K extends keyof AccountSettings>(
+    key: K,
+    value: AccountSettings[K],
+  ) => setAccount({ ...account, [key]: value });
+  const cnpj = account.cnpj
+    .replace(/\D/g, "")
+    .replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
   return (
-    <section aria-label="Configurações demonstrativas">
+    <section aria-label="Configurações da conta">
       <p className={styles.cnpj}>
-        <strong>Cnpj:</strong> xxx.xxx.xxxx-xx
+        <strong>CNPJ:</strong> {cnpj}
       </p>
       <div className={styles.settingsGrid}>
-        <section
+        <form
+          id="settings-profile"
           className={`${styles.card} ${styles.settingsCard}`}
-          aria-label="Dados pessoais de exemplo"
+          onSubmit={(e) => void save(e)}
         >
+          <h2 className={css.title}>Dados pessoais</h2>
           <label className={styles.field}>
             Nome completo
             <input
               className={styles.input}
-              placeholder="Moziel Sirley Alves de Souza"
-              autoComplete="off"
+              required
+              minLength={2}
               maxLength={160}
+              autoComplete="name"
+              disabled={busy}
+              value={account.fullName}
+              onChange={(e) => change("fullName", e.target.value)}
             />
           </label>
           <label className={styles.field}>
-            E-mail
+            E-mail atual
             <input
               className={styles.input}
               type="email"
-              placeholder="mozielsouza28@gmail.com"
-              autoComplete="off"
+              readOnly
+              value={account.email}
             />
           </label>
           <label className={styles.field}>
@@ -47,113 +149,102 @@ export function SettingsView() {
             <input
               className={styles.input}
               type="tel"
-              placeholder="(61) 90000-0000"
-              autoComplete="off"
-              maxLength={20}
+              required
+              autoComplete="tel-national"
+              inputMode="tel"
+              maxLength={15}
+              disabled={busy}
+              value={phoneMask(account.phone)}
+              onChange={(e) =>
+                change("phone", e.target.value.replace(/\D/g, "").slice(0, 11))
+              }
             />
           </label>
-        </section>
+          <button type="submit" className={styles.primary} disabled={busy}>
+            {busy ? "Salvando…" : "Salvar configurações"}
+          </button>
+          {message && (
+            <p
+              role={error ? "alert" : "status"}
+              className={`${css.feedback} ${error ? css.error : ""}`}
+            >
+              {message}
+            </p>
+          )}
+        </form>
         <section
           className={`${styles.card} ${styles.settingsCard} ${styles.preferences}`}
           aria-label="Preferências de notificações"
         >
-          {notificationLabels.map((label, index) => (
-            <div className={styles.toggleRow} key={label}>
-              <span id={`preference-${index}`}>{label}</span>
+          {preferences.map(([key, label]) => (
+            <div className={styles.toggleRow} key={key}>
+              <span id={`preference-${key}`}>{label}</span>
               <button
                 type="button"
                 className={styles.switch}
                 role="switch"
-                aria-checked={preferences[index]}
-                aria-labelledby={`preference-${index}`}
-                onClick={() =>
-                  setPreferences((previous) =>
-                    previous.map((value, item) =>
-                      item === index ? !value : value,
-                    ),
-                  )
-                }
+                disabled={busy}
+                aria-checked={account[key]}
+                aria-labelledby={`preference-${key}`}
+                onClick={() => change(key, !account[key])}
               />
             </div>
           ))}
-        </section>
-        <form
-          className={`${styles.card} ${styles.settingsCard} ${styles.passwordCard}`}
-          onSubmit={(event) => {
-            event.preventDefault();
-            setMessage(
-              "Prévia de interface: nenhum e-mail foi enviado e sua senha não foi alterada. A recuperação será conectada na etapa de lógica.",
-            );
-          }}
-        >
-          <label className={styles.field} htmlFor="preview-password">
-            Senha atual
-          </label>
-          <div className={styles.passwordBox}>
-            <input
-              id="preview-password"
-              className={styles.input}
-              type={passwordVisible ? "text" : "password"}
-              placeholder="••••••••••••"
-              autoComplete="off"
-            />
-            <button
-              type="button"
-              aria-label={passwordVisible ? "Ocultar senha" : "Mostrar senha"}
-              aria-pressed={passwordVisible}
-              onClick={() => setPasswordVisible((value) => !value)}
-            >
-              {passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-          <p>
-            Alteração de senha:
-            <br />
-            Enviaremos um e-mail para alteração de senha
+          <p className={css.note}>
+            As preferências são gravadas ao salvar as configurações. O envio
+            automático de alertas e lembretes ainda não está disponível.
           </p>
-          <button type="submit" className={styles.primary}>
-            Enviar
-          </button>
-        </form>
+        </section>
+        <SettingsSecurity
+          email={account.email}
+          pendingEmail={account.pendingEmail}
+        />
         <section
           className={`${styles.card} ${styles.settingsCard}`}
           aria-label="Preferências regionais"
         >
           <label className={styles.field}>
             Idioma
-            <select className={styles.select} defaultValue="pt">
-              <option value="pt">Português</option>
-              <option value="en">English</option>
-              <option value="es">Español</option>
+            <select className={styles.select} value="pt-BR" disabled>
+              <option value="pt-BR">Português</option>
             </select>
           </label>
           <label className={styles.field}>
             Moeda Padrão
-            <select className={styles.select} defaultValue="BRL">
+            <select className={styles.select} value="BRL" disabled>
               <option value="BRL">R$ - Real (BRL)</option>
-              <option value="USD">US$ - Dólar (USD)</option>
-              <option value="EUR">€ - Euro (EUR)</option>
             </select>
           </label>
+          <p className={css.note}>
+            O sistema trabalha em português e valores em reais.
+          </p>
           <label className={styles.field}>
-            Fuso horário
-            <select className={styles.select} defaultValue="brasilia">
-              <option value="brasilia">(GMT-03:00) Brasília</option>
-              <option value="manaus">(GMT-04:00) Manaus</option>
-              <option value="acre">(GMT-05:00) Rio Branco</option>
+            Fuso horário dos relatórios
+            <select
+              className={styles.select}
+              disabled={busy}
+              value={account.timeZone}
+              onChange={(e) => change("timeZone", e.target.value)}
+            >
+              <option value="America/Sao_Paulo">(GMT-03:00) Brasília</option>
+              <option value="America/Manaus">(GMT-04:00) Manaus</option>
+              <option value="America/Rio_Branco">(GMT-05:00) Rio Branco</option>
             </select>
           </label>
+          <button
+            type="submit"
+            form="settings-profile"
+            className={css.secondary}
+            disabled={busy}
+          >
+            Salvar preferências
+          </button>
         </section>
         <section className={`${styles.card} ${styles.about}`}>
           <h2>Sobre o IntegraMEI</h2>
           <p>Versão 1.0.0 - Plataforma de gestão para MEIs.</p>
         </section>
       </div>
-      {message && (
-        <p className={styles.message} role="status">
-          {message}
-        </p>
-      )}
     </section>
   );
 }

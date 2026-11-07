@@ -1,0 +1,102 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.toolbar label {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-width: 180px;
+}
+.fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.help {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 18px 0;
+}
+.composition {
+  border: 1px solid #c3cde0;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 24px 0;
+}
+.composition h2 {
+  font-size: 20px;
+  margin: 0;
+}
+.composition p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ingredient {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin: 18px 0;
+}
+.ingredient label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.ingredient small {
+  grid-column: 1/-1;
+}
+.outline {
+  border: 1px solid #1e3c73;
+  border-radius: 6px;
+  padding: 12px;
+  background: white;
+  color: #1e3c73;
+  font: inherit;
+  cursor: pointer;
+}
+.error,
+.notice {
+  padding: 16px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.error {
+  color: #a80014;
+  background: #fff2f4;
+  border-left: 3px solid #a80014;
+}
+.notice {
+  background: #edf5ff;
+  border-left: 3px solid #64a6df;
+}
+.actions {
+  margin: 24px 0;
+}
+.fields:disabled {
+  opacity: 0.65;
+}
+.actions button:disabled,
+.outline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.toolbar select {
+  max-width: 100%;
+}
+@media (max-width: 700px) {
+  .ingredient {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .toolbar {
+    align-items: stretch;
+  }
+  .composition {
+    padding: 14px;
+  }
+}

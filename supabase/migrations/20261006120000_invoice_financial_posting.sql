@@ -53,7 +53,10 @@ begin
      or jsonb_typeof(n.dados_extracao->'items') is distinct from 'array' then
     raise exception 'Dados mínimos ausentes.';
   end if;
-  if jsonb_array_length(n.dados_extracao->'items') = 0 then raise exception 'Itens ausentes.'; end if;
+  if jsonb_array_length(n.dados_extracao->'items') = 0 or exists (
+    select 1 from jsonb_array_elements(n.dados_extracao->'items') item
+    where jsonb_typeof(item) <> 'string' or nullif(btrim(item #>> '{}'), '') is null
+  ) then raise exception 'Itens ausentes ou inválidos.'; end if;
   if n.data_emissao > (now() at time zone 'America/Sao_Paulo')::date then raise exception 'Data futura não permitida.'; end if;
   if n.data_emissao::text is distinct from n.dados_extracao->>'date'
      or n.valor_total is distinct from (n.dados_extracao->>'total')::numeric

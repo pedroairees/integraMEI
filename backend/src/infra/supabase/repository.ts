@@ -5,6 +5,7 @@ import type {
   Category,
   Company,
   DashboardRepository,
+  DashboardSource,
   Expense,
   Item,
   Sale,
@@ -23,11 +24,15 @@ async function all<T>(query: PageQuery): Promise<T[]> {
   // No silent 1,000-row truncation in financial totals.
   for (let offset = 0; ; offset += 500) {
     const result = await query.range(offset, offset + 499);
-    if (result.error || !result.data)
+    if (result.error || !result.data) {
+      const code = (result.error as { code?: string } | null)?.code;
       throw new AppError(
         502,
-        "Não foi possível consultar os dados financeiros.",
+        ["42703", "PGRST204"].includes(code ?? "")
+          ? "O banco precisa das migrações financeiras, incluindo 20261006120000_invoice_financial_posting.sql."
+          : "Não foi possível consultar os dados financeiros.",
       );
+    }
     rows.push(...(result.data as T[]));
     if (result.data.length < 500) return rows;
     if (rows.length >= 100000)
@@ -57,79 +62,120 @@ export class SupabaseDashboardRepository implements DashboardRepository {
         502,
         "Não foi possível carregar a empresa. Verifique se a migração do dashboard foi aplicada.",
       );
-    const [sales, expenses, categories, items, supplies, alerts, posted] =
-      await Promise.all([
-        all<Sale>(
-          db
-            .from("vendas")
-            .select("id,data,valor_total")
-            .eq("empresa_id", id)
-            .gte("data", start)
-            .lt("data", end)
-            .order("id"),
-        ),
-        all<Expense>(
-          db
-            .from("notas_fiscais")
-            .select("id,data_emissao,valor_total,tipo,categoria_id")
-            .eq("empresa_id", id)
-            .eq("status", "confirmed")
-            .eq("natureza", "cost")
-            .gte("data_emissao", start)
-            .lt("data_emissao", end)
-            .order("id"),
-        ),
-        all<Category>(
-          db
-            .from("categorias")
-            .select("id,nome")
-            .eq("empresa_id", id)
-            .order("id"),
-        ),
-        all<Item>(
-          db
-            .from("itens_nota_fiscal")
-            .select(
-              "nota_fiscal_id,insumo_id,valor_total_item,notas_fiscais!inner(empresa_id,data_emissao,status)",
-            )
-            .eq("notas_fiscais.empresa_id", id)
-            .eq("notas_fiscais.status", "confirmed")
-            .gte("notas_fiscais.data_emissao", start)
-            .lt("notas_fiscais.data_emissao", end)
-            .order("id"),
-        ),
-        all<Supply>(
-          db.from("insumos").select("id,nome").eq("empresa_id", id).order("id"),
-        ),
+    const [
+      sales,
+      expenses,
+      categories,
+      items,
+      supplies,
+      alerts,
+      posted,
+      pendingInvoices,
+    ] = await Promise.all([
+      all<Sale>(
         db
-          .from("alertas")
-          .select("id,mensagem,lido_em,criado_em")
+          .from("vendas")
+          .select("id,data,valor_total")
           .eq("empresa_id", id)
-          .is("dispensado_em", null)
-          .order("criado_em", { ascending: false })
-          .limit(20)
-          .then((r) => {
-            if (r.error)
-              throw new AppError(502, "Não foi possível carregar os alertas.");
-            return r.data as Alert[];
-          }),
-        all<Expense & { natureza: "revenue" | "cost" }>(db
+          .gte("data", start)
+          .lt("data", end)
+          .order("id"),
+      ),
+      all<Expense>(
+        db
+          .from("notas_fiscais")
+          .select("id,data_emissao,valor_total,tipo,categoria_id")
+          .eq("empresa_id", id)
+          .eq("status", "confirmed")
+          .eq("natureza", "cost")
+          .gte("data_emissao", start)
+          .lt("data_emissao", end)
+          .order("id"),
+      ),
+      all<Category>(
+        db
+          .from("categorias")
+          .select("id,nome")
+          .eq("empresa_id", id)
+          .order("id"),
+      ),
+      all<Item>(
+        db
+          .from("itens_nota_fiscal")
+          .select(
+            "nota_fiscal_id,insumo_id,valor_total_item,notas_fiscais!inner(empresa_id,data_emissao,status)",
+          )
+          .eq("notas_fiscais.empresa_id", id)
+          .eq("notas_fiscais.status", "confirmed")
+          .gte("notas_fiscais.data_emissao", start)
+          .lt("notas_fiscais.data_emissao", end)
+          .order("id"),
+      ),
+      all<Supply>(
+        db.from("insumos").select("id,nome").eq("empresa_id", id).order("id"),
+      ),
+      db
+        .from("alertas")
+        .select("id,mensagem,lido_em,criado_em")
+        .eq("empresa_id", id)
+        .is("dispensado_em", null)
+        .order("criado_em", { ascending: false })
+        .limit(20)
+        .then((r) => {
+          if (r.error)
+            throw new AppError(502, "Não foi possível carregar os alertas.");
+          return r.data as Alert[];
+        }),
+      all<Expense & { natureza: "revenue" | "cost" }>(
+        db
           .from("notas_fiscais")
           .select("id,natureza,data_emissao,valor_total,tipo,categoria_id")
           .eq("empresa_id", id)
           .not("lancado_financeiro_em", "is", null)
           .is("exclusao_solicitada_em", null)
-          .gte("data_emissao", start).lt("data_emissao", end).order("id")),
-      ]);
+          .gte("data_emissao", start)
+          .lt("data_emissao", end)
+          .order("id"),
+      ),
+      all<NonNullable<DashboardSource["pendingInvoices"]>[number]>(
+        db
+          .from("notas_fiscais")
+          .select("natureza,data_emissao,valor_total")
+          .eq("empresa_id", id)
+          .eq("status", "pending_review")
+          .not("revisado_em", "is", null)
+          .is("lancado_financeiro_em", null)
+          .is("exclusao_solicitada_em", null)
+          .gte("data_emissao", start)
+          .lt("data_emissao", end)
+          .order("id"),
+      ),
+    ]);
     return {
       company: company.data as Company,
-      sales: [...sales, ...posted.filter(n => n.natureza === "revenue").map(n => ({ id: n.id, data: n.data_emissao, valor_total: n.valor_total }))],
+      sales: [
+        ...sales,
+        ...posted
+          .filter((n) => n.natureza === "revenue")
+          .map((n) => ({
+            id: n.id,
+            data: n.data_emissao,
+            valor_total: n.valor_total,
+          })),
+      ],
       // A note later confirmed by the inventory workflow must still count once.
-      expenses: [...new Map([...expenses, ...posted.filter(n => n.natureza === "cost")].map(n => [n.id, n])).values()],
+      expenses: [
+        ...new Map(
+          [...expenses, ...posted.filter((n) => n.natureza === "cost")].map(
+            (n) => [n.id, n],
+          ),
+        ).values(),
+      ],
       categories,
       items,
       supplies,
       alerts,
+      pendingInvoices,
     };
   }
   async saveGoal(
@@ -177,10 +223,10 @@ export class SupabaseDashboardRepository implements DashboardRepository {
         .order("data_compra")
         .order("id"),
     );
-    const suppliers = await all<{ id: string; razao_social: string }>(
+    const suppliers = await all<{ id: string; nome: string }>(
       this.client
         .from("fornecedores")
-        .select("id,razao_social")
+        .select("id,nome")
         .eq("empresa_id", tenant.companyId)
         .order("id"),
     );
@@ -189,7 +235,7 @@ export class SupabaseDashboardRepository implements DashboardRepository {
       value: Number(r.valor_unitario),
       unit: r.unidade_medida,
       supplier:
-        suppliers.find((s) => s.id === r.fornecedor_id)?.razao_social ??
+        suppliers.find((s) => s.id === r.fornecedor_id)?.nome ??
         "Fornecedor não informado",
     }));
   }

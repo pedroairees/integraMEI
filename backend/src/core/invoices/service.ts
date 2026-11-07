@@ -72,6 +72,36 @@ export function parseExtraction(
           .slice(0, 200)
       : [],
   };
+  if (Array.isArray(value.lineItems)) {
+    // Keep position/description aligned. Never infer quantities or silently drop a line.
+    parsed.lineItems = value.lineItems.slice(0, 200).map((raw) => {
+      const line =
+        raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+      const numeric = (key: string, decimals: number, positive: boolean) => {
+        const n = line[key];
+        return typeof n === "number" &&
+          Number.isFinite(n) &&
+          n >= 0 &&
+          (!positive || n > 0) &&
+          n <= 999999999 &&
+          Math.abs(n * 10 ** decimals - Math.round(n * 10 ** decimals)) <
+            0.00001
+          ? n
+          : null;
+      };
+      const unit =
+        typeof line.unit === "string" ? line.unit.trim().toLowerCase() : "";
+      return {
+        description:
+          typeof line.description === "string"
+            ? line.description.trim().slice(0, 500)
+            : "",
+        quantity: numeric("quantity", 3, true),
+        unit: /^[a-z0-9²³]{1,12}$/.test(unit) ? unit : null,
+        unitPrice: numeric("unitPrice", 4, false),
+      };
+    });
+  }
   if (
     required &&
     (!parsed.supplier ||
@@ -85,6 +115,38 @@ export function parseExtraction(
       "Preencha emitente, CNPJ, data válida, valor total e pelo menos um item.",
     );
   return parsed;
+}
+
+export function validateSupplyLines(data: ExtractedInvoice) {
+  const lines = data.lineItems;
+  if (
+    !lines?.length ||
+    lines.length !== data.items.length ||
+    lines.some(
+      (line, i) =>
+        !line.description ||
+        line.description.length > 120 ||
+        line.description !== data.items[i] ||
+        line.quantity === null ||
+        !line.unit ||
+        line.unitPrice === null,
+    )
+  )
+    throw new AppError(
+      422,
+      "Revise todos os itens da nota: informe nome (até 120 caracteres), quantidade, unidade e preço unitário antes de lançar os insumos.",
+    );
+  // Integer cents per line, matching PostgreSQL round(numeric, 2).
+  const cents = lines.reduce((sum, line) => {
+    const quantity = BigInt(Math.round(line.quantity! * 1000));
+    const price = BigInt(Math.round(line.unitPrice! * 10000));
+    return sum + (quantity * price + 50000n) / 100000n;
+  }, 0n);
+  if (data.total === null || cents > BigInt(Math.round(data.total * 100)))
+    throw new AppError(
+      422,
+      "A soma dos itens ultrapassa o total da nota. Confira quantidades e preços na revisão.",
+    );
 }
 
 export function validateUpload(input: {
@@ -306,17 +368,26 @@ export class InvoiceService {
     const invoice = await this.repository.get(id);
     // A lost reply or double click must not create another financial entry.
     if (invoice.lancado_financeiro_em) return invoice;
-    if (!invoice.revisado_em || invoice.exclusao_solicitada_em ||
-        invoice.status !== "pending_review" || invoice.versao_arquivo !== version)
-      throw new AppError(409, "Revise a nota e atualize a lista antes de lançar no financeiro.");
+    if (
+      !invoice.revisado_em ||
+      invoice.exclusao_solicitada_em ||
+      invoice.status !== "pending_review" ||
+      invoice.versao_arquivo !== version
+    )
+      throw new AppError(
+        409,
+        "Revise a nota e atualize a lista antes de lançar no financeiro.",
+      );
     if (!["professional", "personal"].includes(scope))
       throw new AppError(400, "Selecione a finalidade da despesa.");
     const data = parseExtraction(invoice.dados_extracao, true);
     await this.validateKind(data, invoice.natureza);
+    if (invoice.natureza === "cost" && scope === "professional")
+      validateSupplyLines(data);
     return this.repository.post(invoice, scope);
   }
 
-  async delete(id: string, reason: string) {
+  async delete(id: string, reason: string, version?: string) {
     const trimmed = typeof reason === "string" ? reason.trim() : "";
     if (trimmed.length < 10 || trimmed.length > 1000)
       throw new AppError(
@@ -330,10 +401,19 @@ export class InvoiceService {
       if (error instanceof AppError && error.status === 404) return;
       throw error;
     }
-    if (invoice.status !== "pending_review" || invoice.lancado_financeiro_em)
+    if (invoice.status !== "pending_review")
       throw new AppError(
         409,
-        "Notas já lançadas no financeiro não podem ser excluídas por esta tela.",
+        "Nota integrada ao estoque: a exclusão exige estorno pelo fluxo de estoque.",
+      );
+    // A previously opened draft modal must not delete a newly posted/edited note.
+    if (
+      (version !== undefined || invoice.lancado_financeiro_em) &&
+      version !== invoice.versao_arquivo
+    )
+      throw new AppError(
+        409,
+        "A nota mudou. Atualize a lista antes de excluir.",
       );
     // Durable marker freezes edits/OCR. A retry can finish after either external call fails.
     const pending = await this.repository.beginDeletion(invoice, trimmed);

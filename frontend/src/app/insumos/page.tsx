@@ -10,7 +10,7 @@ export default function Page() {
     <ScreenPage
       path="/insumos"
       title="Insumos"
-      description="Históricos de valores atualizados com base no mercado. Selecionamos os produtos com base no seu perfil, escolha dentre as opções abaixo."
+      description="Acompanhe os preços dos insumos da sua empresa. Compare fornecedores e consulte compras registradas manualmente ou vinculadas às suas notas de custo."
     >
       <SuppliesView />
     </ScreenPage>

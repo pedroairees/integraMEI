@@ -1,157 +1,290 @@
 "use client";
+import { useEffect, useState } from "react";
+import { financialUpdateEvent } from "@/src/lib/financial-updates";
+import { SupplyForm, SupplyPriceForm } from "./SupplyForms";
+import { SupplyHistory } from "./SupplyHistory";
+import {
+  useSuppliesResource,
+  today,
+  type Supply,
+  type History,
+} from "./supplies-api";
+import css from "./Supplies.module.css";
 
-import Image from "next/image";
-import { useState } from "react";
-import styles from "./Screens.module.css";
-
-const months = [
-  "NOV / 2025",
-  "DEZ / 2025",
-  "JAN / 2026",
-  "FEV / 2026",
-  "MAR / 2026",
-  "ABR / 2026",
-  "MAI / 2026",
-];
-
+function range(period: string) {
+  const end = today();
+  const date = new Date(`${end}T12:00:00Z`);
+  if (period === "30") date.setUTCDate(date.getUTCDate() - 29);
+  else {
+    date.setUTCDate(1);
+    date.setUTCMonth(date.getUTCMonth() + 1 - Number(period));
+  }
+  return { start: date.toISOString().slice(0, 10), end };
+}
 export function SuppliesView() {
-  const [query, setQuery] = useState("");
-  const [period, setPeriod] = useState("6");
-  const [selected, setSelected] = useState(false);
-  const [message, setMessage] = useState("");
-  const populated = selected && period === "6";
-
+  const [query, setQuery] = useState(""),
+    [search, setSearch] = useState(""),
+    [offset, setOffset] = useState(0);
+  const [selected, setSelected] = useState<Supply | null>(null),
+    [editor, setEditor] = useState<"new" | "edit" | "price" | null>(null);
+  const [revision, setRevision] = useState(0),
+    [message, setMessage] = useState("");
+  const [period, setPeriod] = useState("6"),
+    [dates, setDates] = useState(() => range("6")),
+    [unit, setUnit] = useState("");
+  useEffect(() => {
+    const refresh = () => setRevision((value) => value + 1);
+    window.addEventListener(financialUpdateEvent, refresh);
+    window.addEventListener("focus", refresh);
+    let channel: BroadcastChannel | undefined;
+    try {
+      channel = new BroadcastChannel(financialUpdateEvent);
+      channel.onmessage = refresh;
+    } catch {
+      /* Focus/manual refresh also work without BroadcastChannel. */
+    }
+    return () => {
+      window.removeEventListener(financialUpdateEvent, refresh);
+      window.removeEventListener("focus", refresh);
+      channel?.close();
+    };
+  }, []);
+  const list = useSuppliesResource<{ supplies: Supply[] }>(
+    `?q=${encodeURIComponent(search)}&offset=${offset}`,
+    revision,
+  );
+  const history = useSuppliesResource<History>(
+    selected
+      ? `/${selected.id}/prices?${new URLSearchParams({ ...dates, ...(unit ? { unit } : {}) })}`
+      : null,
+    revision,
+  );
+  function select(s: Supply) {
+    setSelected(s);
+    setUnit("");
+    setEditor(null);
+    setMessage("");
+  }
+  function saved(s: Supply) {
+    setSelected(s);
+    setUnit("");
+    setEditor(null);
+    setRevision((v) => v + 1);
+    setMessage("Insumo salvo na sua empresa.");
+  }
   return (
-    <section aria-label="Histórico demonstrativo de insumos">
-      <form
-        className={styles.productRow}
-        onSubmit={(event) => {
-          event.preventDefault();
-          const matches =
-            query.trim().toLocaleLowerCase("pt-BR") === "farinha de trigo";
-          setSelected(matches);
-          setMessage(
-            matches
-              ? "Prévia de Farinha de Trigo conforme o Figma; não é uma consulta ao mercado."
-              : "Nesta prévia, pesquise Farinha de Trigo para visualizar o exemplo do Figma.",
-          );
-        }}
-      >
-        <label htmlFor="supply-product">Produto</label>
-        <div className={`${styles.productInput} ${styles.searchBox}`}>
-          <input
-            id="supply-product"
-            className={styles.input}
-            placeholder="Pesquise"
-            list="supply-examples"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setSelected(false);
-              setMessage("");
-            }}
-          />
-          <datalist id="supply-examples">
-            <option value="Farinha de Trigo" />
-          </datalist>
-          <button
-            type="submit"
-            className={styles.searchButton}
-            aria-label="Pesquisar insumo"
-          >
-            <Image
-              src="/assets/screens/search.svg"
-              alt=""
-              width={28}
-              height={26}
+    <section className={css.root} aria-label="Insumos da empresa">
+      <div className={css.toolbar}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setSearch(query);
+            setOffset(0);
+          }}
+          className={css.search}
+        >
+          <label>
+            Pesquisar insumos
+            <input
+              value={query}
+              maxLength={120}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Nome do insumo"
             />
-          </button>
-        </div>
-        <select
-          aria-label="Período do histórico"
-          className={`${styles.select} ${styles.period}`}
-          value={period}
-          onChange={(event) => setPeriod(event.target.value)}
+          </label>
+          <button type="submit">Pesquisar</button>
+        </form>
+        <button
+          type="button"
+          onClick={() => {
+            setEditor("new");
+            setMessage("");
+          }}
         >
-          <option value="6">Últimos 6 meses</option>
-          <option value="3">Últimos 3 meses</option>
-          <option value="12">Últimos 12 meses</option>
-        </select>
-      </form>
-      <figure className={styles.suppliesChart}>
-        <h2 className={styles.chartTitle}>
-          {populated ? (
-            "Farinha de Trigo"
+          Novo insumo
+        </button>
+        <button type="button" onClick={() => setRevision((v) => v + 1)}>
+          Atualizar dados
+        </button>
+      </div>
+      {list.loading && <p role="status">Carregando insumos…</p>}
+      {list.error && (
+        <p role="alert" className={css.error}>
+          {list.error}
+        </p>
+      )}
+      {list.data && (
+        <>
+          {list.data.supplies.length ? (
+            <div className={css.catalog} aria-label="Catálogo de insumos">
+              {list.data.supplies.map((s) => (
+                <button
+                  type="button"
+                  key={s.id}
+                  aria-pressed={selected?.id === s.id}
+                  onClick={() => select(s)}
+                >
+                  {s.nome}{" "}
+                  <small>
+                    ({s.unidade_medida}){!s.ativo ? " • Inativo" : ""}
+                  </small>
+                </button>
+              ))}
+            </div>
           ) : (
-            <span aria-hidden="true">&nbsp;</span>
+            <p className={css.notice}>
+              {search
+                ? "Nenhum insumo encontrado para essa busca."
+                : "Nenhum insumo cadastrado. Comece em Novo insumo."}
+            </p>
           )}
-        </h2>
-        <h3>Evolução do Preço (R$/kg)</h3>
-        <div
-          className={styles.chartScroll}
-          tabIndex={0}
-          aria-label="Gráfico de exemplo; role horizontalmente em telas pequenas"
-        >
-          <div className={styles.chartAxes}>
-            <div className={styles.yAxis} aria-hidden="true">
-              {["+8,00", "6,00", "4,00", "2,00"].map((value) => (
-                <span key={value}>{value}</span>
-              ))}
+          {(offset > 0 || list.data.supplies.length === 50) && (
+            <div className={css.actions}>
+              <button
+                disabled={offset === 0}
+                onClick={() => setOffset((v) => Math.max(0, v - 50))}
+              >
+                Anteriores
+              </button>
+              <button
+                disabled={list.data.supplies.length < 50}
+                onClick={() => setOffset((v) => v + 50)}
+              >
+                Próximos
+              </button>
             </div>
-            <div className={styles.plot}>
-              {populated ? (
-                <Image
-                  src="/assets/screens/supplies-chart.png"
-                  alt="Evolução ilustrativa do preço de Farinha de Trigo conforme o Figma"
-                  width={806}
-                  height={113}
-                />
-              ) : (
-                <div
-                  className={styles.emptyPlot}
-                  aria-label="Gráfico sem dados selecionados"
-                />
-              )}
-            </div>
-            <div className={styles.xAxis} aria-hidden="true">
-              {months.map((month) => (
-                <span key={month}>{month}</span>
-              ))}
-            </div>
+          )}
+        </>
+      )}
+      {message && (
+        <p role="status" className={css.notice}>
+          {message}
+        </p>
+      )}
+      {editor === "new" && (
+        <SupplyForm
+          key="new"
+          supply={null}
+          onSaved={saved}
+          onCancel={() => setEditor(null)}
+        />
+      )}
+      {selected && (
+        <>
+          <div className={css.toolbar}>
+            <h2>
+              {selected.nome} {!selected.ativo && "(inativo)"}
+            </h2>
+            <button onClick={() => setEditor("edit")}>Editar insumo</button>
+            <button
+              disabled={!selected.ativo}
+              onClick={() => setEditor("price")}
+            >
+              Registrar preço
+            </button>
           </div>
-        </div>
-        <figcaption className={styles.screenReader}>
-          Prévia visual.{" "}
-          {populated
-            ? "Maior preço: R$ 7,80 em janeiro de 2026. Menor preço: R$ 4,28 em novembro de 2025. Preço médio: R$ 6,12."
-            : "Selecione o exemplo Farinha de Trigo e o período de seis meses."}
-        </figcaption>
-      </figure>
-      <div className={styles.suppliesCopy}>
-        <p>Dados consultados baseado nas procuras realizadas por nossa IA.</p>
-        <p>Aqui está um resumo dos valores obtidos:</p>
-      </div>
-      <div className={styles.summaryGrid}>
-        {[
-          { title: "Maior Preço", value: "R$ 7,80", date: "(jan/2026)" },
-          { title: "Menor Preço", value: "R$ 4,28", date: "(nov/2025)" },
-          { title: "Preço médio (período)", value: "R$ 6,12", date: "" },
-        ].map((item) => (
-          <article
-            className={`${styles.card} ${styles.summary}`}
-            key={item.title}
-          >
-            <h3>{item.title}</h3>
-            <strong>{populated ? item.value : "R$ 0,00"}</strong>
-            {populated && item.date && <small>{item.date}</small>}
-          </article>
-        ))}
-      </div>
-      {(message || period !== "6") && (
-        <p className={styles.message} role="status">
-          {period !== "6"
-            ? "Não há dados demonstrativos para este período. O Figma fornece o exemplo de seis meses."
-            : message}
+          {editor === "edit" && (
+            <SupplyForm
+              key={selected.id}
+              supply={selected}
+              onSaved={saved}
+              onCancel={() => setEditor(null)}
+            />
+          )}
+          {editor === "price" && (
+            <SupplyPriceForm
+              key={selected.id}
+              supply={selected}
+              onCancel={() => setEditor(null)}
+              onSaved={() => {
+                setEditor(null);
+                setRevision((v) => v + 1);
+                setMessage(
+                  "Preço salvo. O histórico usa a data da compra; confira o período selecionado.",
+                );
+              }}
+            />
+          )}
+          <div className={css.filters}>
+            <label>
+              Período do histórico
+              <select
+                value={period}
+                onChange={(e) => {
+                  setPeriod(e.target.value);
+                  setUnit("");
+                  if (e.target.value !== "custom")
+                    setDates(range(e.target.value));
+                }}
+              >
+                <option value="30">Últimos 30 dias</option>
+                <option value="3">Últimos 3 meses</option>
+                <option value="6">Últimos 6 meses</option>
+                <option value="12">Últimos 12 meses</option>
+                <option value="custom">Personalizado</option>
+              </select>
+            </label>
+            {period === "custom" && (
+              <>
+                <label>
+                  Data inicial
+                  <input
+                    type="date"
+                    value={dates.start}
+                    max={dates.end}
+                    onChange={(e) => {
+                      setUnit("");
+                      setDates({ ...dates, start: e.target.value });
+                    }}
+                  />
+                </label>
+                <label>
+                  Data final
+                  <input
+                    type="date"
+                    value={dates.end}
+                    min={dates.start}
+                    max={today()}
+                    onChange={(e) => {
+                      setUnit("");
+                      setDates({ ...dates, end: e.target.value });
+                    }}
+                  />
+                </label>
+              </>
+            )}
+            {history.data && (
+              <label>
+                Unidade do histórico
+                <select
+                  value={history.data.unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                >
+                  {history.data.units.map((u) => (
+                    <option key={u}>{u}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
+          {history.loading && <p role="status">Carregando histórico…</p>}
+          {history.error && (
+            <p role="alert" className={css.error}>
+              {history.error}
+            </p>
+          )}
+          {history.data && (
+            <SupplyHistory
+              key={`${selected.id}-${history.data.unit}`}
+              history={history.data}
+            />
+          )}
+        </>
+      )}
+      {!selected && !editor && !!list.data?.supplies.length && (
+        <p className={css.notice}>
+          Selecione um insumo para consultar seu histórico ou registrar uma
+          compra.
         </p>
       )}
     </section>

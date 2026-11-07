@@ -32,17 +32,21 @@ async function forward(
     const route = path.join("/");
     const allowed =
       (request.method === "GET" &&
-        (route === "dashboard" ||
+        (route === "dashboard" || route === "settings" || route === "pricing" || route === "reports/options" ||
           route === "invoices" ||
+          route === "supplies" || route === "supplies/invoices" ||
+          /^supplies\/[0-9a-f-]{36}\/prices$/i.test(route) ||
           /^invoices\/[0-9a-f-]{36}\/file$/i.test(route) ||
           /^supplies\/[0-9a-f-]{36}\/history$/i.test(route))) ||
       (request.method === "DELETE" &&
         /^invoices\/[0-9a-f-]{36}$/i.test(route)) ||
       (request.method === "PATCH" &&
-        (route === "dashboard/goal" ||
+        (route === "dashboard/goal" || route === "settings" ||
+          /^supplies\/[0-9a-f-]{36}$/i.test(route) ||
           /^invoices\/[0-9a-f-]{36}$/i.test(route))) ||
       (request.method === "POST" &&
-        (route === "invoices" ||
+        (route === "invoices" || route === "settings/email" || route === "settings/password-reset" || route === "pricing/quote" || route === "pricing/products" || route === "reports/download" || route === "reports/email" ||
+          route === "supplies" || /^supplies\/[0-9a-f-]{36}\/prices$/i.test(route) ||
           /^invoices\/[0-9a-f-]{36}\/(read|post)$/i.test(route)));
     if (!allowed)
       return Response.json(
@@ -103,12 +107,12 @@ async function forward(
         body: body || undefined,
         cache: "no-store",
         signal: AbortSignal.timeout(
-          route.startsWith("invoices") ? 60000 : 20000,
+          route.startsWith("reports/") ? 120000 : route.startsWith("invoices") ? 60000 : route.startsWith("settings/") ? 45000 : 20000,
         ),
         redirect: "error",
       },
     );
-    if (route.endsWith("/file") && response.ok) {
+    if ((route.endsWith("/file") || route === "reports/download") && response.ok) {
       return new Response(response.body, {
         status: response.status,
         headers: {

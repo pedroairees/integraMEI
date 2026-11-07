@@ -30,6 +30,29 @@ function fail(error: { code?: string } | null, message: string) {
         : message,
     );
 }
+function deletionFailure(error: { code?: string; message?: string } | null) {
+  if (!error) return;
+  if (["PGRST202", "42883", "42703", "42P01"].includes(error.code ?? ""))
+    throw new AppError(
+      503,
+      "Aplique a migração 20261019140000_posted_invoice_deletion.sql no Supabase para habilitar a exclusão auditada.",
+    );
+  if (error.code === "42501")
+    throw new AppError(403, "Você não pode excluir esta nota.");
+  const safe = [
+    "A nota mudou. Atualize a lista antes de excluir.",
+    "Mês encerrado: não é possível excluir esta nota.",
+    "Nota integrada ao estoque: a exclusão exige estorno pelo fluxo de estoque.",
+    "A exclusão do arquivo ainda está pendente. Tente novamente.",
+    "Ainda existem registros vinculados à nota. Exclusão não concluída.",
+  ];
+  if (error.code === "P0001" && safe.includes(error.message ?? ""))
+    throw new AppError(409, error.message!);
+  throw new AppError(
+    502,
+    "Não foi possível concluir a exclusão. Atualize a lista e tente novamente; uma solicitação já registrada preserva a justificativa original.",
+  );
+}
 export class SupabaseInvoiceRepository implements InvoiceRepository {
   client: SupabaseClient;
   authId: string;
@@ -182,6 +205,7 @@ export class SupabaseInvoiceRepository implements InvoiceRepository {
       .eq("empresa_id", this.companyId)
       .eq("enviado_por", this.authId)
       .eq("status", "pending_review")
+      .is("lancado_financeiro_em", null)
       .is("exclusao_solicitada_em", null)
       .eq("versao_arquivo", invoice.versao_arquivo)
       .select(fields)
@@ -199,79 +223,69 @@ export class SupabaseInvoiceRepository implements InvoiceRepository {
   }
 
   async beginDeletion(invoice: Invoice, reason: string) {
-    if (invoice.exclusao_solicitada_em && invoice.exclusao_justificativa)
-      return invoice;
-    let query = this.client
-      .from("notas_fiscais")
-      .update({
-        exclusao_solicitada_em:
-          invoice.exclusao_solicitada_em || new Date().toISOString(),
-        exclusao_justificativa: reason,
-      })
-      .eq("id", invoice.id)
-      .eq("empresa_id", this.companyId)
-      .eq("enviado_por", this.authId)
-      .eq("status", "pending_review")
-      .eq("versao_arquivo", invoice.versao_arquivo)
-      .is("exclusao_justificativa", null);
-    if (!invoice.exclusao_solicitada_em)
-      query = query.is("exclusao_solicitada_em", null);
-    const { data, error } = await query.select(fields).maybeSingle();
-    fail(
-      error,
-      "Não foi possível iniciar a exclusão. Confira as permissões e se o período da nota está aberto.",
-    );
-    if (!data)
-      throw new AppError(
-        409,
-        "A nota mudou. Atualize a lista antes de excluir.",
-      );
-    return normalize(data as Invoice);
+    const { error } = await this.client.rpc("iniciar_exclusao_nota", {
+      p_nota_id: invoice.id,
+      p_empresa_id: this.companyId,
+      p_versao: invoice.versao_arquivo,
+      p_justificativa: reason,
+    });
+    deletionFailure(error);
+    return this.get(invoice.id);
   }
 
   async post(invoice: Invoice, scope: "professional" | "personal") {
-    const { error } = await this.client.rpc("lancar_nota_financeiro", {
+    const { error } = await this.client.rpc("lancar_nota_com_insumos", {
       p_nota_id: invoice.id,
       p_empresa_id: this.companyId,
       p_versao: invoice.versao_arquivo,
       p_tipo: scope,
     });
     if (error) {
+      if (["42P01", "42704"].includes(error.code))
+        throw new AppError(
+          503,
+          "O banco não encontrou uma tabela ou tipo exigido pelo lançamento. Verifique as migrações, incluindo 20261018160000_invoice_trigger_schema_resolution.sql no Supabase.",
+        );
       if (["PGRST202", "42883", "42703"].includes(error.code))
-        throw new AppError(503, "Aplique a migração 20261006120000_invoice_financial_posting.sql no Supabase antes de lançar notas.");
-      if (error.code === "23505") throw new AppError(409, "Este arquivo já foi lançado no financeiro da empresa.");
-      if (error.code === "42501") throw new AppError(403, "Você não pode lançar esta nota.");
-      if (error.code === "P0001") throw new AppError(409, "Não foi possível lançar: confira a revisão, a versão da nota e se o mês está aberto. Atualize a lista.");
-      throw new AppError(502, "Não foi possível confirmar o lançamento. Atualize a lista antes de tentar novamente.");
+        throw new AppError(
+          503,
+          "Aplique a migração 20261019120000_invoice_auto_supplies.sql no Supabase antes de lançar notas.",
+        );
+      if (error.code === "23505")
+        throw new AppError(
+          409,
+          "Este arquivo já foi lançado no financeiro da empresa.",
+        );
+      if (error.code === "42501")
+        throw new AppError(403, "Você não pode lançar esta nota.");
+      if (error.code === "P0001") {
+        const safe = [
+          "Revise todos os itens: nome, quantidade, unidade e preço unitário são obrigatórios.",
+          "A soma dos itens ultrapassa o total da nota.",
+          "Existe insumo com esse nome e outra unidade. Revise o nome ou a unidade do item; não fazemos conversão automática.",
+          "Reative o insumo antes de registrar preços.",
+          "Há insumos duplicados com esse nome. Revise o catálogo antes de lançar.",
+        ];
+        throw new AppError(
+          409,
+          safe.includes(error.message)
+            ? error.message
+            : "Não foi possível lançar: confira a revisão, a versão da nota e se o mês está aberto. Atualize a lista.",
+        );
+      }
+      throw new AppError(
+        502,
+        "Não foi possível confirmar o lançamento. Atualize a lista antes de tentar novamente.",
+      );
     }
     return this.get(invoice.id);
   }
 
   async finishDeletion(invoice: Invoice) {
-    const { data, error } = await this.client
-      .from("notas_fiscais")
-      .delete()
-      .eq("id", invoice.id)
-      .eq("empresa_id", this.companyId)
-      .eq("enviado_por", this.authId)
-      .eq("status", "pending_review")
-      .not("exclusao_solicitada_em", "is", null)
-      .select("id");
-    fail(
-      error,
-      "O arquivo foi removido, mas a exclusão do registro está pendente. Tente excluir novamente.",
-    );
-    if (!data?.length) {
-      try {
-        await this.get(invoice.id);
-      } catch (error) {
-        if (error instanceof AppError && error.status === 404) return;
-        throw error;
-      }
-      throw new AppError(
-        409,
-        "A exclusão do registro não foi autorizada. Atualize a lista e verifique as permissões.",
-      );
-    }
+    const { error } = await this.client.rpc("concluir_exclusao_nota", {
+      p_nota_id: invoice.id,
+      p_empresa_id: this.companyId,
+    });
+    deletionFailure(error);
   }
 }

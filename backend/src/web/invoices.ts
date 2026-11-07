@@ -27,15 +27,38 @@ export function registerInvoices(app: FastifyInstance, reader?: InvoiceReader) {
     required: ["id"],
     properties: { id: { type: "string", format: "uuid" } },
   };
-  app.post<{ Params: { id: string }; Body: { version: string; scope: "professional" | "personal" } }>(
+  app.post<{
+    Params: { id: string };
+    Body: { version: string; scope: "professional" | "personal" };
+  }>(
     "/v1/invoices/:id/post",
-    { schema: { ...common, params, body: {
-      type: "object", additionalProperties: false, required: ["version", "scope"],
-      properties: { version: { type: "string", format: "uuid" }, scope: { type: "string", enum: ["professional", "personal"] } },
-    } } },
-    async request => ({ invoice: await service(request).post(request.params.id, request.body.version, request.body.scope) }),
+    {
+      schema: {
+        ...common,
+        params,
+        body: {
+          type: "object",
+          additionalProperties: false,
+          required: ["version", "scope"],
+          properties: {
+            version: { type: "string", format: "uuid" },
+            scope: { type: "string", enum: ["professional", "personal"] },
+          },
+        },
+      },
+    },
+    async (request) => ({
+      invoice: await service(request).post(
+        request.params.id,
+        request.body.version,
+        request.body.scope,
+      ),
+    }),
   );
-  app.delete<{ Params: { id: string }; Body: { reason: string } }>(
+  app.delete<{
+    Params: { id: string };
+    Body: { reason: string; version?: string };
+  }>(
     "/v1/invoices/:id",
     {
       schema: {
@@ -47,14 +70,19 @@ export function registerInvoices(app: FastifyInstance, reader?: InvoiceReader) {
           required: ["reason"],
           properties: {
             reason: { type: "string", minLength: 10, maxLength: 1000 },
+            version: { type: "string", format: "uuid" },
           },
         },
         description:
-          "Exclui a nota pendente da conta e seu arquivo privado. Operação irreversível.",
+          "Exclui nota e arquivo com auditoria, retirando lançamento e preços vinculados. Não permite mês fechado nem integração de estoque.",
       },
     },
     async (request) => {
-      await service(request).delete(request.params.id, request.body.reason);
+      await service(request).delete(
+        request.params.id,
+        request.body.reason,
+        request.body.version,
+      );
       return { success: true };
     },
   );
@@ -181,6 +209,36 @@ export function registerInvoices(app: FastifyInstance, reader?: InvoiceReader) {
                   minItems: 1,
                   maxItems: 200,
                   items: { type: "string", minLength: 1, maxLength: 500 },
+                },
+                lineItems: {
+                  type: "array",
+                  maxItems: 200,
+                  items: {
+                    type: "object",
+                    additionalProperties: false,
+                    required: ["description", "quantity", "unit", "unitPrice"],
+                    properties: {
+                      description: {
+                        type: "string",
+                        minLength: 1,
+                        maxLength: 120,
+                      },
+                      quantity: {
+                        type: ["number", "null"],
+                        exclusiveMinimum: 0,
+                        maximum: 999999999,
+                      },
+                      unit: {
+                        type: ["string", "null"],
+                        pattern: "^[a-zA-Z0-9²³]{1,12}$",
+                      },
+                      unitPrice: {
+                        type: ["number", "null"],
+                        minimum: 0,
+                        maximum: 999999999,
+                      },
+                    },
+                  },
                 },
               },
             },

@@ -49,6 +49,11 @@ export interface DashboardSource {
   items: Item[];
   supplies: Supply[];
   alerts: Alert[];
+  pendingInvoices?: {
+    natureza: "revenue" | "cost";
+    data_emissao: string;
+    valor_total: number;
+  }[];
 }
 export interface Tenant {
   companyId: string;

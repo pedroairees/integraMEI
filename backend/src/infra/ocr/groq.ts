@@ -1,6 +1,7 @@
 import {
   invoicePrompt,
   invoiceSchema,
+  lineItemsPrompt,
   parseProviderExtraction,
 } from "./contract.ts";
 import { OcrFailure, providerConfig, requestJson } from "./transport.ts";
@@ -42,7 +43,7 @@ export class GroqInvoiceReader {
           messages: [
             {
               role: "system",
-              content: `${invoicePrompt} Responda somente com um objeto JSON que respeite este schema: ${JSON.stringify(invoiceSchema)}`,
+              content: `${invoicePrompt}${lineItemsPrompt} Responda somente com um objeto JSON que respeite este schema: ${JSON.stringify(invoiceSchema)}`,
             },
             {
               role: "user",

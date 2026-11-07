@@ -1,0 +1,49 @@
+.fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.field {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0;
+  max-width: 620px;
+}
+.note {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 18px 0;
+}
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.5;
+  margin: 18px 0;
+}
+.message {
+  background: #edf5ff;
+  border-left: 3px solid #639dd3;
+  padding: 16px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.error {
+  background: #fff0f2;
+  color: #9c1426;
+  border-left-color: #9c1426;
+}
+.retry {
+  background: white;
+  border: 1px solid #1e3c73;
+  border-radius: 6px;
+  color: #1e3c73;
+  padding: 12px;
+  font: inherit;
+  margin-top: 12px;
+  cursor: pointer;
+}
+.fields:disabled {
+  opacity: 0.65;
+}

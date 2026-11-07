@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { spawn } from "node:child_process";
 import { buildApp } from "../../backend/src/web/app.ts";
 import { createSessionResolver } from "../../backend/src/infra/supabase/session.ts";
+import { pricingMock } from "./pricing-mock.mjs";
 
 const companyId = "11111111-1111-4111-8111-111111111111";
 const supplyId = "22222222-2222-4222-8222-222222222222";
@@ -35,6 +36,7 @@ const financialRows = {
   notas_fiscais: [
     {
       id: "note-1",
+      natureza: "cost",
       empresa_id: companyId,
       data_emissao: `${month}-01`,
       valor_total: 600,
@@ -44,6 +46,7 @@ const financialRows = {
     },
     {
       id: "note-2",
+      natureza: "cost",
       empresa_id: companyId,
       data_emissao: `${month}-01`,
       valor_total: 200,
@@ -64,7 +67,8 @@ const financialRows = {
       valor_total_item: 600,
     },
   ],
-  insumos: [{ id: supplyId, empresa_id: companyId, nome: "Farinha" }],
+  insumos: [{ id: supplyId, empresa_id: companyId, nome: "Farinha", unidade_medida:"kg",estoque_minimo:0,ativo:true,versao_cadastro:crypto.randomUUID() }],
+  insumos_precos_registrados: [],
   historico_precos: [
     {
       id: "price-1",
@@ -80,7 +84,7 @@ const financialRows = {
     {
       id: "supplier-1",
       empresa_id: companyId,
-      razao_social: "Fornecedor de teste",
+      nome: "Fornecedor de teste",
     },
   ],
   alertas: [],
@@ -100,6 +104,8 @@ const sessions = new Map();
 const invoiceFiles = new Map();
 const refreshTokens = new Set();
 const refreshReplays = new Map();
+const reportDeliveries = new Map();
+const accountSettings = { fullName: "Perfil Cadastrado", phone: "61912345678", cnpj: "12345678000195", emailAlerts: false, invoiceReminders: true, lowStockAlerts: true, timeZone: "America/Sao_Paulo" };
 
 function session() {
   const encode = (value) =>
@@ -165,6 +171,11 @@ const authServer = createServer(async (req, res) => {
     });
   }
   if (url.pathname === "/auth/v1/user") {
+    if (req.method === "PUT" && sessions.has(token)) {
+      let raw = ""; for await (const chunk of req) raw += chunk;
+      user.new_email = JSON.parse(raw).email;
+      return send(200, user);
+    }
     if (sessions.has(token)) return send(200, user);
     return send(401, { code: "bad_jwt", message: "Invalid token" });
   }
@@ -173,6 +184,12 @@ const authServer = createServer(async (req, res) => {
     sessions.delete(token);
     res.writeHead(204);
     return res.end();
+  }
+  if (url.pathname === "/auth/v1/recover") {
+    let raw = ""; for await (const chunk of req) raw += chunk;
+    const body = JSON.parse(raw);
+    if (body.email !== user.email || !url.searchParams.get("redirect_to")?.endsWith("/definir-senha")) return send(400, {message:"Invalid recovery target"});
+    return send(200, {});
   }
   if (url.pathname.startsWith("/storage/v1/object/")) {
     if (!sessions.has(token)) return send(403, { message: "Unauthorized" });
@@ -240,6 +257,105 @@ const authServer = createServer(async (req, res) => {
   if (url.pathname.startsWith("/rest/v1/")) {
     if (token !== "test-server-key" && !sessions.has(token))
       return send(403, { message: "Unauthorized" });
+    if (req.method === "POST" && ["dados_configuracoes", "salvar_configuracoes"].some(name => url.pathname === `/rest/v1/rpc/${name}`)) {
+      let raw = ""; for await (const chunk of req) raw += chunk;
+      const params = JSON.parse(raw);
+      if (params.p_empresa !== companyId) return send(403,{code:"42501"});
+      if (params.p_dados) Object.assign(accountSettings,params.p_dados);
+      return send(200,{ ...accountSettings, email:user.email });
+    }
+    if(req.method==='POST'&&url.pathname==='/rest/v1/rpc/dados_relatorio'){
+      let raw='';for await(const chunk of req)raw+=chunk;const p=JSON.parse(raw);
+      if(p.p_empresa!==companyId)return send(403,{code:'42501'});
+      const rows=[...financialRows.vendas.map(v=>({id:v.id,date:v.data,amount:v.valor_total,kind:'revenue',scope:'professional',label:'Venda E2E',category:'Vendas',invoice:false,file:null})),
+      ...financialRows.notas_fiscais.filter(n=>!n.exclusao_solicitada_em&&(n.lancado_financeiro_em||n.status==='confirmed')).map(n=>({id:n.id,date:n.data_emissao,amount:n.valor_total,kind:n.natureza,scope:n.tipo,label:'Nota E2E',category:'Insumos',invoice:true,file:n.caminho_arquivo?{id:n.id,name:n.nome_arquivo,path:n.caminho_arquivo,mime:n.mime_arquivo,size:n.tamanho_arquivo}:null}))].filter(r=>r.date>=p.p_inicio&&r.date<=p.p_fim);
+      return send(200,{company:{name:'Empresa E2E',cnpj:'12345678000195'},rows});
+    }
+    if(req.method==='POST'&&['reservar_envio_relatorio','concluir_envio_relatorio'].some(n=>url.pathname===`/rest/v1/rpc/${n}`)){
+      let raw='';for await(const chunk of req)raw+=chunk;const p=JSON.parse(raw);if(p.p_empresa!==companyId)return send(403,{code:'42501'});
+      if(url.pathname.endsWith('reservar_envio_relatorio')){const previous=reportDeliveries.get(p.p_id);if(previous)return send(200,previous);reportDeliveries.set(p.p_id,'processing');return send(200,'reserved');}
+      reportDeliveries.set(p.p_id,p.p_status);return send(200,null);
+    }
+    if(req.method==='POST'&&['dados_precificacao','calcular_precificacao','salvar_precificacao'].some(name=>url.pathname===`/rest/v1/rpc/${name}`)){
+      let raw='';for await(const chunk of req)raw+=chunk;
+      return pricingMock(url.pathname,JSON.parse(raw),financialRows,companyId,send);
+    }
+    if (req.method === "POST" && ["/rest/v1/rpc/iniciar_exclusao_nota", "/rest/v1/rpc/concluir_exclusao_nota"].includes(url.pathname)) {
+      let raw="";for await(const chunk of req)raw+=chunk;
+      const p=JSON.parse(raw);
+      const note=financialRows.notas_fiscais.find(n=>n.id===p.p_nota_id&&n.empresa_id===p.p_empresa_id&&n.enviado_por===user.id);
+      if (!note) return send(200,null);
+      if (url.pathname.endsWith("iniciar_exclusao_nota")) {
+        if (note.exclusao_solicitada_em) return send(200,null);
+        if (note.versao_arquivo!==p.p_versao||note.status!=="pending_review"||p.p_justificativa?.trim().length<10) return send(409,{code:"P0001"});
+        note.exclusao_solicitada_em=new Date().toISOString();note.exclusao_justificativa=p.p_justificativa;
+        financialRows.insumos_precos_registrados=financialRows.insumos_precos_registrados.filter(r=>r.nota_fiscal_id!==note.id);
+      } else {
+        if (!note.exclusao_solicitada_em||invoiceFiles.has(note.caminho_arquivo)) return send(409,{code:"P0001"});
+        financialRows.notas_fiscais=financialRows.notas_fiscais.filter(n=>n.id!==note.id);
+      }
+      return send(200,null);
+    }
+    if (req.method === "POST" && url.pathname === "/rest/v1/rpc/salvar_insumo") {
+      let raw="";for await(const chunk of req)raw+=chunk;
+      const p=JSON.parse(raw);
+      if(p.p_empresa!==companyId)return send(403,{code:"42501"});
+      let s=financialRows.insumos.find(s=>s.id===p.p_id);
+      if(p.p_id&&(!s||s.versao_cadastro!==p.p_versao))return send(409,{code:"P0001"});
+      if(!s){s={id:crypto.randomUUID(),empresa_id:companyId};financialRows.insumos.push(s);}
+      Object.assign(s,{nome:p.p_nome,unidade_medida:p.p_unidade,estoque_minimo:p.p_minimo,ativo:p.p_ativo,versao_cadastro:crypto.randomUUID()});
+      return send(200,s);
+    }
+    if(req.method === "POST" && url.pathname === "/rest/v1/rpc/registrar_preco_insumo") {
+      let raw="";for await(const chunk of req)raw+=chunk;
+      const p=JSON.parse(raw),s=financialRows.insumos.find(s=>s.id===p.p_insumo&&s.empresa_id===p.p_empresa);
+      if(!s||p.p_empresa!==companyId)return send(403,{code:"42501"});
+      if(financialRows.insumos_precos_registrados.some(r=>r.id===p.p_id))return send(200,p.p_id);
+      const n=financialRows.notas_fiscais.find(n=>n.id===p.p_nota&&n.enviado_por===user.id&&n.empresa_id===companyId);
+      if(p.p_origem==="invoice"&&(!n||n.natureza!=="cost"||n.tipo!=="professional"||!n.lancado_financeiro_em))return send(400,{code:"P0001"});
+      if(p.p_origem==="invoice"&&financialRows.insumos_precos_registrados.some(r=>r.nota_fiscal_id===p.p_nota&&r.indice_item===p.p_item))return send(409,{code:"23505"});
+      financialRows.insumos_precos_registrados.push({id:p.p_id,empresa_id:companyId,insumo_id:s.id,origem:p.p_origem,
+        nota_fiscal_id:p.p_nota,indice_item:p.p_item,unidade_medida:s.unidade_medida,valor_unitario:p.p_preco,
+        data_compra:n?.data_emissao??p.p_data,fornecedor:n?.dados_extracao.supplier??p.p_fornecedor});
+      return send(200,p.p_id);
+    }
+    if (
+      req.method === "POST" &&
+      url.pathname === "/rest/v1/rpc/lancar_nota_com_insumos"
+    ) {
+      let raw = "";
+      for await (const chunk of req) raw += chunk;
+      const body = JSON.parse(raw);
+      const note = financialRows.notas_fiscais.find(
+        (row) =>
+          row.id === body.p_nota_id &&
+          row.empresa_id === body.p_empresa_id &&
+          row.enviado_por === user.id,
+      );
+      if (!note) return send(403, { code: "42501" });
+      if (note.lancado_financeiro_em) return send(200, null);
+      if (
+        !note.revisado_em ||
+        note.exclusao_solicitada_em ||
+        note.status !== "pending_review" ||
+        note.versao_arquivo !== body.p_versao
+      )
+        return send(400, { code: "P0001" });
+      note.lancado_financeiro_em = new Date().toISOString();
+      note.tipo = note.natureza === "cost" ? body.p_tipo : "unclassified";
+      note.versao_arquivo = crypto.randomUUID();
+      if (note.natureza === "cost" && note.tipo === "professional") {
+        for (const [index, item] of note.dados_extracao.lineItems.entries()) {
+          let supply = financialRows.insumos.find(s => s.empresa_id === companyId && s.nome.trim().toLowerCase() === item.description.trim().toLowerCase());
+          if (!supply) {
+            supply = { id: crypto.randomUUID(), empresa_id: companyId, nome: item.description, unidade_medida: item.unit, estoque_minimo: 0, ativo: true, versao_cadastro: crypto.randomUUID() };
+            financialRows.insumos.push(supply);
+          }
+          financialRows.insumos_precos_registrados.push({ id: crypto.randomUUID(), empresa_id: companyId, insumo_id: supply.id, origem: "invoice", nota_fiscal_id: note.id, indice_item: index, quantidade: item.quantity, unidade_medida: item.unit, valor_unitario: item.unitPrice, data_compra: note.data_emissao, fornecedor: note.dados_extracao.supplier });
+        }
+      }
+      return send(200, null);
+    }
     if (req.method === "POST" && url.pathname === "/rest/v1/notas_fiscais") {
       let raw = "";
       for await (const chunk of req) raw += chunk;
@@ -254,6 +370,8 @@ const authServer = createServer(async (req, res) => {
         return send(409, { code: "23505" });
       body.exclusao_solicitada_em = null;
       body.exclusao_justificativa = null;
+      body.lancado_financeiro_em = null;
+      body.tipo = "unclassified";
       financialRows.notas_fiscais.push(body);
       return send(201, body);
     }
@@ -279,8 +397,9 @@ const authServer = createServer(async (req, res) => {
         { usuario_id: "test-profile", empresa_id: companyId, papel: "owner" },
       ],
       "/rest/v1/usuarios": [
-        { id: "test-profile", usuario_auth_id: user.id, email: user.email },
+        { id: "test-profile", usuario_auth_id: user.id, email: user.email, nome_completo: accountSettings.fullName, telefone: accountSettings.phone },
       ],
+      "/rest/v1/preferencias_usuario": [{ usuario_auth_id:user.id, fuso_horario:accountSettings.timeZone }],
     };
     let found =
       rows[url.pathname] ?? financialRows[url.pathname.split("/").at(-1)] ?? [];
@@ -298,6 +417,8 @@ const authServer = createServer(async (req, res) => {
           return String(value) >= condition.slice(4);
         if (condition.startsWith("lt."))
           return String(value) < condition.slice(3);
+        if (condition.startsWith("lte.")) return String(value)<=condition.slice(4);
+        if (condition.startsWith("ilike.")) return String(value).toLowerCase().includes(condition.slice(7,-1).toLowerCase());
         if (condition === "is.null") return value == null;
         if (condition === "not.is.null") return value != null;
         return true;
@@ -323,7 +444,7 @@ const authServer = createServer(async (req, res) => {
       for await (const chunk of req) raw += chunk;
       const body = JSON.parse(raw);
       for (const row of found) {
-        if (row.enviado_por !== user.id)
+        if (row.enviado_por !== user.id || row.lancado_financeiro_em)
           return send(403, { message: "Denied" });
         if (
           body.exclusao_solicitada_em &&
@@ -351,6 +472,7 @@ await new Promise((resolve) => authServer.listen(39401, "127.0.0.1", resolve));
 const backend = await buildApp(
   createSessionResolver("http://127.0.0.1:39401", "test-publishable-key"),
   {
+    reportMailer:{configured:true,send:async(_recipient,files)=>{if(!files.length)throw Error('No attachments');}},
     invoiceReader: {
       read: async (file) => {
         if (file.toString().includes("unreadable"))
@@ -370,6 +492,7 @@ const backend = await buildApp(
           total: 89.9,
           number: "123",
           items: ["Insumo de teste"],
+          lineItems: [{ description: "Insumo de teste", quantity: 1, unit: "kg", unitPrice: 10 }],
         };
       },
     },

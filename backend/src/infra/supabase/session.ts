@@ -7,11 +7,23 @@ import type {
 import { SupabaseDashboardRepository } from "./repository.ts";
 import { SupabaseInvoiceRepository } from "./invoices.ts";
 import type { InvoiceRepository } from "../../core/invoices/types.ts";
+import type { SuppliesRepository } from "../../core/supplies/types.ts";
+import { SupabaseSuppliesRepository } from "./supplies.ts";
+import { SupabasePricingRepository } from "./pricing.ts";
+import { SupabaseReportRepository } from "./reports.ts";
+import type { ReportRepository } from "../../core/reports/types.ts";
+import type { PricingRepository } from "../../core/pricing/types.ts";
+import type { SettingsRepository } from "../../core/settings/types.ts";
+import { SupabaseSettingsRepository } from "./settings.ts";
 
 export interface SessionContext {
   tenant: Tenant;
   repository: DashboardRepository;
   invoices?: InvoiceRepository;
+  supplies?: SuppliesRepository;
+  pricing?: PricingRepository;
+  reports?: ReportRepository;
+  settings?: SettingsRepository;
 }
 export type ResolveSession = (token: string) => Promise<SessionContext>;
 export function createSessionResolver(
@@ -60,6 +72,10 @@ export function createSessionResolver(
         role: membership.data.papel,
       },
       repository: new SupabaseDashboardRepository(client),
+      settings: new SupabaseSettingsRepository(client, membership.data.empresa_id, data.user, url, publicKey, token),
+      reports: new SupabaseReportRepository(client,membership.data.empresa_id),
+      pricing: new SupabasePricingRepository(client, membership.data.empresa_id),
+      supplies: new SupabaseSuppliesRepository(client, membership.data.empresa_id, data.user.id),
       invoices: new SupabaseInvoiceRepository(
         client,
         data.user.id,

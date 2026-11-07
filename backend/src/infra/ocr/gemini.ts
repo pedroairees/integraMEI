@@ -1,6 +1,7 @@
 import {
   invoicePrompt,
   invoiceSchema,
+  lineItemsPrompt,
   parseProviderExtraction,
 } from "./contract.ts";
 import { OcrFailure, providerConfig, requestJson } from "./transport.ts";
@@ -25,7 +26,7 @@ export class GeminiInvoiceReader {
           systemInstruction: {
             parts: [
               {
-                text: invoicePrompt,
+                text: invoicePrompt + lineItemsPrompt,
               },
             ],
           },
@@ -61,6 +62,19 @@ export class GeminiInvoiceReader {
                 date: { type: "STRING", nullable: true },
                 total: { type: "NUMBER", nullable: true },
                 items: { type: "ARRAY", items: { type: "STRING" } },
+                lineItems: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: {
+                      description: { type: "STRING" },
+                      quantity: { type: "NUMBER", nullable: true },
+                      unit: { type: "STRING", nullable: true },
+                      unitPrice: { type: "NUMBER", nullable: true },
+                    },
+                    required: ["description", "quantity", "unit", "unitPrice"],
+                  },
+                },
               },
               required: invoiceSchema.required,
             },

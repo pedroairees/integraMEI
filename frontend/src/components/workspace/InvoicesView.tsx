@@ -182,11 +182,11 @@ export function InvoicesView() {
         ))}
       </div>
       <ol className={styles.steps} aria-label="Etapas do envio">
-        {["Capturar", "Registrar", "Revisar"].map((step, index) => (
+        {["Capturar", "Revisar", "Lançar"].map((step, index) => (
           <li
             key={step}
             aria-current={
-              (review ? 2 : busy ? 1 : 0) === index ? "step" : undefined
+              (posting ? 2 : review ? 1 : 0) === index ? "step" : undefined
             }
           >
             <span>{index + 1}</span>
@@ -220,6 +220,13 @@ export function InvoicesView() {
         salvar, confere o CNPJ: sua empresa como emitente em Faturamento ou como
         destinatária em Custos. Documentos ambíguos ou na aba incorreta não são
         aceitos.
+      </p>
+      <p className={ui.hint}>
+        Enviar ou revisar a nota não altera o saldo. Para atualizar o dashboard,
+        conclua “Lançar no financeiro”. O valor pertence ao mês da emissão, não
+        ao mês do envio.
+        {kind === "cost" &&
+          " Ao confirmar um custo profissional, os itens revisados também entram automaticamente em Insumos. Antes da confirmação, nenhum insumo é cadastrado."}
       </p>
       {message && (
         <p role="status" className={styles.message}>
@@ -316,11 +323,33 @@ export function InvoicesView() {
                     ? "Exclusão pendente — tente novamente"
                     : invoice.lancado_financeiro_em
                       ? "Lançada no financeiro"
-                    : invoice.revisado_em
-                      ? "Dados revisados"
-                      : "Pendente de revisão"}
+                      : invoice.revisado_em
+                        ? "Dados revisados"
+                        : "Pendente de revisão"}
                 </p>
+                {invoice.revisado_em &&
+                  !invoice.lancado_financeiro_em &&
+                  !invoice.exclusao_solicitada_em &&
+                  invoice.status !== "confirmed" && (
+                    <p className={ui.hint}>
+                      Ainda não contabilizada no dashboard. Confirme o
+                      lançamento abaixo.
+                    </p>
+                  )}
                 <div className={ui.actions}>
+                  {invoice.revisado_em &&
+                    !invoice.lancado_financeiro_em &&
+                    !invoice.exclusao_solicitada_em &&
+                    invoice.status !== "confirmed" && (
+                      <button
+                        type="button"
+                        className={ui.primaryButton}
+                        disabled={busy}
+                        onClick={() => setPosting(invoice)}
+                      >
+                        Lançar no financeiro
+                      </button>
+                    )}
                   {!invoice.exclusao_solicitada_em && (
                     <a
                       href={`/api/backend/invoices/${invoice.id}/file`}
@@ -331,24 +360,32 @@ export function InvoicesView() {
                   )}
                   <button
                     type="button"
-                    disabled={busy || !!invoice.exclusao_solicitada_em || !!invoice.lancado_financeiro_em || invoice.status === "confirmed"}
+                    disabled={
+                      busy ||
+                      !!invoice.exclusao_solicitada_em ||
+                      !!invoice.lancado_financeiro_em ||
+                      invoice.status === "confirmed"
+                    }
                     onClick={() => setReview(invoice)}
                   >
                     Revisar dados
                   </button>
-                  {!invoice.revisado_em && !invoice.exclusao_solicitada_em && !invoice.lancado_financeiro_em && invoice.status !== "confirmed" && (
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => void read(invoice)}
-                    >
-                      Ler arquivo
-                    </button>
-                  )}
+                  {!invoice.revisado_em &&
+                    !invoice.exclusao_solicitada_em &&
+                    !invoice.lancado_financeiro_em &&
+                    invoice.status !== "confirmed" && (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void read(invoice)}
+                      >
+                        Ler arquivo
+                      </button>
+                    )}
                   <button
                     type="button"
                     className={ui.deleteButton}
-                    disabled={busy || !!invoice.lancado_financeiro_em || invoice.status === "confirmed"}
+                    disabled={busy || invoice.status === "confirmed"}
                     onClick={() => setDeleting(invoice)}
                   >
                     <Trash2 size={15} aria-hidden="true" />{" "}
@@ -356,9 +393,6 @@ export function InvoicesView() {
                       ? "Concluir exclusão"
                       : "Excluir nota"}
                   </button>
-                  {invoice.revisado_em && !invoice.lancado_financeiro_em && !invoice.exclusao_solicitada_em && invoice.status !== "confirmed" && (
-                    <button type="button" disabled={busy} onClick={() => setPosting(invoice)}>Lançar no financeiro</button>
-                  )}
                 </div>
               </div>
             </article>
@@ -380,10 +414,13 @@ export function InvoicesView() {
           key={`${review.id}-${review.versao_arquivo}`}
           invoice={review}
           onClose={() => setReview(null)}
-          onSaved={() => {
+          onSaved={(saved, launch) => {
             setReview(null);
+            if (launch) setPosting(saved);
             setMessage(
-              "Revisão salva. Use Lançar no financeiro para atualizar os indicadores do dashboard.",
+              launch
+                ? "Revisão salva. Confirme o lançamento para atualizar o dashboard."
+                : "Revisão salva como rascunho: ainda não contabilizada. Use Lançar no financeiro para atualizar o dashboard.",
             );
             reload();
           }}
@@ -402,15 +439,30 @@ export function InvoicesView() {
             );
             setDeleting(null);
             setMessage(
-              "Nota e arquivo original excluídos permanentemente. Justificativa registrada no histórico.",
+              "Nota e arquivo excluídos. Dashboard e preços vinculados atualizados. Justificativa preservada no histórico.",
             );
             reload();
           }}
         />
       )}
-      {posting && <InvoicePost invoice={posting} onClose={() => setPosting(null)} onPosted={() => {
-        setPosting(null); reload(); setMessage("Lançamento confirmado. O dashboard foi atualizado no mês da emissão da nota.");
-      }} />}
+      {posting && (
+        <InvoicePost
+          invoice={posting}
+          onClose={() => setPosting(null)}
+          onPosted={() => {
+            const month = posting.dados_extracao.date
+              ?.slice(0, 7)
+              .split("-")
+              .reverse()
+              .join("/");
+            setPosting(null);
+            reload();
+            setMessage(
+              `Lançamento confirmado. Consulte ${month} no dashboard para ver o valor contabilizado.`,
+            );
+          }}
+        />
+      )}
     </section>
   );
 }

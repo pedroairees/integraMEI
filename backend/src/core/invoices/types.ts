@@ -1,4 +1,10 @@
 export type InvoiceKind = "revenue" | "cost";
+export interface InvoiceLine {
+  description: string;
+  quantity: number | null;
+  unit: string | null;
+  unitPrice: number | null;
+}
 export interface ExtractedInvoice {
   supplier: string | null;
   cnpj: string | null;
@@ -8,6 +14,7 @@ export interface ExtractedInvoice {
   date: string | null;
   total: number | null;
   items: string[];
+  lineItems?: InvoiceLine[];
 }
 export interface Invoice {
   id: string;

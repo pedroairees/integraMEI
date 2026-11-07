@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { invoiceRequest, type SavedInvoice } from "./invoice-api";
 import styles from "./Invoices.module.css";
+import { notifyFinancialUpdate } from "@/src/lib/financial-updates";
 
 export function InvoiceDelete({
   invoice,
@@ -35,7 +36,10 @@ export function InvoiceDelete({
     try {
       await invoiceRequest(`/${invoice.id}`, {
         method: "DELETE",
-        body: JSON.stringify({ reason: reason.trim() }),
+        body: JSON.stringify({
+          reason: reason.trim(),
+          version: invoice.versao_arquivo,
+        }),
       });
       onDeleted();
     } catch (error) {
@@ -47,6 +51,8 @@ export function InvoiceDelete({
           : "Não foi possível concluir a exclusão. Tente novamente.",
       );
     } finally {
+      // The DB reversal can succeed before external Storage cleanup fails.
+      notifyFinancialUpdate();
       setBusy(false);
     }
   }
@@ -69,6 +75,15 @@ export function InvoiceDelete({
           ser desfeita. A justificativa, a autoria e as datas permanecerão no
           histórico de exclusões.
         </p>
+        {invoice.lancado_financeiro_em && (
+          <p>
+            Esta nota já foi lançada. A exclusão retirará seu valor do dashboard
+            no mês da emissão e removerá os preços de insumos vinculados a ela.
+            Os cadastros dos insumos e outras compras serão preservados. Se a
+            limpeza do arquivo falhar, a nota ficará em exclusão pendente, já
+            fora dos indicadores.
+          </p>
+        )}
         <fieldset disabled={busy}>
           <label>
             Justificativa da exclusão
@@ -84,6 +99,12 @@ export function InvoiceDelete({
               aria-describedby="delete-reason-hint"
             />
           </label>
+          {invoice.lancado_financeiro_em && (
+            <label className={styles.confirmation}>
+              <input type="checkbox" required /> Entendo que esta exclusão
+              altera o dashboard e o histórico de preços.
+            </label>
+          )}
         </fieldset>
         <p id="delete-reason-hint" className={styles.hint}>
           {requested

@@ -1,6 +1,7 @@
 import {
   invoicePrompt,
   invoiceSchema,
+  lineItemsPrompt,
   parseProviderExtraction,
 } from "./contract.ts";
 import { OcrFailure, providerConfig, requestJson } from "./transport.ts";
@@ -27,7 +28,7 @@ export class OpenAIInvoiceReader {
       body: JSON.stringify({
         model,
         store: false,
-        instructions: invoicePrompt,
+        instructions: invoicePrompt + lineItemsPrompt,
         input: [{ role: "user", content: [document] }],
         max_output_tokens: 8192,
         text: {

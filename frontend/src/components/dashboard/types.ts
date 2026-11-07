@@ -7,6 +7,7 @@ export interface DashboardData {
   updatedAt: string;
   insight: string;
   marginTarget: number | null;
+  pending?: { count: number; revenue: number; costs: number };
   metrics: {
     revenue: number;
     costs: number;

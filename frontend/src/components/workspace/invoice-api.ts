@@ -7,6 +7,12 @@ export interface InvoiceData {
   date: string | null;
   total: number | null;
   items: string[];
+  lineItems?: {
+    description: string;
+    quantity: number | null;
+    unit: string | null;
+    unitPrice: number | null;
+  }[];
 }
 export interface SavedInvoice {
   id: string;

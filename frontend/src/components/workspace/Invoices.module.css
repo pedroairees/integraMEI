@@ -20,6 +20,7 @@
 .toolbar button,
 .actions button,
 .actions a,
+.itemsEditor button,
 .more {
   border: 1px solid #1c3a70;
   background: white;
@@ -34,15 +35,18 @@
 .toolbar button:focus-visible,
 .actions button:focus-visible,
 .actions a:focus-visible,
+.itemsEditor button:focus-visible,
 .more:focus-visible {
   outline: 3px solid #67aade;
   outline-offset: 3px;
 }
 .actions button:hover,
+.itemsEditor button:hover:not(:disabled),
 .actions a:hover {
   background: #edf3fb;
 }
 .actions button:disabled,
+.itemsEditor button:disabled,
 .toolbar button:disabled,
 .more:disabled {
   opacity: 0.5;
@@ -134,7 +138,8 @@
   font-size: 14px;
 }
 .dialog input,
-.dialog textarea {
+.dialog textarea,
+.dialog select {
   width: 100%;
   min-width: 0;
   border: 1px solid #adbbcf;
@@ -145,7 +150,8 @@
   color: #243247;
 }
 .dialog input:focus-visible,
-.dialog textarea:focus-visible {
+.dialog textarea:focus-visible,
+.dialog select:focus-visible {
   outline: 2px solid #155bcb;
   outline-offset: 2px;
 }
@@ -155,6 +161,36 @@
 }
 .dialog .actions {
   justify-content: flex-end;
+  margin-top: 20px;
+}
+.invoiceLine {
+  padding: 14px;
+  margin-bottom: 12px;
+  border: 1px solid #adbbcf;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+}
+.lineNumbers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 480px) {
+  .lineNumbers {
+    grid-template-columns: 1fr;
+  }
+}
+.dialog .confirmation {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.confirmation input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #1c3a70;
 }
 .dialog button[type="submit"] {
   color: white;
@@ -162,6 +198,17 @@
 }
 .dialog button[type="submit"].deleteButton {
   background: #b42318;
+}
+.actions .primaryButton {
+  background: #1c3a70;
+  color: white;
+}
+.actions .primaryButton:hover:not(:disabled) {
+  background: #142c55;
+}
+.dialog button[type="submit"].secondaryButton {
+  background: white;
+  color: #1c3a70;
 }
 .dialog button[type="submit"].deleteButton:hover:not(:disabled) {
   background: #912018;

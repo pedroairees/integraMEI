@@ -11,7 +11,6 @@ export default function Page() {
       path="/notas-fiscais"
       title="Notas Fiscais"
       description="Anexo e consultas de Notas Fiscais."
-      preview={false}
     >
       <InvoicesView />
     </ScreenPage>

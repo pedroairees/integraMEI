@@ -31,14 +31,6 @@
 .header {
   margin-bottom: 32px;
 }
-.demoNotice {
-  max-width: 1285px;
-  margin: 16px auto 0;
-  color: #fff;
-  font-size: 12px;
-  line-height: 1.6;
-  text-align: center;
-}
 .card {
   border-radius: 8px;
   background: #fff;

@@ -20,11 +20,16 @@
     "@fastify/swagger-ui": "^6.1.1",
     "@napi-rs/canvas": "^1.0.10",
     "@supabase/supabase-js": "^2.116.0",
+    "exceljs": "^4.4.0",
     "fastify": "^5.0.0",
+    "jszip": "^3.10.2",
+    "nodemailer": "^10.3.1",
+    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.4.299"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "@types/nodemailer": "^8.0.2",
     "typescript": "~6.0.0"
   }
 }

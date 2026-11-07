@@ -276,7 +276,7 @@ test("delete asks confirmation and removes both record and original permanently"
   });
   await deletion.getByRole("button", { name: "Confirmar exclusão" }).click();
   await expect(
-    page.getByText(/Nota e arquivo original excluídos permanentemente/),
+    page.getByText(/Nota e arquivo excluídos/),
   ).toBeVisible();
   await expect(card).toHaveCount(0);
   expect((await page.request.get(download!)).status()).toBe(404);

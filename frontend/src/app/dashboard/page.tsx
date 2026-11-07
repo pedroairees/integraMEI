@@ -12,7 +12,8 @@ export default async function DashboardPage() {
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user?.email_confirmed_at) redirect("/");
 
-  const fullName: unknown = user.user_metadata?.nome_completo;
+  const { data: profile } = await supabase.from("usuarios").select("nome_completo").eq("usuario_auth_id", user.id).maybeSingle();
+  const fullName: unknown = profile?.nome_completo ?? user.user_metadata?.nome_completo;
   const firstName = typeof fullName === "string" ? fullName.trim().split(/\s+/)[0] : "";
 
   return <DashboardView firstName={firstName || "Usuário"} />;

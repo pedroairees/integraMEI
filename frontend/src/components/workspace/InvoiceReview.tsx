@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { invoiceRequest, type SavedInvoice } from "./invoice-api";
+import { notifyFinancialUpdate } from "@/src/lib/financial-updates";
 import styles from "./Invoices.module.css";
+import { editableLines, InvoiceItems } from "./InvoiceItems";
 
 export function InvoiceReview({
   invoice,
@@ -11,12 +13,13 @@ export function InvoiceReview({
 }: {
   invoice: SavedInvoice;
   onClose: () => void;
-  onSaved: (invoice: SavedInvoice) => void;
+  onSaved: (invoice: SavedInvoice, launch: boolean) => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const data = invoice.dados_extracao;
+  const [lines, setLines] = useState(() => editableLines(data));
   useEffect(() => {
     const element = dialog.current;
     element?.showModal();
@@ -24,6 +27,9 @@ export function InvoiceReview({
   }, []);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    const launch =
+      submitter instanceof HTMLButtonElement && submitter.value === "post";
     const form = new FormData(event.currentTarget);
     setBusy(true);
     setError("");
@@ -42,15 +48,30 @@ export function InvoiceReview({
               number: form.get("number") || null,
               date: form.get("date"),
               total: Number(form.get("total")),
-              items: String(form.get("items"))
-                .split("\n")
-                .map((item) => item.trim())
-                .filter(Boolean),
+              ...(invoice.natureza === "cost"
+                ? {
+                    items: lines.map((line) => line.description.trim()),
+                    lineItems: lines.map((line) => ({
+                      description: line.description.trim(),
+                      quantity:
+                        line.quantity === "" ? null : Number(line.quantity),
+                      unit: line.unit.trim().toLowerCase() || null,
+                      unitPrice:
+                        line.unitPrice === "" ? null : Number(line.unitPrice),
+                    })),
+                  }
+                : {
+                    items: String(form.get("items"))
+                      .split("\n")
+                      .map((item) => item.trim())
+                      .filter(Boolean),
+                  }),
             },
           }),
         },
       );
-      onSaved(result.invoice);
+      notifyFinancialUpdate();
+      onSaved(result.invoice, launch);
     } catch (error) {
       setError(
         error instanceof Error
@@ -139,21 +160,26 @@ export function InvoiceReview({
               required
             />
           </label>
-          <label>
-            Itens (uma descrição por linha)
-            <textarea
-              name="items"
-              defaultValue={data.items.join("\n")}
-              rows={4}
-              required
-              maxLength={100000}
-            />
-          </label>
+          {invoice.natureza === "cost" ? (
+            <InvoiceItems lines={lines} onChange={setLines} />
+          ) : (
+            <label>
+              Itens (uma descrição por linha)
+              <textarea
+                name="items"
+                defaultValue={data.items.join("\n")}
+                rows={4}
+                required
+                maxLength={100000}
+              />
+            </label>
+          )}
         </fieldset>
         <p className={styles.hint}>
           Os CNPJs usados para validar a categoria vêm da leitura do arquivo e
-          não podem ser alterados manualmente. Após salvar a revisão, use
-          “Lançar no financeiro” para incluir o valor no dashboard. O estoque não é alterado.
+          não podem ser alterados manualmente. Use “Salvar e lançar” para seguir
+          à confirmação que atualiza o dashboard. “Salvar revisão” guarda apenas
+          o rascunho, sem alterar os indicadores. O estoque não é alterado.
         </p>
         {error && (
           <p role="alert" className={styles.error}>
@@ -164,7 +190,15 @@ export function InvoiceReview({
           <button type="button" onClick={onClose} disabled={busy}>
             Cancelar
           </button>
-          <button type="submit" disabled={busy}>
+          <button type="submit" value="post" disabled={busy}>
+            {busy ? "Salvando…" : "Salvar e lançar"}
+          </button>
+          <button
+            type="submit"
+            value="draft"
+            className={styles.secondaryButton}
+            disabled={busy}
+          >
             {busy ? "Salvando…" : "Salvar revisão"}
           </button>
         </div>

@@ -10,7 +10,7 @@ export default function Page() {
     <ScreenPage
       path="/precificacao"
       title="Precificação"
-      description="Precificação estratégica, calculada com base no custo e na margem de lucro desejada."
+      description="Calcule e salve preços com base nos custos da sua empresa, nos insumos e no markup desejado."
     >
       <PricingView />
     </ScreenPage>

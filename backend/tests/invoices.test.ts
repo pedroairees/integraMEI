@@ -37,6 +37,7 @@ const extraction: ExtractedInvoice = {
   total: 15.25,
   number: "42",
   items: ["Farinha"],
+  lineItems: [{ description: "Farinha", quantity: 1, unit: "kg", unitPrice: 15.25 }],
 };
 class MemoryRepository implements InvoiceRepository {
   async companyCnpj() {
@@ -125,7 +126,102 @@ class MemoryRepository implements InvoiceRepository {
 const reader = { read: async () => extraction };
 const reason = "Arquivo enviado por engano durante o teste.";
 
-test("deletion removes file and record, is idempotent, and never deletes confirmed financial data", async () => {
+test("cost draft remains saveable without structured items, but professional confirmation requires them", async () => {
+  const repo = new MemoryRepository();
+  const service = new InvoiceService(repo, { read: async () => ({ ...extraction, lineItems: undefined }) });
+  const { invoice } = await service.upload(payload);
+  const reviewed = await service.review(invoice.id, invoice.versao_arquivo, { ...extraction, lineItems: undefined });
+  assert.equal(reviewed.lancado_financeiro_em, undefined);
+  await assert.rejects(() => service.post(reviewed.id, reviewed.versao_arquivo, "professional"), { status: 422 });
+  assert.equal((await repo.get(reviewed.id)).lancado_financeiro_em, undefined);
+  const complete = await service.review(reviewed.id, reviewed.versao_arquivo, extraction);
+  assert.ok((await service.post(complete.id, complete.versao_arquivo, "professional")).lancado_financeiro_em);
+});
+
+test("financial posting requires review and current version, is idempotent and freezes edits/obsolete deletion requests", async () => {
+  const repo = new MemoryRepository(), service = new InvoiceService(repo, reader);
+  const { invoice } = await service.upload(payload);
+  await assert.rejects(() => service.post(invoice.id, invoice.versao_arquivo, "professional"), { status: 409 });
+  const reviewed = await service.review(invoice.id, invoice.versao_arquivo, extraction);
+  await assert.rejects(() => service.post(reviewed.id, invoice.versao_arquivo, "professional"), { status: 409 });
+  const posted = await service.post(reviewed.id, reviewed.versao_arquivo, "professional");
+  assert.ok(posted.lancado_financeiro_em);
+  assert.equal(posted.tipo, "professional");
+  assert.deepEqual(await service.post(posted.id, invoice.versao_arquivo, "personal"), posted);
+  assert.equal(repo.records.size, 1);
+  await assert.rejects(() => service.review(posted.id, posted.versao_arquivo, extraction), { status: 409 });
+  await assert.rejects(() => service.read(posted.id), { status: 409 });
+  await assert.rejects(() => service.delete(posted.id, reason), { status: 409 });
+  assert.equal(repo.files.size, 1);
+});
+
+test("personal costs retain their scope, and deleting or invalid notes cannot be posted", async () => {
+  const repo = new MemoryRepository(), service = new InvoiceService(repo, reader);
+  const { invoice } = await service.upload(payload);
+  const reviewed = await service.review(invoice.id, invoice.versao_arquivo, extraction);
+  repo.records.set(reviewed.id, { ...reviewed, exclusao_solicitada_em: new Date().toISOString() });
+  await assert.rejects(() => service.post(reviewed.id, reviewed.versao_arquivo, "personal"), { status: 409 });
+  repo.records.set(reviewed.id, { ...reviewed, dados_extracao: { ...extraction, recipientCnpj: "12345678000195" } });
+  await assert.rejects(() => service.post(reviewed.id, reviewed.versao_arquivo, "personal"), { status: 422 });
+  repo.records.set(reviewed.id, reviewed);
+  assert.equal((await service.post(reviewed.id, reviewed.versao_arquivo, "personal")).tipo, "personal");
+});
+
+test("posted deletion requires the displayed version and can resume after Storage failure", async () => {
+  const repo = new MemoryRepository(), service = new InvoiceService(repo, reader);
+  const { invoice } = await service.upload(payload);
+  const reviewed = await service.review(invoice.id, invoice.versao_arquivo, extraction);
+  const posted = await service.post(reviewed.id, reviewed.versao_arquivo, "professional");
+  await assert.rejects(() => service.delete(posted.id, reason, invoice.versao_arquivo), { status: 409 });
+  await assert.rejects(() => service.delete(posted.id, reason), { status: 409 });
+  assert.equal(repo.files.size, 1);
+  repo.failRemoval = true;
+  await assert.rejects(() => service.delete(posted.id, reason, posted.versao_arquivo), { status: 502 });
+  assert.equal(repo.files.size, 1);
+  assert.ok((await repo.get(posted.id)).exclusao_solicitada_em);
+  repo.failRemoval = false;
+  await service.delete(posted.id, reason, posted.versao_arquivo);
+  await service.delete(posted.id, reason, posted.versao_arquivo);
+  assert.equal(repo.records.size, 0); assert.equal(repo.files.size, 0);
+});
+
+test("deletion RPCs use trusted company and version; missing migration and errors are safe", async () => {
+  const memory = new MemoryRepository(), service = new InvoiceService(memory, reader);
+  const { invoice } = await service.upload(payload);
+  for (const [code, status] of [["PGRST202",503],["42501",403],["P0001",502],["08000",502]] as const) {
+    const client = createClient("http://localhost:1", "test-key", { global: { fetch: async (url, init) => {
+      const path = new URL(String(url)).pathname;
+      const body = JSON.parse(String(init?.body));
+      assert.equal(body.p_empresa_id, "trusted-company"); assert.equal(body.p_nota_id, invoice.id);
+      if (path.endsWith("iniciar_exclusao_nota")) {
+        assert.equal(body.p_versao, invoice.versao_arquivo); assert.equal(body.p_justificativa, reason);
+      } else assert.ok(path.endsWith("concluir_exclusao_nota"));
+      return Response.json({ code, message: "private database diagnostic" }, { status: 400 });
+    } } });
+    const repo = new SupabaseInvoiceRepository(client, "trusted-owner", "trusted-company");
+    for (const action of [() => repo.beginDeletion(invoice, reason), () => repo.finishDeletion(invoice)])
+      await assert.rejects(action, e => e instanceof AppError && e.status === status && !e.message.includes("private database"));
+  }
+});
+
+test("posting repository sends only scoped RPC arguments and safely maps missing migration/conflict errors", async () => {
+  const repo = new MemoryRepository(), service = new InvoiceService(repo, reader);
+  const { invoice } = await service.upload(payload);
+  for (const [code, status] of [["PGRST202", 503], ["42P01", 503], ["42704", 503], ["P0001", 409], ["23505", 409], ["42501", 403], ["08000", 502]] as const) {
+    const client = createClient("http://localhost:1", "test-key", {
+      global: { fetch: async (url, init) => {
+        assert.equal(new URL(String(url)).pathname, "/rest/v1/rpc/lancar_nota_com_insumos");
+        assert.deepEqual(JSON.parse(String(init?.body)), { p_nota_id: invoice.id, p_empresa_id: "trusted-company", p_versao: invoice.versao_arquivo, p_tipo: "professional" });
+        return Response.json({ code, message: "private database details" }, { status: 400 });
+      } },
+    });
+    await assert.rejects(() => new SupabaseInvoiceRepository(client, "trusted-owner", "trusted-company").post(invoice, "professional"),
+      error => error instanceof AppError && error.status === status && !error.message.includes("private database")
+        && (!["42P01", "42704"].includes(code) || error.message.includes("20261018160000_invoice_trigger_schema_resolution.sql")));
+  }
+});
+
+test("deletion removes file and record, is idempotent, and never deletes legacy stock-confirmed data", async () => {
   const repo = new MemoryRepository(),
     service = new InvoiceService(repo, reader);
   const { invoice } = await service.upload(payload);

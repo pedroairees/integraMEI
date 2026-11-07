@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { FinancialChart } from "./FinancialChart";
 import { Notifications } from "./DashboardActions";
 import { currency, percentage, type DashboardData } from "./types";
@@ -83,19 +84,26 @@ export function DashboardPanel() {
   const loading = result.key !== key;
   const data = result.query === query ? result.data : undefined;
   useEffect(() => {
-    let last = 0;
+    let scheduled: ReturnType<typeof setTimeout> | undefined;
     const refresh = () => {
-      if (document.visibilityState === "hidden" || Date.now() - last < 2000) return;
-      last = Date.now(); setRevision(v => v + 1);
+      if (document.visibilityState === "hidden") return;
+      // Coalesce focus/visibility/broadcast bursts without dropping the last update.
+      clearTimeout(scheduled);
+      scheduled = setTimeout(() => setRevision((v) => v + 1), 150);
     };
-    const channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(financialUpdateEvent) : null;
+    const channel =
+      typeof BroadcastChannel !== "undefined"
+        ? new BroadcastChannel(financialUpdateEvent)
+        : null;
     if (channel) channel.onmessage = refresh;
     window.addEventListener(financialUpdateEvent, refresh);
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
     const timer = window.setInterval(refresh, 30000);
     return () => {
-      channel?.close(); window.clearInterval(timer);
+      channel?.close();
+      window.clearInterval(timer);
+      clearTimeout(scheduled);
       window.removeEventListener(financialUpdateEvent, refresh);
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", refresh);
@@ -113,10 +121,12 @@ export function DashboardPanel() {
           throw Error(body.message ?? "Não foi possível carregar o painel.");
         return body as DashboardData;
       })
-      .then((data) => { if (!controller.signal.aborted) setResult({ key, query, data }); })
+      .then((data) => {
+        if (!controller.signal.aborted) setResult({ key, query, data });
+      })
       .catch((error) => {
         if (!controller.signal.aborted)
-          setResult(previous => ({
+          setResult((previous) => ({
             key,
             query,
             data: previous.query === query ? previous.data : undefined,
@@ -239,6 +249,22 @@ export function DashboardPanel() {
       )}
       {data && (
         <>
+          {!!data.pending?.count && (
+            <aside className={styles.notice} aria-label="Lançamentos pendentes">
+              <strong>
+                {data.pending.count} nota(s) revisada(s) ainda não lançada(s)
+                neste mês.
+              </strong>
+              <p>
+                Faturamento pendente: {currency(data.pending.revenue)}. Custos
+                pendentes: {currency(data.pending.costs)}. Esses valores ainda
+                não entram nos indicadores.
+              </p>
+              <Link href="/notas-fiscais">
+                Concluir lançamentos em Notas Fiscais
+              </Link>
+            </aside>
+          )}
           {data.empty && (
             <p role="status" className={styles.notice}>
               Nenhuma venda ou despesa confirmada neste mês. Os indicadores
@@ -352,7 +378,7 @@ export function DashboardPanel() {
                 </select>
               </label>
             </div>
-            <FinancialChart key={key} points={data.evolution} />
+            <FinancialChart key={query} points={data.evolution} />
           </section>
           <section
             className={styles.bottomCharts}
@@ -544,8 +570,10 @@ export function DashboardPanel() {
             </section>
           )}
           <p className={styles.dataNotice}>
-            Dados reais de {data.companyName}, por data de emissão. Atualização automática a cada 30 segundos enquanto esta tela estiver visível. Atualizado às{" "}
-            {new Date(data.updatedAt).toLocaleTimeString("pt-BR")}.
+            Dados reais de {data.companyName}, por data de emissão. Atualização
+            automática a cada 30 segundos enquanto esta tela estiver visível.
+            Atualizado às {new Date(data.updatedAt).toLocaleTimeString("pt-BR")}
+            .
           </p>
         </>
       )}

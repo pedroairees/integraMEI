@@ -10,13 +10,11 @@ export async function ScreenPage({
   title,
   description,
   children,
-  preview = true,
 }: {
   path: string;
   title: string;
   description: string;
   children: ReactNode;
-  preview?: boolean;
 }) {
   const supabase = await getSessionSupabaseClient({ readOnly: true });
   const {
@@ -40,12 +38,6 @@ export async function ScreenPage({
           {children}
         </main>
       </div>
-      {preview && (
-        <p className={styles.demoNotice}>
-          Prévia das telas • Dados demonstrativos do Figma. Alterações e
-          arquivos ficam apenas nesta tela; nada é enviado ou salvo.
-        </p>
-      )}
     </div>
   );
 }

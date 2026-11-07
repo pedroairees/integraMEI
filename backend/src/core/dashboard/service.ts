@@ -152,9 +152,25 @@ export function calculateDashboard(
     daysWithSales >= 15 ? Math.round((revenue / elapsed) * daysInMonth) : null;
   const revenueChange = change(revenue, previousRevenue),
     costChange = change(costs, previousCosts);
+  const pending = (source.pendingInvoices ?? []).filter(
+    (n) => n.data_emissao.slice(0, 7) === month,
+  );
   return {
     filter,
     companyName: source.company.razao_social,
+    pending: {
+      count: pending.length,
+      revenue: money(
+        pending
+          .filter((n) => n.natureza === "revenue")
+          .reduce((sum, n) => sum + cents(n.valor_total), 0),
+      ),
+      costs: money(
+        pending
+          .filter((n) => n.natureza === "cost")
+          .reduce((sum, n) => sum + cents(n.valor_total), 0),
+      ),
+    },
     metrics: {
       revenue: money(revenue),
       costs: money(costs),

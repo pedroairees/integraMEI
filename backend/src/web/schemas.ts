@@ -26,6 +26,7 @@ export const dashboardSchema = object({
   updatedAt: text,
   insight: text,
   marginTarget: nullableNumber,
+  pending: object({ count: number, revenue: number, costs: number }),
   metrics: object(
     Object.fromEntries(
       [

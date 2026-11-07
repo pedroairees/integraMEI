@@ -1,0 +1,36 @@
+.title {
+  margin: 0 0 12px;
+  color: #1e3c73;
+  font-size: 20px;
+}
+.note {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.feedback {
+  padding: 12px;
+  margin: 12px 0 0;
+  background: #ecf4fd;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.error {
+  color: #b42318;
+  background: #fff4f4;
+}
+.secondary {
+  border: 1px solid #1e3c73;
+  color: #1e3c73;
+  background: white;
+  border-radius: 6px;
+  padding: 10px 14px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.secondary:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}

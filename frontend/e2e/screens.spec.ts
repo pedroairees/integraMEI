@@ -53,9 +53,7 @@ for (const [route, title] of screens) {
     await expect(
       page.getByRole("link", { name: title, exact: true }),
     ).toHaveAttribute("aria-current", "page");
-    if (route !== "notas-fiscais")
-      await expect(page.getByText(/Prévia das telas/)).toBeVisible();
-    else await expect(page.getByText(/Prévia das telas/)).toHaveCount(0);
+    await expect(page.getByText(/Prévia das telas/)).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
     for (const width of [1440, 1024, 768, 390]) {
       await page.setViewportSize({ width, height: 1024 });
@@ -92,75 +90,3 @@ for (const [route, title] of screens) {
   });
 }
 
-test("preview controls work locally without business requests or persistence", async ({
-  page,
-}) => {
-  await authenticate(page);
-  const writes: string[] = [];
-  page.on("request", (request) => {
-    if (!["GET", "HEAD"].includes(request.method())) writes.push(request.url());
-  });
-  await page.goto("/insumos");
-  await page.getByLabel("Produto", { exact: true }).fill("Farinha de Trigo");
-  await page.getByRole("button", { name: "Pesquisar insumo" }).click();
-  await expect(page.getByText("R$ 7,80", { exact: true })).toBeVisible();
-  await expect(
-    page.getByRole("img", { name: /Evolução ilustrativa/ }),
-  ).toBeVisible();
-  await page.screenshot({
-    path: "test-results/insumos-example.png",
-    fullPage: true,
-  });
-  await page.getByLabel("Período do histórico").selectOption("3");
-  await expect(page.getByRole("status")).toContainText(
-    "Não há dados demonstrativos",
-  );
-
-  await page.goto("/precificacao");
-  await page.getByLabel("Produto", { exact: true }).fill("Bolo de chocolate");
-  await page
-    .getByLabel("Custo Total Unitário (R$)", { exact: true })
-    .fill("18,50");
-  await page.getByLabel("Margem de Lucro Desejada (%)").fill("50");
-  await page.getByRole("button", { name: "Sugerir Preço" }).click();
-  await expect(page.getByRole("status")).toContainText(
-    "Nenhum valor foi calculado ou salvo",
-  );
-
-  await page.goto("/relatorios");
-  await page.getByLabel("Data Inicial").fill("2026-04-01");
-  await page.getByLabel("Data Final").fill("2026-04-30");
-  await page.getByLabel("Lucro", { exact: true }).check();
-  await page.getByLabel("Excel (XLSX)").check();
-  await page.getByRole("button", { name: "Gerar Relatório" }).click();
-  await expect(page.getByRole("status")).toContainText(
-    "nenhum arquivo ou e-mail foi gerado",
-  );
-  await page.screenshot({
-    path: "test-results/relatorios-selected.png",
-    fullPage: true,
-  });
-
-  await page.goto("/configuracoes");
-  const toggle = page.getByRole("switch", {
-    name: "Receber alertas por e-mail",
-  });
-  await expect(toggle).toBeChecked();
-  await toggle.focus();
-  await page.keyboard.press("Space");
-  await expect(toggle).not.toBeChecked();
-  await page.getByLabel("Senha atual", { exact: true }).fill("preview-only");
-  await page.getByRole("button", { name: "Mostrar senha" }).click();
-  await expect(page.getByLabel("Senha atual", { exact: true })).toHaveAttribute(
-    "type",
-    "text",
-  );
-  await page.getByRole("button", { name: "Enviar", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText(
-    "nenhum e-mail foi enviado",
-  );
-  await page.reload();
-  await expect(toggle).toBeChecked();
-  await expect(page.getByLabel("Senha atual", { exact: true })).toHaveValue("");
-  expect(writes).toEqual([]);
-});
