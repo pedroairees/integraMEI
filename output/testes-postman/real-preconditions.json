@@ -1,0 +1,26 @@
+{
+  "runId": "47308b36-6891-4035-9a3f-7d9f771fc432",
+  "preparedAt": "2026-11-07T17:09:29.619Z",
+  "project": "smetijbqfigxnxodxgph.supabase.co",
+  "tenants": [
+    {
+      "label": "A",
+      "authId": "8cb58d01-4c0b-4f18-88b1-aef28c7f3279",
+      "companyId": "7c773bbb-625d-4cf3-a9c9-e7a1512c8259",
+      "profileId": "78a249ba-b609-4272-9c08-66f851b26cd8"
+    },
+    {
+      "label": "B",
+      "authId": "19046479-a44c-45ac-a793-dedcd82be668",
+      "companyId": "23fc37b4-a921-485e-bf87-c2e53fbc385b",
+      "profileId": "9a88f821-c4ca-481d-b98d-04594ccbf47b"
+    }
+  ],
+  "sale": {
+    "id": "d7ee9a34-af3f-46f1-8bad-bf87c6f48958",
+    "value": 150,
+    "date": "2026-11-07"
+  },
+  "authentication": "Contas sintéticas criadas via Admin, confirmadas sem envio de e-mail. Login testado com senha pelo Auth real.",
+  "adminKeyInCollection": false
+}

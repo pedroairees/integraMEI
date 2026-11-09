@@ -1,0 +1,1832 @@
+{
+  "info": {
+    "name": "IntegraMEI - Local com serviços simulados",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Executar em ordem pelo Collection Runner. Usa exclusivamente contas/empresas sintéticas. Gera e modifica dados de teste. Nunca usar credenciais de uma conta pessoal. Testes reais não enviam e-mails nem chamam IA. Consulte INSTRUCOES.md."
+  },
+  "variable": [
+    {
+      "key": "invalidToken",
+      "value": "token-invalido-para-teste"
+    },
+    {
+      "key": "supplyId",
+      "value": ""
+    },
+    {
+      "key": "supplyVersion",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": "6e0908f4-b732-4e20-bdca-cba5351c9702"
+    },
+    {
+      "key": "priceId",
+      "value": "c9c3dff5-5ae9-4ac7-a693-752ddf6729dd"
+    },
+    {
+      "key": "mailId",
+      "value": "ce4e78d3-132f-443f-aa9d-00c3dddf4ca9"
+    },
+    {
+      "key": "mailXlsxId",
+      "value": "776cec06-2bba-4641-817d-aac72ffa0871"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Saúde da API",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/health",
+        "description": "01 Saúde da API"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Serviço disponível\", function () { pm.expect(pm.response.json().status).to.eql(\"ok\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Dashboard exige autenticação",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/dashboard",
+        "description": "02 Dashboard exige autenticação"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Token inválido é recusado",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{invalidToken}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings",
+        "description": "03 Token inválido é recusado"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Login com conta exclusiva de teste",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "apikey",
+            "value": "{{publicKey}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{authBase}}/auth/v1/token?grant_type=password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Login direto no Supabase Auth. Não valida a tela de login/CNPJ nem envio de confirmação por e-mail."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Token de acesso recebido\", function () { pm.expect(pm.response.json().access_token).to.be.a(\"string\").and.not.empty; });",
+              "if (pm.response.code === 200) pm.environment.set(\"token\", pm.response.json().access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Configurações pertencem à conta logada",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings",
+        "description": "05 Configurações pertencem à conta logada"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Nome da conta\", function () { pm.expect(pm.response.json().fullName).to.eql(pm.environment.get(\"initialName\")); });",
+              "pm.test(\"E-mail da conta\", function () { pm.expect(pm.response.json().email).to.eql(pm.environment.get(\"email\")); });",
+              "pm.test(\"Resposta não armazenada em cache\", function () { pm.expect(pm.response.headers.get(\"Cache-Control\")).to.include(\"no-store\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Salvar nome, telefone e preferências",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Pessoa Teste Postman Atualizada\",\n  \"phone\": \"61900000001\",\n  \"emailAlerts\": true,\n  \"invoiceReminders\": false,\n  \"lowStockAlerts\": true,\n  \"timeZone\": \"America/Manaus\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "06 Salvar nome, telefone e preferências"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Nome salvo\", function () { pm.expect(pm.response.json().fullName).to.eql(\"Pessoa Teste Postman Atualizada\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Ler novamente as configurações salvas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings",
+        "description": "07 Ler novamente as configurações salvas"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Persistência de todos os campos\", function () { const b = pm.response.json(); const expected = {\"fullName\":\"Pessoa Teste Postman Atualizada\",\"phone\":\"61900000001\",\"emailAlerts\":true,\"invoiceReminders\":false,\"lowStockAlerts\":true,\"timeZone\":\"America/Manaus\"}; for (const [k,v] of Object.entries(expected)) pm.expect(b[k], k).to.eql(v); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Telefone inválido é recusado",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Pessoa Teste Postman Atualizada\",\n  \"phone\": \"123\",\n  \"emailAlerts\": true,\n  \"invoiceReminders\": false,\n  \"lowStockAlerts\": true,\n  \"timeZone\": \"America/Manaus\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "08 Telefone inválido é recusado"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Alteração direta de e-mail no perfil é recusada",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Pessoa Teste Postman Atualizada\",\n  \"phone\": \"61900000001\",\n  \"emailAlerts\": true,\n  \"invoiceReminders\": false,\n  \"lowStockAlerts\": true,\n  \"timeZone\": \"America/Manaus\",\n  \"email\": \"nao-enviar@example.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "09 Alteração direta de e-mail no perfil é recusada"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Dashboard reflete os lançamentos conhecidos",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/dashboard?month={{month}}&months=3&scope=professional",
+        "description": "10 Dashboard reflete os lançamentos conhecidos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Receita exata\", function () { pm.expect(pm.response.json().metrics.revenue).to.eql(Number(pm.environment.get(\"expectedRevenue\"))); });",
+              "pm.test(\"Custos exatos\", function () { pm.expect(pm.response.json().metrics.costs).to.eql(Number(pm.environment.get(\"expectedCosts\"))); });",
+              "pm.test(\"Lucro = receita - custos\", function () { pm.expect(pm.response.json().metrics.profit).to.eql(Number(pm.environment.get(\"expectedRevenue\")) - Number(pm.environment.get(\"expectedCosts\"))); });",
+              "pm.test(\"Gráfico de despesas tem três meses e custo final correto\", function () { const b=pm.response.json(); pm.expect(b.evolution).to.have.length(3); pm.expect(b.evolution[2].month).to.eql(pm.environment.get(\"month\")); pm.expect(b.evolution[2].value).to.eql(Number(pm.environment.get(\"expectedCosts\"))); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Mês inválido é recusado",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/dashboard?month=2026-13",
+        "description": "11 Mês inválido é recusado"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Salvar meta da empresa de teste",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/dashboard/goal",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"value\": 1000,\n  \"marginTarget\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "12 Salvar meta da empresa de teste"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Meta aparece no dashboard",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/dashboard?month={{month}}",
+        "description": "13 Meta aparece no dashboard"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Meta persistida\", function () { pm.expect(pm.response.json().goal.value).to.eql(1000); });",
+              "pm.test(\"Meta de margem persistida\", function () { pm.expect(pm.response.json().marginTarget).to.eql(30); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 Listar insumos da empresa",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/supplies",
+        "description": "14 Listar insumos da empresa"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Lista de insumos válida\", function () { pm.expect(pm.response.json().supplies).to.be.an(\"array\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 Cadastrar insumo manualmente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/supplies",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Insumo QA {{runTag}}\",\n  \"unit\": \"kg\",\n  \"minimum\": 2,\n  \"active\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "15 Cadastrar insumo manualmente"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Identificador e versão recebidos\", function () { const s=pm.response.json().supply; pm.expect(s.id).to.match(/^[a-f0-9-]{36}$/); pm.expect(s.versao_cadastro).to.match(/^[a-f0-9-]{36}$/); });",
+              "if (pm.response.code===201) { const s=pm.response.json().supply; pm.environment.set(\"supplyId\",s.id); pm.environment.set(\"supplyVersion\",s.versao_cadastro); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 Pesquisa encontra o insumo salvo",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/supplies?q={{runTag}}",
+        "description": "16 Pesquisa encontra o insumo salvo"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Registro recém-criado encontrado\", function () { pm.expect(pm.response.json().supplies.some(s=>s.id===pm.environment.get(\"supplyId\"))).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 Atualizar insumo com versão atual",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/supplies/{{supplyId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Insumo QA {{runTag}}\",\n  \"unit\": \"kg\",\n  \"minimum\": 3,\n  \"active\": true,\n  \"version\": \"{{supplyVersion}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "17 Atualizar insumo com versão atual"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Estoque mínimo atualizado\", function () { pm.expect(Number(pm.response.json().supply.estoque_minimo)).to.eql(3); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 Impedir sobrescrita com versão antiga",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/supplies/{{supplyId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Insumo QA {{runTag}}\",\n  \"unit\": \"kg\",\n  \"minimum\": 9,\n  \"active\": true,\n  \"version\": \"{{supplyVersion}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "18 Impedir sobrescrita com versão antiga"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 Insumo com estoque mínimo negativo é recusado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/supplies",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Insumo QA {{runTag}}\",\n  \"unit\": \"kg\",\n  \"minimum\": -1,\n  \"active\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "19 Insumo com estoque mínimo negativo é recusado"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 Registrar compra manual de insumo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/supplies/{{supplyId}}/prices",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"requestId\": \"{{priceId}}\",\n  \"source\": \"manual\",\n  \"quantity\": 2,\n  \"price\": 6,\n  \"date\": \"{{end}}\",\n  \"supplier\": \"Fornecedor fictício Postman\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "20 Registrar compra manual de insumo"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Compra registrada\", function () { pm.expect(pm.response.json().success).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 Histórico de compra mantém preço e unidade",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/supplies/{{supplyId}}/prices?start={{start}}&end={{end}}",
+        "description": "21 Histórico de compra mantém preço e unidade"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Preço médio exato\", function () { pm.expect(pm.response.json().average).to.eql(6); });",
+              "pm.test(\"Unidade preservada\", function () { pm.expect(pm.response.json().unit).to.eql(\"kg\"); });",
+              "pm.test(\"Uma compra registrada\", function () { pm.expect(pm.response.json().points.length).to.eql(1); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 Calcular preço por custo base",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/pricing/quote",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Produto QA {{runTag}}\",\n  \"baseCost\": 20,\n  \"markup\": 100,\n  \"currentPrice\": 30,\n  \"monthlyUnits\": 10,\n  \"ingredients\": []\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "22 Calcular preço por custo base"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Custo de R$20\", function () { pm.expect(pm.response.json().cost).to.eql(20); });",
+              "pm.test(\"Preço com markup 100%\", function () { pm.expect(pm.response.json().suggestedPrice).to.eql(40); });",
+              "pm.test(\"Margem de 50%\", function () { pm.expect(pm.response.json().margin).to.eql(50); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 Calcular preço com insumo comprado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/pricing/quote",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Produto QA {{runTag}}\",\n  \"baseCost\": 20,\n  \"markup\": 100,\n  \"currentPrice\": 30,\n  \"monthlyUnits\": 10,\n  \"ingredients\": [\n    {\n      \"supplyId\": \"{{supplyId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "23 Calcular preço com insumo comprado"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Custo base + compra = R$26\", function () { pm.expect(pm.response.json().cost).to.eql(26); });",
+              "pm.test(\"Preço sugerido = R$52\", function () { pm.expect(pm.response.json().suggestedPrice).to.eql(52); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 Salvar produto precificado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/pricing/products",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Produto QA {{runTag}}\",\n  \"baseCost\": 20,\n  \"markup\": 100,\n  \"currentPrice\": 30,\n  \"monthlyUnits\": 10,\n  \"ingredients\": [],\n  \"id\": \"{{productId}}\",\n  \"version\": null\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "24 Salvar produto precificado"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"ID salvo\", function () { pm.expect(pm.response.json().id).to.eql(pm.variables.get(\"productId\")); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "25 Consultar produto salvo",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/pricing",
+        "description": "25 Consultar produto salvo"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Produto persistido encontrado\", function () { pm.expect(pm.response.json().products.some(p=>p.id===pm.variables.get(\"productId\"))).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "26 Impedir edição de produto com versão errada",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/pricing/products",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Produto QA {{runTag}}\",\n  \"baseCost\": 20,\n  \"markup\": 100,\n  \"currentPrice\": 30,\n  \"monthlyUnits\": 10,\n  \"ingredients\": [],\n  \"id\": \"{{productId}}\",\n  \"version\": \"{{priceId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "26 Impedir edição de produto com versão errada"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "27 Rejeitar valores monetários com três casas",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/pricing/quote",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Produto QA {{runTag}}\",\n  \"baseCost\": 20.001,\n  \"markup\": 100,\n  \"currentPrice\": 30,\n  \"monthlyUnits\": 10,\n  \"ingredients\": []\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "27 Rejeitar valores monetários com três casas"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "28 Consultar notas de custos",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/invoices?kind=cost&period=all",
+        "description": "28 Consultar notas de custos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Lista de notas válida\", function () { pm.expect(pm.response.json().invoices).to.be.an(\"array\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "29 Rejeitar arquivo de tipo não permitido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/invoices",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"teste.txt\",\n  \"mime\": \"text/plain\",\n  \"content\": \"dGVzdGU=\",\n  \"kind\": \"cost\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "29 Rejeitar arquivo de tipo não permitido"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "30 Exigir justificativa suficiente para exclusão",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/invoices/00000000-0000-4000-8000-000000000001",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"erro\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "30 Exigir justificativa suficiente para exclusão"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "31 Consultar disponibilidade de e-mail",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/options",
+        "description": "31 Consultar disponibilidade de e-mail"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Configuração de e-mail informada\", function () { pm.expect(pm.response.json().emailConfigured).to.be.a(\"boolean\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "32 Exportar relatório PDF",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/download",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"{{start}}\",\n  \"end\": \"{{end}}\",\n  \"type\": \"full\",\n  \"scope\": \"professional\",\n  \"format\": \"pdf\",\n  \"originals\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "32 Exportar relatório PDF"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Tipo de arquivo correto\", function () { pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/pdf\"); });",
+              "pm.test(\"Assinatura binária válida\", function () { pm.expect(pm.response.text().slice(0,5)).to.eql(\"%PDF-\"); });",
+              "pm.test(\"Download com nome e proteção MIME\", function () { pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment;\"); pm.expect(pm.response.headers.get(\"X-Content-Type-Options\")).to.eql(\"nosniff\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "33 Exportar relatório XLSX",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/download",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"{{start}}\",\n  \"end\": \"{{end}}\",\n  \"type\": \"full\",\n  \"scope\": \"professional\",\n  \"format\": \"xlsx\",\n  \"originals\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "33 Exportar relatório XLSX"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Tipo de arquivo correto\", function () { pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\"); });",
+              "pm.test(\"Assinatura binária válida\", function () { pm.expect(pm.response.text().slice(0,2)).to.eql(\"PK\"); });",
+              "pm.test(\"Download com nome e proteção MIME\", function () { pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment;\"); pm.expect(pm.response.headers.get(\"X-Content-Type-Options\")).to.eql(\"nosniff\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "34 Exportar relatório BOTH",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/download",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"{{start}}\",\n  \"end\": \"{{end}}\",\n  \"type\": \"full\",\n  \"scope\": \"professional\",\n  \"format\": \"both\",\n  \"originals\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "34 Exportar relatório BOTH"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Tipo de arquivo correto\", function () { pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/zip\"); });",
+              "pm.test(\"Assinatura binária válida\", function () { pm.expect(pm.response.text().slice(0,2)).to.eql(\"PK\"); });",
+              "pm.test(\"Download com nome e proteção MIME\", function () { pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment;\"); pm.expect(pm.response.headers.get(\"X-Content-Type-Options\")).to.eql(\"nosniff\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "35 Rejeitar relatório com período invertido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/download",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"2026-11-30\",\n  \"end\": \"2026-11-01\",\n  \"type\": \"full\",\n  \"scope\": \"professional\",\n  \"format\": \"pdf\",\n  \"originals\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "35 Rejeitar relatório com período invertido"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "36 Relatório sem dados informa vazio",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/download",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"2000-01-01\",\n  \"end\": \"2000-01-02\",\n  \"type\": \"full\",\n  \"scope\": \"professional\",\n  \"format\": \"pdf\",\n  \"originals\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "36 Relatório sem dados informa vazio"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "37 E-mail PDF com transporte simulado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/email",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"{{start}}\",\n  \"end\": \"{{end}}\",\n  \"type\": \"full\",\n  \"scope\": \"professional\",\n  \"format\": \"pdf\",\n  \"originals\": false,\n  \"recipient\": \"qa@example.test\",\n  \"requestId\": \"{{mailId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "A API gera o anexo; o transporte de e-mail é simulado. Não comprova entrega em uma caixa de entrada real."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Aceite informado\", function () { pm.expect(pm.response.json().message).to.include(\"aceito\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "38 E-mail XLSX com transporte simulado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/email",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"{{start}}\",\n  \"end\": \"{{end}}\",\n  \"type\": \"full\",\n  \"scope\": \"professional\",\n  \"format\": \"xlsx\",\n  \"originals\": false,\n  \"recipient\": \"qa@example.test\",\n  \"requestId\": \"{{mailXlsxId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "A API gera o anexo; o transporte de e-mail é simulado. Não comprova entrega em uma caixa de entrada real."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Aceite informado\", function () { pm.expect(pm.response.json().message).to.include(\"aceito\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "39 Repetição do e-mail não dispara novo envio",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/reports/email",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"{{start}}\",\n  \"end\": \"{{end}}\",\n  \"type\": \"full\",\n  \"scope\": \"professional\",\n  \"format\": \"pdf\",\n  \"originals\": false,\n  \"recipient\": \"qa@example.test\",\n  \"requestId\": \"{{mailId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "39 Repetição do e-mail não dispara novo envio"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Repetição identificada\", function () { pm.expect(pm.response.json().message).to.include(\"já foi aceito\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "40 Recuperação exige senha atual correta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings/password-reset",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"currentPassword\": \"SenhaErrada!123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "40 Recuperação exige senha atual correta"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Erro seguro sem stack trace\", function () { const b = pm.response.json(); pm.expect(b.message).to.be.a(\"string\"); pm.expect(b).not.to.have.property(\"stack\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "41 Recuperação de senha com provedor simulado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings/password-reset",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"currentPassword\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "41 Recuperação de senha com provedor simulado"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Solicitação aceita\", function () { pm.expect(pm.response.json().message).to.include(\"aceita\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "42 Alteração de e-mail aguarda confirmação simulada",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings/email",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"novo@example.test\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "42 Alteração de e-mail aguarda confirmação simulada"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "43 E-mail pendente não substitui identidade confirmada",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{apiBase}}/v1/settings",
+        "description": "43 E-mail pendente não substitui identidade confirmada"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"E-mail confirmado preservado\", function () { pm.expect(pm.response.json().email).to.eql(pm.environment.get(\"email\")); });",
+              "pm.test(\"Novo e-mail permanece pendente\", function () { pm.expect(pm.response.json().pendingEmail).to.eql(\"novo@example.test\"); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

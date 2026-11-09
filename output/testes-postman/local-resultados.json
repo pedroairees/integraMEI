@@ -1,0 +1,1906 @@
+{
+  "mode": "local",
+  "environment": "Backend local + Auth, banco, armazenamento e e-mail simulados",
+  "tool": "Postman CLI",
+  "version": "1.86.0",
+  "startedAt": "2026-11-07T17:09:41.490Z",
+  "finishedAt": "2026-11-07T17:09:50.967Z",
+  "durationMs": 9477,
+  "exitCode": 0,
+  "summary": {
+    "iterations": {
+      "executed": 1,
+      "errors": 0
+    },
+    "executedRequests": {
+      "executed": 43,
+      "errors": 0
+    },
+    "prerequestScripts": {
+      "executed": 0,
+      "errors": 0
+    },
+    "postresponseScripts": {
+      "executed": 43,
+      "errors": 0
+    },
+    "tests": {
+      "executed": 102,
+      "failed": 0,
+      "passed": 102,
+      "skipped": 0
+    },
+    "timeStats": {
+      "responseAverage": 8.860465116279068,
+      "responseMin": 3,
+      "responseMax": 39,
+      "responseStandardDeviation": 7.937492414495807
+    }
+  },
+  "rawReportSha256": "e11f6bead537ad9b623f2e7828097c272c5251e5ef66310f0bc215c1f4524b80",
+  "redaction": "Headers de autenticação omitidos; senhas e tokens removidos. JSON normalizado do relatório original da CLI, sem alterar resultados.",
+  "collectionSha256": "556249a25d9c59e9d0eccae66f07c43cf02c98e087531fbe4e3e19cd4d0da305",
+  "executions": [
+    {
+      "name": "01 Saúde da API",
+      "method": "GET",
+      "path": "/health",
+      "query": [],
+      "status": 200,
+      "durationMs": 21,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "status": "ok"
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Serviço disponível",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "02 Dashboard exige autenticação",
+      "method": "GET",
+      "path": "/v1/dashboard",
+      "query": [],
+      "status": 401,
+      "durationMs": 3,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Entre na sua conta para acessar os dados."
+      },
+      "checks": [
+        {
+          "name": "HTTP 401",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "03 Token inválido é recusado",
+      "method": "GET",
+      "path": "/v1/settings",
+      "query": [],
+      "status": 401,
+      "durationMs": 19,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Sua sessão expirou. Entre novamente."
+      },
+      "checks": [
+        {
+          "name": "HTTP 401",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "04 Login com conta exclusiva de teste",
+      "method": "POST",
+      "path": "/auth/v1/token",
+      "query": [
+        {
+          "key": "grant_type",
+          "value": "password"
+        }
+      ],
+      "requestBody": {
+        "email": "dashboard@example.test",
+        "password": "[REMOVIDO]"
+      },
+      "status": 200,
+      "durationMs": 3,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "responseBody": {
+        "access_token": "[REMOVIDO]",
+        "refresh_token": "[REMOVIDO]",
+        "token_type": "bearer",
+        "expires_in": 3600,
+        "expires_at": 1794074982,
+        "user": {
+          "id": "b76530b9-9324-4d94-a5ec-5bda2ab3c2aa",
+          "aud": "authenticated",
+          "role": "authenticated",
+          "email": "dashboard@example.test",
+          "email_confirmed_at": "2026-09-01T00:00:00Z",
+          "created_at": "2026-09-01T00:00:00Z",
+          "app_metadata": {
+            "provider": "email",
+            "providers": [
+              "email"
+            ]
+          },
+          "user_metadata": {
+            "nome_completo": "Usuário Teste"
+          }
+        }
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Token de acesso recebido",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "05 Configurações pertencem à conta logada",
+      "method": "GET",
+      "path": "/v1/settings",
+      "query": [],
+      "status": 200,
+      "durationMs": 17,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "fullName": "Perfil Cadastrado",
+        "phone": "61912345678",
+        "cnpj": "12345678000195",
+        "emailAlerts": false,
+        "invoiceReminders": true,
+        "lowStockAlerts": true,
+        "timeZone": "America/Sao_Paulo",
+        "email": "dashboard@example.test",
+        "pendingEmail": null
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Nome da conta",
+          "status": "passed"
+        },
+        {
+          "name": "E-mail da conta",
+          "status": "passed"
+        },
+        {
+          "name": "Resposta não armazenada em cache",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "06 Salvar nome, telefone e preferências",
+      "method": "PATCH",
+      "path": "/v1/settings",
+      "query": [],
+      "requestBody": {
+        "fullName": "Pessoa Teste Postman Atualizada",
+        "phone": "61900000001",
+        "emailAlerts": true,
+        "invoiceReminders": false,
+        "lowStockAlerts": true,
+        "timeZone": "America/Manaus"
+      },
+      "status": 200,
+      "durationMs": 9,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "fullName": "Pessoa Teste Postman Atualizada",
+        "phone": "61900000001",
+        "cnpj": "12345678000195",
+        "emailAlerts": true,
+        "invoiceReminders": false,
+        "lowStockAlerts": true,
+        "timeZone": "America/Manaus",
+        "email": "dashboard@example.test",
+        "pendingEmail": null
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Nome salvo",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "07 Ler novamente as configurações salvas",
+      "method": "GET",
+      "path": "/v1/settings",
+      "query": [],
+      "status": 200,
+      "durationMs": 6,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "fullName": "Pessoa Teste Postman Atualizada",
+        "phone": "61900000001",
+        "cnpj": "12345678000195",
+        "emailAlerts": true,
+        "invoiceReminders": false,
+        "lowStockAlerts": true,
+        "timeZone": "America/Manaus",
+        "email": "dashboard@example.test",
+        "pendingEmail": null
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Persistência de todos os campos",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "08 Telefone inválido é recusado",
+      "method": "PATCH",
+      "path": "/v1/settings",
+      "query": [],
+      "requestBody": {
+        "fullName": "Pessoa Teste Postman Atualizada",
+        "phone": "123",
+        "emailAlerts": true,
+        "invoiceReminders": false,
+        "lowStockAlerts": true,
+        "timeZone": "America/Manaus"
+      },
+      "status": 400,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Dados inválidos. Confira os filtros e valores informados."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "09 Alteração direta de e-mail no perfil é recusada",
+      "method": "PATCH",
+      "path": "/v1/settings",
+      "query": [],
+      "requestBody": {
+        "fullName": "Pessoa Teste Postman Atualizada",
+        "phone": "61900000001",
+        "emailAlerts": true,
+        "invoiceReminders": false,
+        "lowStockAlerts": true,
+        "timeZone": "America/Manaus",
+        "email": "nao-enviar@example.com"
+      },
+      "status": 400,
+      "durationMs": 6,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Dados inválidos. Confira os filtros e valores informados."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "10 Dashboard reflete os lançamentos conhecidos",
+      "method": "GET",
+      "path": "/v1/dashboard",
+      "query": [
+        {
+          "key": "month",
+          "value": "2026-11"
+        },
+        {
+          "key": "months",
+          "value": "3"
+        },
+        {
+          "key": "scope",
+          "value": "professional"
+        }
+      ],
+      "status": 200,
+      "durationMs": 34,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "filter": {
+          "month": "2026-11",
+          "months": 3,
+          "scope": "professional"
+        },
+        "companyName": "Empresa Teste",
+        "canEditGoal": true,
+        "empty": false,
+        "updatedAt": "2026-11-07T17:09:43.725Z",
+        "insight": "Sem base suficiente no mês anterior para comparar receita e custos.",
+        "marginTarget": null,
+        "pending": {
+          "count": 0,
+          "revenue": 0,
+          "costs": 0
+        },
+        "metrics": {
+          "revenue": 1200,
+          "costs": 600,
+          "profit": 600,
+          "withdrawals": 200,
+          "margin": 50,
+          "revenueChange": 20,
+          "costChange": null,
+          "profitChange": -40
+        },
+        "goal": {
+          "value": 8000,
+          "percentage": 15,
+          "projection": null,
+          "projectedToReach": null,
+          "daysWithSales": 1
+        },
+        "evolution": [
+          {
+            "month": "2026-09",
+            "value": 0
+          },
+          {
+            "month": "2026-10",
+            "value": 0
+          },
+          {
+            "month": "2026-11",
+            "value": 600
+          }
+        ],
+        "distribution": [
+          {
+            "id": "category-1",
+            "name": "Insumos",
+            "value": 600,
+            "percentage": 100,
+            "topSupplies": [
+              {
+                "id": "22222222-2222-4222-8222-222222222222",
+                "name": "Farinha",
+                "value": 600
+              }
+            ]
+          }
+        ],
+        "alerts": []
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Receita exata",
+          "status": "passed"
+        },
+        {
+          "name": "Custos exatos",
+          "status": "passed"
+        },
+        {
+          "name": "Lucro = receita - custos",
+          "status": "passed"
+        },
+        {
+          "name": "Gráfico de despesas tem três meses e custo final correto",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "11 Mês inválido é recusado",
+      "method": "GET",
+      "path": "/v1/dashboard",
+      "query": [
+        {
+          "key": "month",
+          "value": "2026-13"
+        }
+      ],
+      "status": 400,
+      "durationMs": 4,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Dados inválidos. Confira os filtros e valores informados."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "12 Salvar meta da empresa de teste",
+      "method": "PATCH",
+      "path": "/v1/dashboard/goal",
+      "query": [],
+      "requestBody": {
+        "value": 1000,
+        "marginTarget": 30
+      },
+      "status": 204,
+      "durationMs": 6,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store"
+      },
+      "checks": [
+        {
+          "name": "HTTP 204",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "13 Meta aparece no dashboard",
+      "method": "GET",
+      "path": "/v1/dashboard",
+      "query": [
+        {
+          "key": "month",
+          "value": "2026-11"
+        }
+      ],
+      "status": 200,
+      "durationMs": 11,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "filter": {
+          "month": "2026-11",
+          "months": 6,
+          "scope": "professional"
+        },
+        "companyName": "Empresa Teste",
+        "canEditGoal": true,
+        "empty": false,
+        "updatedAt": "2026-11-07T17:09:44.406Z",
+        "insight": "Sem base suficiente no mês anterior para comparar receita e custos.",
+        "marginTarget": 30,
+        "pending": {
+          "count": 0,
+          "revenue": 0,
+          "costs": 0
+        },
+        "metrics": {
+          "revenue": 1200,
+          "costs": 600,
+          "profit": 600,
+          "withdrawals": 200,
+          "margin": 50,
+          "revenueChange": 20,
+          "costChange": null,
+          "profitChange": -40
+        },
+        "goal": {
+          "value": 1000,
+          "percentage": 120,
+          "projection": null,
+          "projectedToReach": null,
+          "daysWithSales": 1
+        },
+        "evolution": [
+          {
+            "month": "2026-06",
+            "value": 0
+          },
+          {
+            "month": "2026-07",
+            "value": 0
+          },
+          {
+            "month": "2026-08",
+            "value": 0
+          },
+          {
+            "month": "2026-09",
+            "value": 0
+          },
+          {
+            "month": "2026-10",
+            "value": 0
+          },
+          {
+            "month": "2026-11",
+            "value": 600
+          }
+        ],
+        "distribution": [
+          {
+            "id": "category-1",
+            "name": "Insumos",
+            "value": 600,
+            "percentage": 100,
+            "topSupplies": [
+              {
+                "id": "22222222-2222-4222-8222-222222222222",
+                "name": "Farinha",
+                "value": 600
+              }
+            ]
+          }
+        ],
+        "alerts": []
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Meta persistida",
+          "status": "passed"
+        },
+        {
+          "name": "Meta de margem persistida",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "14 Listar insumos da empresa",
+      "method": "GET",
+      "path": "/v1/supplies",
+      "query": [],
+      "status": 200,
+      "durationMs": 7,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "supplies": [
+          {
+            "id": "22222222-2222-4222-8222-222222222222",
+            "empresa_id": "11111111-1111-4111-8111-111111111111",
+            "nome": "Farinha",
+            "unidade_medida": "kg",
+            "estoque_minimo": 0,
+            "ativo": true,
+            "versao_cadastro": "3a68c8bd-4e3b-46c7-9a65-548b21681a21"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Lista de insumos válida",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "15 Cadastrar insumo manualmente",
+      "method": "POST",
+      "path": "/v1/supplies",
+      "query": [],
+      "requestBody": {
+        "name": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "unit": "kg",
+        "minimum": 2,
+        "active": true
+      },
+      "status": 201,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "supply": {
+          "id": "6eace110-c2d4-4e5b-8148-b2c5b508e71b",
+          "empresa_id": "11111111-1111-4111-8111-111111111111",
+          "nome": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+          "unidade_medida": "kg",
+          "estoque_minimo": 2,
+          "ativo": true,
+          "versao_cadastro": "f4be7676-355d-41b2-89ee-729af42c2247"
+        }
+      },
+      "checks": [
+        {
+          "name": "HTTP 201",
+          "status": "passed"
+        },
+        {
+          "name": "Identificador e versão recebidos",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "16 Pesquisa encontra o insumo salvo",
+      "method": "GET",
+      "path": "/v1/supplies",
+      "query": [
+        {
+          "key": "q",
+          "value": "43d2761b-795e-4375-aed5-b6ef3bf71f1f"
+        }
+      ],
+      "status": 200,
+      "durationMs": 4,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "supplies": [
+          {
+            "id": "6eace110-c2d4-4e5b-8148-b2c5b508e71b",
+            "empresa_id": "11111111-1111-4111-8111-111111111111",
+            "nome": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+            "unidade_medida": "kg",
+            "estoque_minimo": 2,
+            "ativo": true,
+            "versao_cadastro": "f4be7676-355d-41b2-89ee-729af42c2247"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Registro recém-criado encontrado",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "17 Atualizar insumo com versão atual",
+      "method": "PATCH",
+      "path": "/v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b",
+      "query": [],
+      "requestBody": {
+        "name": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "unit": "kg",
+        "minimum": 3,
+        "active": true,
+        "version": "f4be7676-355d-41b2-89ee-729af42c2247"
+      },
+      "status": 200,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "supply": {
+          "id": "6eace110-c2d4-4e5b-8148-b2c5b508e71b",
+          "empresa_id": "11111111-1111-4111-8111-111111111111",
+          "nome": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+          "unidade_medida": "kg",
+          "estoque_minimo": 3,
+          "ativo": true,
+          "versao_cadastro": "0b8ce1c1-5912-4ce3-991e-763765d0e6b0"
+        }
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Estoque mínimo atualizado",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "18 Impedir sobrescrita com versão antiga",
+      "method": "PATCH",
+      "path": "/v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b",
+      "query": [],
+      "requestBody": {
+        "name": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "unit": "kg",
+        "minimum": 9,
+        "active": true,
+        "version": "f4be7676-355d-41b2-89ee-729af42c2247"
+      },
+      "status": 409,
+      "durationMs": 4,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Confira os dados, a versão do insumo e se o mês está aberto."
+      },
+      "checks": [
+        {
+          "name": "HTTP 409",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "19 Insumo com estoque mínimo negativo é recusado",
+      "method": "POST",
+      "path": "/v1/supplies",
+      "query": [],
+      "requestBody": {
+        "name": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "unit": "kg",
+        "minimum": -1,
+        "active": true
+      },
+      "status": 400,
+      "durationMs": 4,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Dados inválidos. Confira os filtros e valores informados."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "20 Registrar compra manual de insumo",
+      "method": "POST",
+      "path": "/v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b/prices",
+      "query": [],
+      "requestBody": {
+        "requestId": "c9c3dff5-5ae9-4ac7-a693-752ddf6729dd",
+        "source": "manual",
+        "quantity": 2,
+        "price": 6,
+        "date": "2026-11-07",
+        "supplier": "Fornecedor fictício Postman"
+      },
+      "status": 201,
+      "durationMs": 6,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "success": true
+      },
+      "checks": [
+        {
+          "name": "HTTP 201",
+          "status": "passed"
+        },
+        {
+          "name": "Compra registrada",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "21 Histórico de compra mantém preço e unidade",
+      "method": "GET",
+      "path": "/v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b/prices",
+      "query": [
+        {
+          "key": "start",
+          "value": "2026-11-01"
+        },
+        {
+          "key": "end",
+          "value": "2026-11-07"
+        }
+      ],
+      "status": 200,
+      "durationMs": 7,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "supply": {
+          "id": "6eace110-c2d4-4e5b-8148-b2c5b508e71b",
+          "empresa_id": "11111111-1111-4111-8111-111111111111",
+          "nome": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+          "unidade_medida": "kg",
+          "estoque_minimo": 3,
+          "ativo": true,
+          "versao_cadastro": "0b8ce1c1-5912-4ce3-991e-763765d0e6b0"
+        },
+        "units": [
+          "kg"
+        ],
+        "unit": "kg",
+        "points": [
+          {
+            "id": "c9c3dff5-5ae9-4ac7-a693-752ddf6729dd",
+            "date": "2026-11-07",
+            "value": 6,
+            "unit": "kg",
+            "supplier": "Fornecedor fictício Postman",
+            "source": "manual"
+          }
+        ],
+        "minimum": {
+          "id": "c9c3dff5-5ae9-4ac7-a693-752ddf6729dd",
+          "date": "2026-11-07",
+          "value": 6,
+          "unit": "kg",
+          "supplier": "Fornecedor fictício Postman",
+          "source": "manual"
+        },
+        "maximum": {
+          "id": "c9c3dff5-5ae9-4ac7-a693-752ddf6729dd",
+          "date": "2026-11-07",
+          "value": 6,
+          "unit": "kg",
+          "supplier": "Fornecedor fictício Postman",
+          "source": "manual"
+        },
+        "average": 6
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Preço médio exato",
+          "status": "passed"
+        },
+        {
+          "name": "Unidade preservada",
+          "status": "passed"
+        },
+        {
+          "name": "Uma compra registrada",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "22 Calcular preço por custo base",
+      "method": "POST",
+      "path": "/v1/pricing/quote",
+      "query": [],
+      "requestBody": {
+        "name": "Produto QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "baseCost": 20,
+        "markup": 100,
+        "currentPrice": 30,
+        "monthlyUnits": 10,
+        "ingredients": []
+      },
+      "status": 200,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "cost": 20,
+        "inputCost": 0,
+        "tax": 0,
+        "taxCost": 0,
+        "suggestedPrice": 40,
+        "profit": 20,
+        "margin": 50,
+        "monthlyRevenue": 400,
+        "revenueDifference": 100,
+        "lines": []
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Custo de R$20",
+          "status": "passed"
+        },
+        {
+          "name": "Preço com markup 100%",
+          "status": "passed"
+        },
+        {
+          "name": "Margem de 50%",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "23 Calcular preço com insumo comprado",
+      "method": "POST",
+      "path": "/v1/pricing/quote",
+      "query": [],
+      "requestBody": {
+        "name": "Produto QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "baseCost": 20,
+        "markup": 100,
+        "currentPrice": 30,
+        "monthlyUnits": 10,
+        "ingredients": [
+          {
+            "supplyId": "6eace110-c2d4-4e5b-8148-b2c5b508e71b",
+            "quantity": 1
+          }
+        ]
+      },
+      "status": 200,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "cost": 26,
+        "inputCost": 6,
+        "tax": 0,
+        "taxCost": 0,
+        "suggestedPrice": 52,
+        "profit": 26,
+        "margin": 50,
+        "monthlyRevenue": 520,
+        "revenueDifference": 220,
+        "lines": [
+          {
+            "name": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+            "unit": "kg",
+            "quantity": 1,
+            "price": 6,
+            "cost": 6
+          }
+        ]
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Custo base + compra = R$26",
+          "status": "passed"
+        },
+        {
+          "name": "Preço sugerido = R$52",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "24 Salvar produto precificado",
+      "method": "POST",
+      "path": "/v1/pricing/products",
+      "query": [],
+      "requestBody": {
+        "name": "Produto QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "baseCost": 20,
+        "markup": 100,
+        "currentPrice": 30,
+        "monthlyUnits": 10,
+        "ingredients": [],
+        "id": "6e0908f4-b732-4e20-bdca-cba5351c9702",
+        "version": null
+      },
+      "status": 200,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "id": "6e0908f4-b732-4e20-bdca-cba5351c9702",
+        "version": "83e738f9-625e-4108-8a8e-d7b57a9bc763",
+        "quote": {
+          "cost": 20,
+          "inputCost": 0,
+          "tax": 0,
+          "taxCost": 0,
+          "suggestedPrice": 40,
+          "profit": 20,
+          "margin": 50,
+          "monthlyRevenue": 400,
+          "revenueDifference": 100,
+          "lines": []
+        }
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "ID salvo",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "25 Consultar produto salvo",
+      "method": "GET",
+      "path": "/v1/pricing",
+      "query": [],
+      "status": 200,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "tax": 0,
+        "products": [
+          {
+            "id": "6e0908f4-b732-4e20-bdca-cba5351c9702",
+            "name": "Produto QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+            "baseCost": 20,
+            "markup": 100,
+            "currentPrice": 30,
+            "monthlyUnits": 10,
+            "ingredients": [],
+            "version": "83e738f9-625e-4108-8a8e-d7b57a9bc763",
+            "active": true,
+            "referenceCost": 20
+          }
+        ],
+        "supplies": [
+          {
+            "id": "22222222-2222-4222-8222-222222222222",
+            "name": "Farinha",
+            "unit": "kg",
+            "active": true,
+            "price": 6,
+            "date": "2026-11-01"
+          },
+          {
+            "id": "6eace110-c2d4-4e5b-8148-b2c5b508e71b",
+            "name": "Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+            "unit": "kg",
+            "active": true,
+            "price": 6,
+            "date": "2026-11-07"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Produto persistido encontrado",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "26 Impedir edição de produto com versão errada",
+      "method": "POST",
+      "path": "/v1/pricing/products",
+      "query": [],
+      "requestBody": {
+        "name": "Produto QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "baseCost": 20,
+        "markup": 100,
+        "currentPrice": 30,
+        "monthlyUnits": 10,
+        "ingredients": [],
+        "id": "6e0908f4-b732-4e20-bdca-cba5351c9702",
+        "version": "c9c3dff5-5ae9-4ac7-a693-752ddf6729dd"
+      },
+      "status": 409,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "O produto mudou. Atualize os dados antes de salvar."
+      },
+      "checks": [
+        {
+          "name": "HTTP 409",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "27 Rejeitar valores monetários com três casas",
+      "method": "POST",
+      "path": "/v1/pricing/quote",
+      "query": [],
+      "requestBody": {
+        "name": "Produto QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f",
+        "baseCost": 20.001,
+        "markup": 100,
+        "currentPrice": 30,
+        "monthlyUnits": 10,
+        "ingredients": []
+      },
+      "status": 400,
+      "durationMs": 6,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Use até duas casas decimais nos valores e três nas quantidades."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "28 Consultar notas de custos",
+      "method": "GET",
+      "path": "/v1/invoices",
+      "query": [
+        {
+          "key": "kind",
+          "value": "cost"
+        },
+        {
+          "key": "period",
+          "value": "all"
+        }
+      ],
+      "status": 200,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "invoices": []
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Lista de notas válida",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "29 Rejeitar arquivo de tipo não permitido",
+      "method": "POST",
+      "path": "/v1/invoices",
+      "query": [],
+      "requestBody": {
+        "name": "teste.txt",
+        "mime": "text/plain",
+        "content": "dGVzdGU=",
+        "kind": "cost"
+      },
+      "status": 400,
+      "durationMs": 4,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Dados inválidos. Confira os filtros e valores informados."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "30 Exigir justificativa suficiente para exclusão",
+      "method": "DELETE",
+      "path": "/v1/invoices/00000000-0000-4000-8000-000000000001",
+      "query": [],
+      "requestBody": {
+        "reason": "erro"
+      },
+      "status": 400,
+      "durationMs": 4,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Dados inválidos. Confira os filtros e valores informados."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "31 Consultar disponibilidade de e-mail",
+      "method": "GET",
+      "path": "/v1/reports/options",
+      "query": [],
+      "status": 200,
+      "durationMs": 4,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "emailConfigured": true
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Configuração de e-mail informada",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "32 Exportar relatório PDF",
+      "method": "POST",
+      "path": "/v1/reports/download",
+      "query": [],
+      "requestBody": {
+        "start": "2026-11-01",
+        "end": "2026-11-07",
+        "type": "full",
+        "scope": "professional",
+        "format": "pdf",
+        "originals": false
+      },
+      "status": 200,
+      "durationMs": 39,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/pdf",
+        "content-disposition": "attachment; filename=\"integramei-full-2026-11-01-2026-11-07.pdf\""
+      },
+      "artifact": {
+        "file": "amostras/local-relatorio.pdf",
+        "bytes": 2045,
+        "sha256": "a0538b960c3e07c135c5f7a02fcf18357e0791fea6d62fb91259101dc5a0e898"
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Tipo de arquivo correto",
+          "status": "passed"
+        },
+        {
+          "name": "Assinatura binária válida",
+          "status": "passed"
+        },
+        {
+          "name": "Download com nome e proteção MIME",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "33 Exportar relatório XLSX",
+      "method": "POST",
+      "path": "/v1/reports/download",
+      "query": [],
+      "requestBody": {
+        "start": "2026-11-01",
+        "end": "2026-11-07",
+        "type": "full",
+        "scope": "professional",
+        "format": "xlsx",
+        "originals": false
+      },
+      "status": 200,
+      "durationMs": 25,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "content-disposition": "attachment; filename=\"integramei-full-2026-11-01-2026-11-07.xlsx\""
+      },
+      "artifact": {
+        "file": "amostras/local-relatorio.xlsx",
+        "bytes": 8512,
+        "sha256": "021bdbd2d2d928a5fdfd928449c2d677dddf23b3134301cd58749cafdd5c9cfc"
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Tipo de arquivo correto",
+          "status": "passed"
+        },
+        {
+          "name": "Assinatura binária válida",
+          "status": "passed"
+        },
+        {
+          "name": "Download com nome e proteção MIME",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "34 Exportar relatório BOTH",
+      "method": "POST",
+      "path": "/v1/reports/download",
+      "query": [],
+      "requestBody": {
+        "start": "2026-11-01",
+        "end": "2026-11-07",
+        "type": "full",
+        "scope": "professional",
+        "format": "both",
+        "originals": false
+      },
+      "status": 200,
+      "durationMs": 17,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/zip",
+        "content-disposition": "attachment; filename=\"integramei-relatorio-e-anexos.zip\""
+      },
+      "artifact": {
+        "file": "amostras/local-relatorio.zip",
+        "bytes": 9657,
+        "sha256": "e356c049b75d790599f00dcac8945f7745d19048ba6bf55c9b28fc1bcdd91798"
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Tipo de arquivo correto",
+          "status": "passed"
+        },
+        {
+          "name": "Assinatura binária válida",
+          "status": "passed"
+        },
+        {
+          "name": "Download com nome e proteção MIME",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "35 Rejeitar relatório com período invertido",
+      "method": "POST",
+      "path": "/v1/reports/download",
+      "query": [],
+      "requestBody": {
+        "start": "2026-11-30",
+        "end": "2026-11-01",
+        "type": "full",
+        "scope": "professional",
+        "format": "pdf",
+        "originals": false
+      },
+      "status": 400,
+      "durationMs": 6,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Selecione um período válido de até 367 dias."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "36 Relatório sem dados informa vazio",
+      "method": "POST",
+      "path": "/v1/reports/download",
+      "query": [],
+      "requestBody": {
+        "start": "2000-01-01",
+        "end": "2000-01-02",
+        "type": "full",
+        "scope": "professional",
+        "format": "pdf",
+        "originals": false
+      },
+      "status": 422,
+      "durationMs": 4,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Nada para exportar: não foram encontrados registros no período e filtros selecionados."
+      },
+      "checks": [
+        {
+          "name": "HTTP 422",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "37 E-mail PDF com transporte simulado",
+      "method": "POST",
+      "path": "/v1/reports/email",
+      "query": [],
+      "requestBody": {
+        "start": "2026-11-01",
+        "end": "2026-11-07",
+        "type": "full",
+        "scope": "professional",
+        "format": "pdf",
+        "originals": false,
+        "recipient": "qa@example.test",
+        "requestId": "ce4e78d3-132f-443f-aa9d-00c3dddf4ca9"
+      },
+      "status": 200,
+      "durationMs": 13,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Relatório aceito pelo servidor de e-mail. Confira a caixa de entrada e o spam do destinatário."
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Aceite informado",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "38 E-mail XLSX com transporte simulado",
+      "method": "POST",
+      "path": "/v1/reports/email",
+      "query": [],
+      "requestBody": {
+        "start": "2026-11-01",
+        "end": "2026-11-07",
+        "type": "full",
+        "scope": "professional",
+        "format": "xlsx",
+        "originals": false,
+        "recipient": "qa@example.test",
+        "requestId": "776cec06-2bba-4641-817d-aac72ffa0871"
+      },
+      "status": 200,
+      "durationMs": 12,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Relatório aceito pelo servidor de e-mail. Confira a caixa de entrada e o spam do destinatário."
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Aceite informado",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "39 Repetição do e-mail não dispara novo envio",
+      "method": "POST",
+      "path": "/v1/reports/email",
+      "query": [],
+      "requestBody": {
+        "start": "2026-11-01",
+        "end": "2026-11-07",
+        "type": "full",
+        "scope": "professional",
+        "format": "pdf",
+        "originals": false,
+        "recipient": "qa@example.test",
+        "requestId": "ce4e78d3-132f-443f-aa9d-00c3dddf4ca9"
+      },
+      "status": 200,
+      "durationMs": 9,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Este envio já foi aceito pelo servidor de e-mail. Confira a caixa de entrada e o spam."
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Repetição identificada",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "40 Recuperação exige senha atual correta",
+      "method": "POST",
+      "path": "/v1/settings/password-reset",
+      "query": [],
+      "requestBody": {
+        "currentPassword": "[REMOVIDO]"
+      },
+      "status": 400,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Senha atual incorreta ou indisponível. Confira e tente novamente."
+      },
+      "checks": [
+        {
+          "name": "HTTP 400",
+          "status": "passed"
+        },
+        {
+          "name": "Erro seguro sem stack trace",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "41 Recuperação de senha com provedor simulado",
+      "method": "POST",
+      "path": "/v1/settings/password-reset",
+      "query": [],
+      "requestBody": {
+        "currentPassword": "[REMOVIDO]"
+      },
+      "status": 200,
+      "durationMs": 6,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Solicitação de recuperação aceita. Confira a caixa de entrada e o spam do e-mail da sua conta."
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "Solicitação aceita",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "42 Alteração de e-mail aguarda confirmação simulada",
+      "method": "POST",
+      "path": "/v1/settings/email",
+      "query": [],
+      "requestBody": {
+        "email": "novo@example.test"
+      },
+      "status": 200,
+      "durationMs": 6,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "message": "Solicitação de alteração enviada. Confira o e-mail atual e o novo e-mail e siga as confirmações solicitadas. O endereço será atualizado após a confirmação."
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "43 E-mail pendente não substitui identidade confirmada",
+      "method": "GET",
+      "path": "/v1/settings",
+      "query": [],
+      "status": 200,
+      "durationMs": 5,
+      "headers": {
+        "x-content-type-options": "nosniff",
+        "cache-control": "private, no-store",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "responseBody": {
+        "fullName": "Pessoa Teste Postman Atualizada",
+        "phone": "61900000001",
+        "cnpj": "12345678000195",
+        "emailAlerts": true,
+        "invoiceReminders": false,
+        "lowStockAlerts": true,
+        "timeZone": "America/Manaus",
+        "email": "dashboard@example.test",
+        "pendingEmail": "novo@example.test"
+      },
+      "checks": [
+        {
+          "name": "HTTP 200",
+          "status": "passed"
+        },
+        {
+          "name": "E-mail confirmado preservado",
+          "status": "passed"
+        },
+        {
+          "name": "Novo e-mail permanece pendente",
+          "status": "passed"
+        }
+      ],
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

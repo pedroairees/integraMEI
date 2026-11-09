@@ -1,0 +1,294 @@
+{
+  "generatedAt": "2026-11-07T17:15:00.731Z",
+  "commit": "6310401539e91d9d39f889380acb67a48165461e",
+  "branch": "main",
+  "node": "v24.16.0",
+  "postmanVersion": "1.86.0",
+  "results": [
+    {
+      "mode": "local",
+      "environment": "Backend local + Auth, banco, armazenamento e e-mail simulados",
+      "summary": {
+        "iterations": {
+          "executed": 1,
+          "errors": 0
+        },
+        "executedRequests": {
+          "executed": 43,
+          "errors": 0
+        },
+        "prerequestScripts": {
+          "executed": 0,
+          "errors": 0
+        },
+        "postresponseScripts": {
+          "executed": 43,
+          "errors": 0
+        },
+        "tests": {
+          "executed": 102,
+          "failed": 0,
+          "passed": 102,
+          "skipped": 0
+        },
+        "timeStats": {
+          "responseAverage": 8.860465116279068,
+          "responseMin": 3,
+          "responseMax": 39,
+          "responseStandardDeviation": 7.937492414495807
+        }
+      },
+      "exitCode": 0,
+      "startedAt": "2026-11-07T17:09:41.490Z",
+      "finishedAt": "2026-11-07T17:09:50.967Z",
+      "durationMs": 9477
+    },
+    {
+      "mode": "real",
+      "environment": "Backend local + Supabase Auth/PostgreSQL reais",
+      "summary": {
+        "iterations": {
+          "executed": 1,
+          "errors": 0
+        },
+        "executedRequests": {
+          "executed": 43,
+          "errors": 0
+        },
+        "prerequestScripts": {
+          "executed": 0,
+          "errors": 0
+        },
+        "postresponseScripts": {
+          "executed": 43,
+          "errors": 0
+        },
+        "tests": {
+          "executed": 102,
+          "failed": 0,
+          "passed": 102,
+          "skipped": 0
+        },
+        "timeStats": {
+          "responseAverage": 596.5813953488373,
+          "responseMin": 3,
+          "responseMax": 1147,
+          "responseStandardDeviation": 238.86429275122194
+        }
+      },
+      "exitCode": 0,
+      "startedAt": "2026-11-07T17:09:42.010Z",
+      "finishedAt": "2026-11-07T17:10:16.482Z",
+      "durationMs": 34472
+    }
+  ],
+  "artifactChecks": [
+    {
+      "mode": "local",
+      "artifact": "local-relatorio.pdf",
+      "check": "PDF abre e possui páginas",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "pages": 1
+    },
+    {
+      "mode": "local",
+      "artifact": "local-relatorio.xlsx",
+      "check": "Resumo: faturamento",
+      "expected": 1200,
+      "actual": 1200,
+      "passed": true
+    },
+    {
+      "mode": "local",
+      "artifact": "local-relatorio.xlsx",
+      "check": "Resumo: custos",
+      "expected": 600,
+      "actual": 600,
+      "passed": true
+    },
+    {
+      "mode": "local",
+      "artifact": "local-relatorio.xlsx",
+      "check": "Resumo: lucro",
+      "expected": 600,
+      "actual": 600,
+      "passed": true
+    },
+    {
+      "mode": "local",
+      "artifact": "local-relatorio.xlsx",
+      "check": "Soma das vendas exportadas",
+      "expected": 1200,
+      "actual": 1200,
+      "passed": true
+    },
+    {
+      "mode": "local",
+      "artifact": "local-relatorio.zip",
+      "check": "ZIP abre, passa no CRC e contém PDF e XLSX",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "files": [
+        "integramei-full-2026-11-01-2026-11-07.pdf",
+        "integramei-full-2026-11-01-2026-11-07.xlsx"
+      ]
+    },
+    {
+      "mode": "real",
+      "artifact": "real-relatorio.pdf",
+      "check": "PDF abre e possui páginas",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "pages": 1
+    },
+    {
+      "mode": "real",
+      "artifact": "real-relatorio.xlsx",
+      "check": "Resumo: faturamento",
+      "expected": 150,
+      "actual": 150,
+      "passed": true
+    },
+    {
+      "mode": "real",
+      "artifact": "real-relatorio.xlsx",
+      "check": "Resumo: custos",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "mode": "real",
+      "artifact": "real-relatorio.xlsx",
+      "check": "Resumo: lucro",
+      "expected": 150,
+      "actual": 150,
+      "passed": true
+    },
+    {
+      "mode": "real",
+      "artifact": "real-relatorio.xlsx",
+      "check": "Soma das vendas exportadas",
+      "expected": 150,
+      "actual": 150,
+      "passed": true
+    },
+    {
+      "mode": "real",
+      "artifact": "real-relatorio.zip",
+      "check": "ZIP abre, passa no CRC e contém PDF e XLSX",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "files": [
+        "integramei-full-2026-11-01-2026-11-07.pdf",
+        "integramei-full-2026-11-01-2026-11-07.xlsx"
+      ]
+    }
+  ],
+  "cleanup": {
+    "runId": "47308b36-6891-4035-9a3f-7d9f771fc432",
+    "cleanedAt": "2026-11-07T17:11:19.627Z",
+    "actions": [
+      {
+        "tenant": "A",
+        "table": "insumos_precos_registrados",
+        "remaining": 0
+      },
+      {
+        "tenant": "A",
+        "table": "produtos",
+        "remaining": 0
+      },
+      {
+        "tenant": "A",
+        "table": "insumos",
+        "remaining": 0
+      },
+      {
+        "tenant": "A",
+        "table": "vendas",
+        "remaining": 0
+      },
+      {
+        "tenant": "A",
+        "table": "usuarios",
+        "remaining": 0
+      },
+      {
+        "tenant": "A",
+        "table": "empresas",
+        "remaining": 0
+      },
+      {
+        "tenant": "A",
+        "table": "membros_empresa",
+        "remaining": 0
+      },
+      {
+        "tenant": "A",
+        "table": "preferencias_usuario",
+        "remaining": 0
+      },
+      {
+        "tenant": "A",
+        "authDeleted": true
+      },
+      {
+        "tenant": "B",
+        "table": "insumos_precos_registrados",
+        "remaining": 0
+      },
+      {
+        "tenant": "B",
+        "table": "produtos",
+        "remaining": 0
+      },
+      {
+        "tenant": "B",
+        "table": "insumos",
+        "remaining": 0
+      },
+      {
+        "tenant": "B",
+        "table": "vendas",
+        "remaining": 0
+      },
+      {
+        "tenant": "B",
+        "table": "usuarios",
+        "remaining": 0
+      },
+      {
+        "tenant": "B",
+        "table": "empresas",
+        "remaining": 0
+      },
+      {
+        "tenant": "B",
+        "table": "membros_empresa",
+        "remaining": 0
+      },
+      {
+        "tenant": "B",
+        "table": "preferencias_usuario",
+        "remaining": 0
+      },
+      {
+        "tenant": "B",
+        "authDeleted": true
+      }
+    ],
+    "existingAccountsModified": false
+  },
+  "limits": [
+    "Não comprova entrega real de e-mails, confirmação de cadastro ou alteração real de endereço.",
+    "Não testa provedores externos de IA, qualidade do OCR, upload/lançamento/exclusão completos de notas, carga ou interface visual.",
+    "A venda real de R$150 é uma pré-condição sintética inserida para testar leitura financeira e exportação; não foi criada pelo fluxo de notas.",
+    "Testes reais usam o backend local com Auth e banco reais. O navegador, BFF e login por CNPJ não fazem parte desta coleção."
+  ]
+}

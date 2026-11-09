@@ -1,0 +1,95 @@
+{
+  "runId": "47308b36-6891-4035-9a3f-7d9f771fc432",
+  "cleanedAt": "2026-11-07T17:11:19.627Z",
+  "actions": [
+    {
+      "tenant": "A",
+      "table": "insumos_precos_registrados",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "produtos",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "insumos",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "vendas",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "usuarios",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "empresas",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "membros_empresa",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "preferencias_usuario",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "authDeleted": true
+    },
+    {
+      "tenant": "B",
+      "table": "insumos_precos_registrados",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "produtos",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "insumos",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "vendas",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "usuarios",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "empresas",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "membros_empresa",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "preferencias_usuario",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "authDeleted": true
+    }
+  ],
+  "existingAccountsModified": false
+}

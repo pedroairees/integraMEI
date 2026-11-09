@@ -1,0 +1,923 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IntegraMEI | Evidências Postman</title><style>body{font:16px system-ui,sans-serif;background:#f2f5fa;color:#142a4d;margin:0}main{max-width:1120px;margin:auto;padding:40px 24px}h1{font-size:36px}h2{margin-top:40px}.cards{display:flex;gap:16px;flex-wrap:wrap}.card,details{background:white;padding:20px;border:1px solid #dce4ee;border-radius:12px;margin:12px 0}.card b{display:block;font-size:30px}.ok{color:#166534}.bad{color:#b91c1c}table{border-collapse:collapse;width:100%;font-size:14px}td,th{padding:10px;border-bottom:1px solid #dce4ee;text-align:left}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}summary{cursor:pointer}small{color:#52647a}a{color:#1e3c73}@media print{details{break-inside:avoid}body{background:white}}</style><main><small>VALIDAÇÃO DA API / 2026-11-07T17:15:00.731Z</small><h1>IntegraMEI · Testes com Postman</h1><p>Execução real da Postman CLI 1.86.0. Resultados de dois ambientes separados.</p><div class="cards"><div class="card"><b>86</b>requisições</div><div class="card"><b class="ok">204</b>verificações aprovadas</div><div class="card"><b class="ok">0</b>falhas na rodada final</div></div><p>Commit: <code>6310401539e91d9d39f889380acb67a48165461e</code> · branch main</p><h2>Ambiente local simulado</h2><p>Backend local + Auth, banco, armazenamento e e-mail simulados. 43 requisições, 102/102 verificações aprovadas. 2026-11-07T17:09:41.490Z a 2026-11-07T17:09:50.967Z.</p><p><a href="local-resultados.json">Respostas e verificações (JSON)</a> · <a href="local-junit.xml">JUnit XML</a> · <a href="local-postman.log">Log Postman</a></p><details><summary><span class="ok">PASSOU</span> · 01 Saúde da API · HTTP 200 · 21 ms</summary><p><code>GET /health</code></p><ul><li>passed: HTTP 200 </li><li>passed: Serviço disponível </li></ul><pre>{
+  &quot;status&quot;: &quot;ok&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 02 Dashboard exige autenticação · HTTP 401 · 3 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 401 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Entre na sua conta para acessar os dados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 03 Token inválido é recusado · HTTP 401 · 19 ms</summary><p><code>GET /v1/settings</code></p><ul><li>passed: HTTP 401 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Sua sessão expirou. Entre novamente.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 04 Login com conta exclusiva de teste · HTTP 200 · 3 ms</summary><p><code>POST /auth/v1/token</code></p><ul><li>passed: HTTP 200 </li><li>passed: Token de acesso recebido </li></ul><pre>{
+  &quot;access_token&quot;: &quot;[REMOVIDO]&quot;,
+  &quot;refresh_token&quot;: &quot;[REMOVIDO]&quot;,
+  &quot;token_type&quot;: &quot;bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;expires_at&quot;: 1794074982,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;b76530b9-9324-4d94-a5ec-5bda2ab3c2aa&quot;,
+    &quot;aud&quot;: &quot;authenticated&quot;,
+    &quot;role&quot;: &quot;authenticated&quot;,
+    &quot;email&quot;: &quot;dashboard@example.test&quot;,
+    &quot;email_confirmed_at&quot;: &quot;2026-09-01T00:00:00Z&quot;,
+    &quot;created_at&quot;: &quot;2026-09-01T00:00:00Z&quot;,
+    &quot;app_metadata&quot;: {
+      &quot;provider&quot;: &quot;email&quot;,
+      &quot;providers&quot;: [
+        &quot;email&quot;
+      ]
+    },
+    &quot;user_metadata&quot;: {
+      &quot;nome_completo&quot;: &quot;Usuário Teste&quot;
+    }
+  }
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 05 Configurações pertencem à conta logada · HTTP 200 · 17 ms</summary><p><code>GET /v1/settings</code></p><ul><li>passed: HTTP 200 </li><li>passed: Nome da conta </li><li>passed: E-mail da conta </li><li>passed: Resposta não armazenada em cache </li></ul><pre>{
+  &quot;fullName&quot;: &quot;Perfil Cadastrado&quot;,
+  &quot;phone&quot;: &quot;61912345678&quot;,
+  &quot;cnpj&quot;: &quot;12345678000195&quot;,
+  &quot;emailAlerts&quot;: false,
+  &quot;invoiceReminders&quot;: true,
+  &quot;lowStockAlerts&quot;: true,
+  &quot;timeZone&quot;: &quot;America/Sao_Paulo&quot;,
+  &quot;email&quot;: &quot;dashboard@example.test&quot;,
+  &quot;pendingEmail&quot;: null
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 06 Salvar nome, telefone e preferências · HTTP 200 · 9 ms</summary><p><code>PATCH /v1/settings</code></p><ul><li>passed: HTTP 200 </li><li>passed: Nome salvo </li></ul><pre>{
+  &quot;fullName&quot;: &quot;Pessoa Teste Postman Atualizada&quot;,
+  &quot;phone&quot;: &quot;61900000001&quot;,
+  &quot;cnpj&quot;: &quot;12345678000195&quot;,
+  &quot;emailAlerts&quot;: true,
+  &quot;invoiceReminders&quot;: false,
+  &quot;lowStockAlerts&quot;: true,
+  &quot;timeZone&quot;: &quot;America/Manaus&quot;,
+  &quot;email&quot;: &quot;dashboard@example.test&quot;,
+  &quot;pendingEmail&quot;: null
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 07 Ler novamente as configurações salvas · HTTP 200 · 6 ms</summary><p><code>GET /v1/settings</code></p><ul><li>passed: HTTP 200 </li><li>passed: Persistência de todos os campos </li></ul><pre>{
+  &quot;fullName&quot;: &quot;Pessoa Teste Postman Atualizada&quot;,
+  &quot;phone&quot;: &quot;61900000001&quot;,
+  &quot;cnpj&quot;: &quot;12345678000195&quot;,
+  &quot;emailAlerts&quot;: true,
+  &quot;invoiceReminders&quot;: false,
+  &quot;lowStockAlerts&quot;: true,
+  &quot;timeZone&quot;: &quot;America/Manaus&quot;,
+  &quot;email&quot;: &quot;dashboard@example.test&quot;,
+  &quot;pendingEmail&quot;: null
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 08 Telefone inválido é recusado · HTTP 400 · 5 ms</summary><p><code>PATCH /v1/settings</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 09 Alteração direta de e-mail no perfil é recusada · HTTP 400 · 6 ms</summary><p><code>PATCH /v1/settings</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 10 Dashboard reflete os lançamentos conhecidos · HTTP 200 · 34 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 200 </li><li>passed: Receita exata </li><li>passed: Custos exatos </li><li>passed: Lucro = receita - custos </li><li>passed: Gráfico de despesas tem três meses e custo final correto </li></ul><pre>{
+  &quot;filter&quot;: {
+    &quot;month&quot;: &quot;2026-11&quot;,
+    &quot;months&quot;: 3,
+    &quot;scope&quot;: &quot;professional&quot;
+  },
+  &quot;companyName&quot;: &quot;Empresa Teste&quot;,
+  &quot;canEditGoal&quot;: true,
+  &quot;empty&quot;: false,
+  &quot;updatedAt&quot;: &quot;2026-11-07T17:09:43.725Z&quot;,
+  &quot;insight&quot;: &quot;Sem base suficiente no mês anterior para comparar receita e custos.&quot;,
+  &quot;marginTarget&quot;: null,
+  &quot;pending&quot;: {
+    &quot;count&quot;: 0,
+    &quot;revenue&quot;: 0,
+    &quot;costs&quot;: 0
+  },
+  &quot;metrics&quot;: {
+    &quot;revenue&quot;: 1200,
+    &quot;costs&quot;: 600,
+    &quot;profit&quot;: 600,
+    &quot;withdrawals&quot;: 200,
+    &quot;margin&quot;: 50,
+    &quot;revenueChange&quot;: 20,
+    &quot;costChange&quot;: null,
+    &quot;profitChange&quot;: -40
+  },
+  &quot;goal&quot;: {
+    &quot;value&quot;: 8000,
+    &quot;percentage&quot;: 15,
+    &quot;projection&quot;: null,
+    &quot;projectedToReach&quot;: null,
+    &quot;daysWithSales&quot;: 1
+  },
+  &quot;evolution&quot;: [
+    {
+      &quot;month&quot;: &quot;2026-09&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-10&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-11&quot;,
+      &quot;value&quot;: 600
+    }
+  ],
+  &quot;distribution&quot;: [
+    {
+      &quot;id&quot;: &quot;category-1&quot;,
+      &quot;name&quot;: &quot;Insumos&quot;,
+      &quot;value&quot;: 600,
+      &quot;percentage&quot;: 100,
+      &quot;topSupplies&quot;: [
+        {
+          &quot;id&quot;: &quot;22222222-2222-4222-8222-222222222222&quot;,
+          &quot;name&quot;: &quot;Farinha&quot;,
+          &quot;value&quot;: 600
+        }
+      ]
+    }
+  ],
+  &quot;alerts&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 11 Mês inválido é recusado · HTTP 400 · 4 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 12 Salvar meta da empresa de teste · HTTP 204 · 6 ms</summary><p><code>PATCH /v1/dashboard/goal</code></p><ul><li>passed: HTTP 204 </li></ul><pre>Sem corpo de resposta</pre></details><details><summary><span class="ok">PASSOU</span> · 13 Meta aparece no dashboard · HTTP 200 · 11 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 200 </li><li>passed: Meta persistida </li><li>passed: Meta de margem persistida </li></ul><pre>{
+  &quot;filter&quot;: {
+    &quot;month&quot;: &quot;2026-11&quot;,
+    &quot;months&quot;: 6,
+    &quot;scope&quot;: &quot;professional&quot;
+  },
+  &quot;companyName&quot;: &quot;Empresa Teste&quot;,
+  &quot;canEditGoal&quot;: true,
+  &quot;empty&quot;: false,
+  &quot;updatedAt&quot;: &quot;2026-11-07T17:09:44.406Z&quot;,
+  &quot;insight&quot;: &quot;Sem base suficiente no mês anterior para comparar receita e custos.&quot;,
+  &quot;marginTarget&quot;: 30,
+  &quot;pending&quot;: {
+    &quot;count&quot;: 0,
+    &quot;revenue&quot;: 0,
+    &quot;costs&quot;: 0
+  },
+  &quot;metrics&quot;: {
+    &quot;revenue&quot;: 1200,
+    &quot;costs&quot;: 600,
+    &quot;profit&quot;: 600,
+    &quot;withdrawals&quot;: 200,
+    &quot;margin&quot;: 50,
+    &quot;revenueChange&quot;: 20,
+    &quot;costChange&quot;: null,
+    &quot;profitChange&quot;: -40
+  },
+  &quot;goal&quot;: {
+    &quot;value&quot;: 1000,
+    &quot;percentage&quot;: 120,
+    &quot;projection&quot;: null,
+    &quot;projectedToReach&quot;: null,
+    &quot;daysWithSales&quot;: 1
+  },
+  &quot;evolution&quot;: [
+    {
+      &quot;month&quot;: &quot;2026-06&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-07&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-08&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-09&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-10&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-11&quot;,
+      &quot;value&quot;: 600
+    }
+  ],
+  &quot;distribution&quot;: [
+    {
+      &quot;id&quot;: &quot;category-1&quot;,
+      &quot;name&quot;: &quot;Insumos&quot;,
+      &quot;value&quot;: 600,
+      &quot;percentage&quot;: 100,
+      &quot;topSupplies&quot;: [
+        {
+          &quot;id&quot;: &quot;22222222-2222-4222-8222-222222222222&quot;,
+          &quot;name&quot;: &quot;Farinha&quot;,
+          &quot;value&quot;: 600
+        }
+      ]
+    }
+  ],
+  &quot;alerts&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 14 Listar insumos da empresa · HTTP 200 · 7 ms</summary><p><code>GET /v1/supplies</code></p><ul><li>passed: HTTP 200 </li><li>passed: Lista de insumos válida </li></ul><pre>{
+  &quot;supplies&quot;: [
+    {
+      &quot;id&quot;: &quot;22222222-2222-4222-8222-222222222222&quot;,
+      &quot;empresa_id&quot;: &quot;11111111-1111-4111-8111-111111111111&quot;,
+      &quot;nome&quot;: &quot;Farinha&quot;,
+      &quot;unidade_medida&quot;: &quot;kg&quot;,
+      &quot;estoque_minimo&quot;: 0,
+      &quot;ativo&quot;: true,
+      &quot;versao_cadastro&quot;: &quot;3a68c8bd-4e3b-46c7-9a65-548b21681a21&quot;
+    }
+  ]
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 15 Cadastrar insumo manualmente · HTTP 201 · 5 ms</summary><p><code>POST /v1/supplies</code></p><ul><li>passed: HTTP 201 </li><li>passed: Identificador e versão recebidos </li></ul><pre>{
+  &quot;supply&quot;: {
+    &quot;id&quot;: &quot;6eace110-c2d4-4e5b-8148-b2c5b508e71b&quot;,
+    &quot;empresa_id&quot;: &quot;11111111-1111-4111-8111-111111111111&quot;,
+    &quot;nome&quot;: &quot;Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f&quot;,
+    &quot;unidade_medida&quot;: &quot;kg&quot;,
+    &quot;estoque_minimo&quot;: 2,
+    &quot;ativo&quot;: true,
+    &quot;versao_cadastro&quot;: &quot;f4be7676-355d-41b2-89ee-729af42c2247&quot;
+  }
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 16 Pesquisa encontra o insumo salvo · HTTP 200 · 4 ms</summary><p><code>GET /v1/supplies</code></p><ul><li>passed: HTTP 200 </li><li>passed: Registro recém-criado encontrado </li></ul><pre>{
+  &quot;supplies&quot;: [
+    {
+      &quot;id&quot;: &quot;6eace110-c2d4-4e5b-8148-b2c5b508e71b&quot;,
+      &quot;empresa_id&quot;: &quot;11111111-1111-4111-8111-111111111111&quot;,
+      &quot;nome&quot;: &quot;Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f&quot;,
+      &quot;unidade_medida&quot;: &quot;kg&quot;,
+      &quot;estoque_minimo&quot;: 2,
+      &quot;ativo&quot;: true,
+      &quot;versao_cadastro&quot;: &quot;f4be7676-355d-41b2-89ee-729af42c2247&quot;
+    }
+  ]
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 17 Atualizar insumo com versão atual · HTTP 200 · 5 ms</summary><p><code>PATCH /v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b</code></p><ul><li>passed: HTTP 200 </li><li>passed: Estoque mínimo atualizado </li></ul><pre>{
+  &quot;supply&quot;: {
+    &quot;id&quot;: &quot;6eace110-c2d4-4e5b-8148-b2c5b508e71b&quot;,
+    &quot;empresa_id&quot;: &quot;11111111-1111-4111-8111-111111111111&quot;,
+    &quot;nome&quot;: &quot;Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f&quot;,
+    &quot;unidade_medida&quot;: &quot;kg&quot;,
+    &quot;estoque_minimo&quot;: 3,
+    &quot;ativo&quot;: true,
+    &quot;versao_cadastro&quot;: &quot;0b8ce1c1-5912-4ce3-991e-763765d0e6b0&quot;
+  }
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 18 Impedir sobrescrita com versão antiga · HTTP 409 · 4 ms</summary><p><code>PATCH /v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b</code></p><ul><li>passed: HTTP 409 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Confira os dados, a versão do insumo e se o mês está aberto.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 19 Insumo com estoque mínimo negativo é recusado · HTTP 400 · 4 ms</summary><p><code>POST /v1/supplies</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 20 Registrar compra manual de insumo · HTTP 201 · 6 ms</summary><p><code>POST /v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b/prices</code></p><ul><li>passed: HTTP 201 </li><li>passed: Compra registrada </li></ul><pre>{
+  &quot;success&quot;: true
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 21 Histórico de compra mantém preço e unidade · HTTP 200 · 7 ms</summary><p><code>GET /v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b/prices</code></p><ul><li>passed: HTTP 200 </li><li>passed: Preço médio exato </li><li>passed: Unidade preservada </li><li>passed: Uma compra registrada </li></ul><pre>{
+  &quot;supply&quot;: {
+    &quot;id&quot;: &quot;6eace110-c2d4-4e5b-8148-b2c5b508e71b&quot;,
+    &quot;empresa_id&quot;: &quot;11111111-1111-4111-8111-111111111111&quot;,
+    &quot;nome&quot;: &quot;Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f&quot;,
+    &quot;unidade_medida&quot;: &quot;kg&quot;,
+    &quot;estoque_minimo&quot;: 3,
+    &quot;ativo&quot;: true,
+    &quot;versao_cadastro&quot;: &quot;0b8ce1c1-5912-4ce3-991e-763765d0e6b0&quot;
+  },
+  &quot;units&quot;: [
+    &quot;kg&quot;
+  ],
+  &quot;unit&quot;: &quot;kg&quot;,
+  &quot;points&quot;: [
+    {
+      &quot;id&quot;: &quot;c9c3dff5-5ae9-4ac7-a693-752ddf6729dd&quot;,
+      &quot;date&quot;: &quot;2026-11-07&quot;,
+      &quot;value&quot;: 6,
+      &quot;unit&quot;: &quot;kg&quot;,
+      &quot;supplier&quot;: &quot;Fornecedor fictício Postman&quot;,
+      &quot;source&quot;: &quot;manual&quot;
+    }
+  ],
+  &quot;minimum&quot;: {
+    &quot;id&quot;: &quot;c9c3dff5-5ae9-4ac7-a693-752ddf6729dd&quot;,
+    &quot;date&quot;: &quot;2026-11-07&quot;,
+    &quot;value&quot;: 6,
+    &quot;unit&quot;: &quot;kg&quot;,
+    &quot;supplier&quot;: &quot;Fornecedor fictício Postman&quot;,
+    &quot;source&quot;: &quot;manual&quot;
+  },
+  &quot;maximum&quot;: {
+    &quot;id&quot;: &quot;c9c3dff5-5ae9-4ac7-a693-752ddf6729dd&quot;,
+    &quot;date&quot;: &quot;2026-11-07&quot;,
+    &quot;value&quot;: 6,
+    &quot;unit&quot;: &quot;kg&quot;,
+    &quot;supplier&quot;: &quot;Fornecedor fictício Postman&quot;,
+    &quot;source&quot;: &quot;manual&quot;
+  },
+  &quot;average&quot;: 6
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 22 Calcular preço por custo base · HTTP 200 · 5 ms</summary><p><code>POST /v1/pricing/quote</code></p><ul><li>passed: HTTP 200 </li><li>passed: Custo de R$20 </li><li>passed: Preço com markup 100% </li><li>passed: Margem de 50% </li></ul><pre>{
+  &quot;cost&quot;: 20,
+  &quot;inputCost&quot;: 0,
+  &quot;tax&quot;: 0,
+  &quot;taxCost&quot;: 0,
+  &quot;suggestedPrice&quot;: 40,
+  &quot;profit&quot;: 20,
+  &quot;margin&quot;: 50,
+  &quot;monthlyRevenue&quot;: 400,
+  &quot;revenueDifference&quot;: 100,
+  &quot;lines&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 23 Calcular preço com insumo comprado · HTTP 200 · 5 ms</summary><p><code>POST /v1/pricing/quote</code></p><ul><li>passed: HTTP 200 </li><li>passed: Custo base + compra = R$26 </li><li>passed: Preço sugerido = R$52 </li></ul><pre>{
+  &quot;cost&quot;: 26,
+  &quot;inputCost&quot;: 6,
+  &quot;tax&quot;: 0,
+  &quot;taxCost&quot;: 0,
+  &quot;suggestedPrice&quot;: 52,
+  &quot;profit&quot;: 26,
+  &quot;margin&quot;: 50,
+  &quot;monthlyRevenue&quot;: 520,
+  &quot;revenueDifference&quot;: 220,
+  &quot;lines&quot;: [
+    {
+      &quot;name&quot;: &quot;Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f&quot;,
+      &quot;unit&quot;: &quot;kg&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;price&quot;: 6,
+      &quot;cost&quot;: 6
+    }
+  ]
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 24 Salvar produto precificado · HTTP 200 · 5 ms</summary><p><code>POST /v1/pricing/products</code></p><ul><li>passed: HTTP 200 </li><li>passed: ID salvo </li></ul><pre>{
+  &quot;id&quot;: &quot;6e0908f4-b732-4e20-bdca-cba5351c9702&quot;,
+  &quot;version&quot;: &quot;83e738f9-625e-4108-8a8e-d7b57a9bc763&quot;,
+  &quot;quote&quot;: {
+    &quot;cost&quot;: 20,
+    &quot;inputCost&quot;: 0,
+    &quot;tax&quot;: 0,
+    &quot;taxCost&quot;: 0,
+    &quot;suggestedPrice&quot;: 40,
+    &quot;profit&quot;: 20,
+    &quot;margin&quot;: 50,
+    &quot;monthlyRevenue&quot;: 400,
+    &quot;revenueDifference&quot;: 100,
+    &quot;lines&quot;: []
+  }
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 25 Consultar produto salvo · HTTP 200 · 5 ms</summary><p><code>GET /v1/pricing</code></p><ul><li>passed: HTTP 200 </li><li>passed: Produto persistido encontrado </li></ul><pre>{
+  &quot;tax&quot;: 0,
+  &quot;products&quot;: [
+    {
+      &quot;id&quot;: &quot;6e0908f4-b732-4e20-bdca-cba5351c9702&quot;,
+      &quot;name&quot;: &quot;Produto QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f&quot;,
+      &quot;baseCost&quot;: 20,
+      &quot;markup&quot;: 100,
+      &quot;currentPrice&quot;: 30,
+      &quot;monthlyUnits&quot;: 10,
+      &quot;ingredients&quot;: [],
+      &quot;version&quot;: &quot;83e738f9-625e-4108-8a8e-d7b57a9bc763&quot;,
+      &quot;active&quot;: true,
+      &quot;referenceCost&quot;: 20
+    }
+  ],
+  &quot;supplies&quot;: [
+    {
+      &quot;id&quot;: &quot;22222222-2222-4222-8222-222222222222&quot;,
+      &quot;name&quot;: &quot;Farinha&quot;,
+      &quot;unit&quot;: &quot;kg&quot;,
+      &quot;active&quot;: true,
+      &quot;price&quot;: 6,
+      &quot;date&quot;: &quot;2026-11-01&quot;
+    },
+    {
+      &quot;id&quot;: &quot;6eace110-c2d4-4e5b-8148-b2c5b508e71b&quot;,
+      &quot;name&quot;: &quot;Insumo QA 43d2761b-795e-4375-aed5-b6ef3bf71f1f&quot;,
+      &quot;unit&quot;: &quot;kg&quot;,
+      &quot;active&quot;: true,
+      &quot;price&quot;: 6,
+      &quot;date&quot;: &quot;2026-11-07&quot;
+    }
+  ]
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 26 Impedir edição de produto com versão errada · HTTP 409 · 5 ms</summary><p><code>POST /v1/pricing/products</code></p><ul><li>passed: HTTP 409 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;O produto mudou. Atualize os dados antes de salvar.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 27 Rejeitar valores monetários com três casas · HTTP 400 · 6 ms</summary><p><code>POST /v1/pricing/quote</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Use até duas casas decimais nos valores e três nas quantidades.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 28 Consultar notas de custos · HTTP 200 · 5 ms</summary><p><code>GET /v1/invoices</code></p><ul><li>passed: HTTP 200 </li><li>passed: Lista de notas válida </li></ul><pre>{
+  &quot;invoices&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 29 Rejeitar arquivo de tipo não permitido · HTTP 400 · 4 ms</summary><p><code>POST /v1/invoices</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 30 Exigir justificativa suficiente para exclusão · HTTP 400 · 4 ms</summary><p><code>DELETE /v1/invoices/00000000-0000-4000-8000-000000000001</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 31 Consultar disponibilidade de e-mail · HTTP 200 · 4 ms</summary><p><code>GET /v1/reports/options</code></p><ul><li>passed: HTTP 200 </li><li>passed: Configuração de e-mail informada </li></ul><pre>{
+  &quot;emailConfigured&quot;: true
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 32 Exportar relatório PDF · HTTP 200 · 39 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 200 </li><li>passed: Tipo de arquivo correto </li><li>passed: Assinatura binária válida </li><li>passed: Download com nome e proteção MIME </li></ul><p><a href="amostras/local-relatorio.pdf">Baixar arquivo efetivamente retornado pela API</a> (2045 bytes)</p></details><details><summary><span class="ok">PASSOU</span> · 33 Exportar relatório XLSX · HTTP 200 · 25 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 200 </li><li>passed: Tipo de arquivo correto </li><li>passed: Assinatura binária válida </li><li>passed: Download com nome e proteção MIME </li></ul><p><a href="amostras/local-relatorio.xlsx">Baixar arquivo efetivamente retornado pela API</a> (8512 bytes)</p></details><details><summary><span class="ok">PASSOU</span> · 34 Exportar relatório BOTH · HTTP 200 · 17 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 200 </li><li>passed: Tipo de arquivo correto </li><li>passed: Assinatura binária válida </li><li>passed: Download com nome e proteção MIME </li></ul><p><a href="amostras/local-relatorio.zip">Baixar arquivo efetivamente retornado pela API</a> (9657 bytes)</p></details><details><summary><span class="ok">PASSOU</span> · 35 Rejeitar relatório com período invertido · HTTP 400 · 6 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Selecione um período válido de até 367 dias.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 36 Relatório sem dados informa vazio · HTTP 422 · 4 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 422 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Nada para exportar: não foram encontrados registros no período e filtros selecionados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 37 E-mail PDF com transporte simulado · HTTP 200 · 13 ms</summary><p><code>POST /v1/reports/email</code></p><ul><li>passed: HTTP 200 </li><li>passed: Aceite informado </li></ul><pre>{
+  &quot;message&quot;: &quot;Relatório aceito pelo servidor de e-mail. Confira a caixa de entrada e o spam do destinatário.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 38 E-mail XLSX com transporte simulado · HTTP 200 · 12 ms</summary><p><code>POST /v1/reports/email</code></p><ul><li>passed: HTTP 200 </li><li>passed: Aceite informado </li></ul><pre>{
+  &quot;message&quot;: &quot;Relatório aceito pelo servidor de e-mail. Confira a caixa de entrada e o spam do destinatário.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 39 Repetição do e-mail não dispara novo envio · HTTP 200 · 9 ms</summary><p><code>POST /v1/reports/email</code></p><ul><li>passed: HTTP 200 </li><li>passed: Repetição identificada </li></ul><pre>{
+  &quot;message&quot;: &quot;Este envio já foi aceito pelo servidor de e-mail. Confira a caixa de entrada e o spam.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 40 Recuperação exige senha atual correta · HTTP 400 · 5 ms</summary><p><code>POST /v1/settings/password-reset</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Senha atual incorreta ou indisponível. Confira e tente novamente.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 41 Recuperação de senha com provedor simulado · HTTP 200 · 6 ms</summary><p><code>POST /v1/settings/password-reset</code></p><ul><li>passed: HTTP 200 </li><li>passed: Solicitação aceita </li></ul><pre>{
+  &quot;message&quot;: &quot;Solicitação de recuperação aceita. Confira a caixa de entrada e o spam do e-mail da sua conta.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 42 Alteração de e-mail aguarda confirmação simulada · HTTP 200 · 6 ms</summary><p><code>POST /v1/settings/email</code></p><ul><li>passed: HTTP 200 </li></ul><pre>{
+  &quot;message&quot;: &quot;Solicitação de alteração enviada. Confira o e-mail atual e o novo e-mail e siga as confirmações solicitadas. O endereço será atualizado após a confirmação.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 43 E-mail pendente não substitui identidade confirmada · HTTP 200 · 5 ms</summary><p><code>GET /v1/settings</code></p><ul><li>passed: HTTP 200 </li><li>passed: E-mail confirmado preservado </li><li>passed: Novo e-mail permanece pendente </li></ul><pre>{
+  &quot;fullName&quot;: &quot;Pessoa Teste Postman Atualizada&quot;,
+  &quot;phone&quot;: &quot;61900000001&quot;,
+  &quot;cnpj&quot;: &quot;12345678000195&quot;,
+  &quot;emailAlerts&quot;: true,
+  &quot;invoiceReminders&quot;: false,
+  &quot;lowStockAlerts&quot;: true,
+  &quot;timeZone&quot;: &quot;America/Manaus&quot;,
+  &quot;email&quot;: &quot;dashboard@example.test&quot;,
+  &quot;pendingEmail&quot;: &quot;novo@example.test&quot;
+}</pre></details><h2>Supabase real</h2><p>Backend local + Supabase Auth/PostgreSQL reais. 43 requisições, 102/102 verificações aprovadas. 2026-11-07T17:09:42.010Z a 2026-11-07T17:10:16.482Z.</p><p><a href="real-resultados.json">Respostas e verificações (JSON)</a> · <a href="real-junit.xml">JUnit XML</a> · <a href="real-postman.log">Log Postman</a></p><details><summary><span class="ok">PASSOU</span> · 01 Saúde da API · HTTP 200 · 13 ms</summary><p><code>GET /health</code></p><ul><li>passed: HTTP 200 </li><li>passed: Serviço disponível </li></ul><pre>{
+  &quot;status&quot;: &quot;ok&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 02 Dashboard exige autenticação · HTTP 401 · 3 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 401 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Entre na sua conta para acessar os dados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 03 Token inválido é recusado · HTTP 401 · 216 ms</summary><p><code>GET /v1/settings</code></p><ul><li>passed: HTTP 401 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Sua sessão expirou. Entre novamente.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 04 Login com conta exclusiva de teste · HTTP 200 · 387 ms</summary><p><code>POST /auth/v1/token</code></p><ul><li>passed: HTTP 200 </li><li>passed: Token de acesso recebido </li></ul><pre>{
+  &quot;access_token&quot;: &quot;[REMOVIDO]&quot;,
+  &quot;token_type&quot;: &quot;bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;expires_at&quot;: 1794074984,
+  &quot;refresh_token&quot;: &quot;[REMOVIDO]&quot;,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;8cb58d01-4c0b-4f18-88b1-aef28c7f3279&quot;,
+    &quot;aud&quot;: &quot;authenticated&quot;,
+    &quot;role&quot;: &quot;authenticated&quot;,
+    &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-a@example.com&quot;,
+    &quot;email_confirmed_at&quot;: &quot;2026-11-07T17:09:28.712468Z&quot;,
+    &quot;phone&quot;: &quot;&quot;,
+    &quot;confirmed_at&quot;: &quot;2026-11-07T17:09:28.712468Z&quot;,
+    &quot;last_sign_in_at&quot;: &quot;2026-11-07T17:09:43.991002613Z&quot;,
+    &quot;app_metadata&quot;: {
+      &quot;provider&quot;: &quot;email&quot;,
+      &quot;providers&quot;: [
+        &quot;email&quot;
+      ]
+    },
+    &quot;user_metadata&quot;: {
+      &quot;cnpj&quot;: &quot;52042202000108&quot;,
+      &quot;data_nascimento&quot;: &quot;1990-01-01&quot;,
+      &quot;email_verified&quot;: true,
+      &quot;nome_completo&quot;: &quot;Teste Postman A&quot;,
+      &quot;razao_social&quot;: &quot;TESTE POSTMAN 47308b36-6891-4035-9a3f-7d9f771fc432 A&quot;,
+      &quot;telefone&quot;: &quot;61900000000&quot;
+    },
+    &quot;identities&quot;: [
+      {
+        &quot;identity_id&quot;: &quot;3dab3a34-da0d-496a-bf34-fd62b3b839e9&quot;,
+        &quot;id&quot;: &quot;8cb58d01-4c0b-4f18-88b1-aef28c7f3279&quot;,
+        &quot;user_id&quot;: &quot;8cb58d01-4c0b-4f18-88b1-aef28c7f3279&quot;,
+        &quot;identity_data&quot;: {
+          &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-a@example.com&quot;,
+          &quot;email_verified&quot;: false,
+          &quot;phone_verified&quot;: false,
+          &quot;sub&quot;: &quot;8cb58d01-4c0b-4f18-88b1-aef28c7f3279&quot;
+        },
+        &quot;provider&quot;: &quot;email&quot;,
+        &quot;last_sign_in_at&quot;: &quot;2026-11-07T17:09:28.709946Z&quot;,
+        &quot;created_at&quot;: &quot;2026-11-07T17:09:28.710032Z&quot;,
+        &quot;updated_at&quot;: &quot;2026-11-07T17:09:28.710032Z&quot;,
+        &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-a@example.com&quot;
+      }
+    ],
+    &quot;created_at&quot;: &quot;2026-11-07T17:09:28.694Z&quot;,
+    &quot;updated_at&quot;: &quot;2026-11-07T17:09:44.005097Z&quot;,
+    &quot;is_anonymous&quot;: false
+  },
+  &quot;weak_password&quot;: &quot;[REMOVIDO]&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 05 Configurações pertencem à conta logada · HTTP 200 · 762 ms</summary><p><code>GET /v1/settings</code></p><ul><li>passed: HTTP 200 </li><li>passed: Nome da conta </li><li>passed: E-mail da conta </li><li>passed: Resposta não armazenada em cache </li></ul><pre>{
+  &quot;cnpj&quot;: &quot;52042202000108&quot;,
+  &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-a@example.com&quot;,
+  &quot;phone&quot;: &quot;61900000000&quot;,
+  &quot;fullName&quot;: &quot;Teste Postman A&quot;,
+  &quot;timeZone&quot;: &quot;America/Sao_Paulo&quot;,
+  &quot;emailAlerts&quot;: false,
+  &quot;lowStockAlerts&quot;: true,
+  &quot;invoiceReminders&quot;: true,
+  &quot;pendingEmail&quot;: null
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 06 Salvar nome, telefone e preferências · HTTP 200 · 692 ms</summary><p><code>PATCH /v1/settings</code></p><ul><li>passed: HTTP 200 </li><li>passed: Nome salvo </li></ul><pre>{
+  &quot;cnpj&quot;: &quot;52042202000108&quot;,
+  &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-a@example.com&quot;,
+  &quot;phone&quot;: &quot;61900000001&quot;,
+  &quot;fullName&quot;: &quot;Pessoa Teste Postman Atualizada&quot;,
+  &quot;timeZone&quot;: &quot;America/Manaus&quot;,
+  &quot;emailAlerts&quot;: true,
+  &quot;lowStockAlerts&quot;: true,
+  &quot;invoiceReminders&quot;: false,
+  &quot;pendingEmail&quot;: null
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 07 Ler novamente as configurações salvas · HTTP 200 · 646 ms</summary><p><code>GET /v1/settings</code></p><ul><li>passed: HTTP 200 </li><li>passed: Persistência de todos os campos </li></ul><pre>{
+  &quot;cnpj&quot;: &quot;52042202000108&quot;,
+  &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-a@example.com&quot;,
+  &quot;phone&quot;: &quot;61900000001&quot;,
+  &quot;fullName&quot;: &quot;Pessoa Teste Postman Atualizada&quot;,
+  &quot;timeZone&quot;: &quot;America/Manaus&quot;,
+  &quot;emailAlerts&quot;: true,
+  &quot;lowStockAlerts&quot;: true,
+  &quot;invoiceReminders&quot;: false,
+  &quot;pendingEmail&quot;: null
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 08 Telefone inválido é recusado · HTTP 400 · 479 ms</summary><p><code>PATCH /v1/settings</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 09 Alteração direta de e-mail no perfil é recusada · HTTP 400 · 470 ms</summary><p><code>PATCH /v1/settings</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 10 Dashboard reflete os lançamentos conhecidos · HTTP 200 · 882 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 200 </li><li>passed: Receita exata </li><li>passed: Custos exatos </li><li>passed: Lucro = receita - custos </li><li>passed: Gráfico de despesas tem três meses e custo final correto </li></ul><pre>{
+  &quot;filter&quot;: {
+    &quot;month&quot;: &quot;2026-11&quot;,
+    &quot;months&quot;: 3,
+    &quot;scope&quot;: &quot;professional&quot;
+  },
+  &quot;companyName&quot;: &quot;TESTE POSTMAN 47308b36-6891-4035-9a3f-7d9f771fc432 A&quot;,
+  &quot;canEditGoal&quot;: true,
+  &quot;empty&quot;: false,
+  &quot;updatedAt&quot;: &quot;2026-11-07T17:09:48.606Z&quot;,
+  &quot;insight&quot;: &quot;Sem base suficiente no mês anterior para comparar receita e custos.&quot;,
+  &quot;marginTarget&quot;: null,
+  &quot;pending&quot;: {
+    &quot;count&quot;: 0,
+    &quot;revenue&quot;: 0,
+    &quot;costs&quot;: 0
+  },
+  &quot;metrics&quot;: {
+    &quot;revenue&quot;: 150,
+    &quot;costs&quot;: 0,
+    &quot;profit&quot;: 150,
+    &quot;withdrawals&quot;: 0,
+    &quot;margin&quot;: 100,
+    &quot;revenueChange&quot;: null,
+    &quot;costChange&quot;: null,
+    &quot;profitChange&quot;: null
+  },
+  &quot;goal&quot;: {
+    &quot;value&quot;: 0,
+    &quot;percentage&quot;: null,
+    &quot;projection&quot;: null,
+    &quot;projectedToReach&quot;: null,
+    &quot;daysWithSales&quot;: 1
+  },
+  &quot;evolution&quot;: [
+    {
+      &quot;month&quot;: &quot;2026-09&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-10&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-11&quot;,
+      &quot;value&quot;: 0
+    }
+  ],
+  &quot;distribution&quot;: [],
+  &quot;alerts&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 11 Mês inválido é recusado · HTTP 400 · 490 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 12 Salvar meta da empresa de teste · HTTP 204 · 901 ms</summary><p><code>PATCH /v1/dashboard/goal</code></p><ul><li>passed: HTTP 204 </li></ul><pre>Sem corpo de resposta</pre></details><details><summary><span class="ok">PASSOU</span> · 13 Meta aparece no dashboard · HTTP 200 · 844 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 200 </li><li>passed: Meta persistida </li><li>passed: Meta de margem persistida </li></ul><pre>{
+  &quot;filter&quot;: {
+    &quot;month&quot;: &quot;2026-11&quot;,
+    &quot;months&quot;: 6,
+    &quot;scope&quot;: &quot;professional&quot;
+  },
+  &quot;companyName&quot;: &quot;TESTE POSTMAN 47308b36-6891-4035-9a3f-7d9f771fc432 A&quot;,
+  &quot;canEditGoal&quot;: true,
+  &quot;empty&quot;: false,
+  &quot;updatedAt&quot;: &quot;2026-11-07T17:09:51.468Z&quot;,
+  &quot;insight&quot;: &quot;Sem base suficiente no mês anterior para comparar receita e custos.&quot;,
+  &quot;marginTarget&quot;: 30,
+  &quot;pending&quot;: {
+    &quot;count&quot;: 0,
+    &quot;revenue&quot;: 0,
+    &quot;costs&quot;: 0
+  },
+  &quot;metrics&quot;: {
+    &quot;revenue&quot;: 150,
+    &quot;costs&quot;: 0,
+    &quot;profit&quot;: 150,
+    &quot;withdrawals&quot;: 0,
+    &quot;margin&quot;: 100,
+    &quot;revenueChange&quot;: null,
+    &quot;costChange&quot;: null,
+    &quot;profitChange&quot;: null
+  },
+  &quot;goal&quot;: {
+    &quot;value&quot;: 1000,
+    &quot;percentage&quot;: 15,
+    &quot;projection&quot;: null,
+    &quot;projectedToReach&quot;: null,
+    &quot;daysWithSales&quot;: 1
+  },
+  &quot;evolution&quot;: [
+    {
+      &quot;month&quot;: &quot;2026-06&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-07&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-08&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-09&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-10&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-11&quot;,
+      &quot;value&quot;: 0
+    }
+  ],
+  &quot;distribution&quot;: [],
+  &quot;alerts&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 14 Listar insumos da empresa · HTTP 200 · 875 ms</summary><p><code>GET /v1/supplies</code></p><ul><li>passed: HTTP 200 </li><li>passed: Lista de insumos válida </li></ul><pre>{
+  &quot;supplies&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 15 Cadastrar insumo manualmente · HTTP 201 · 646 ms</summary><p><code>POST /v1/supplies</code></p><ul><li>passed: HTTP 201 </li><li>passed: Identificador e versão recebidos </li></ul><pre>{
+  &quot;supply&quot;: {
+    &quot;id&quot;: &quot;4bc19ce0-3a57-43bb-8ee9-f3def5e2af72&quot;,
+    &quot;empresa_id&quot;: &quot;7c773bbb-625d-4cf3-a9c9-e7a1512c8259&quot;,
+    &quot;nome&quot;: &quot;Insumo QA 47308b36-6891-4035-9a3f-7d9f771fc432&quot;,
+    &quot;unidade_medida&quot;: &quot;kg&quot;,
+    &quot;estoque_minimo&quot;: 2,
+    &quot;ativo&quot;: true,
+    &quot;criado_em&quot;: &quot;2026-11-07T17:09:53.991575+00:00&quot;,
+    &quot;atualizado_em&quot;: &quot;2026-11-07T17:09:53.991575+00:00&quot;,
+    &quot;versao_cadastro&quot;: &quot;fd4bb587-e8a6-4d77-b019-8cfef5067dbe&quot;
+  }
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 16 Pesquisa encontra o insumo salvo · HTTP 200 · 616 ms</summary><p><code>GET /v1/supplies</code></p><ul><li>passed: HTTP 200 </li><li>passed: Registro recém-criado encontrado </li></ul><pre>{
+  &quot;supplies&quot;: [
+    {
+      &quot;id&quot;: &quot;4bc19ce0-3a57-43bb-8ee9-f3def5e2af72&quot;,
+      &quot;nome&quot;: &quot;Insumo QA 47308b36-6891-4035-9a3f-7d9f771fc432&quot;,
+      &quot;unidade_medida&quot;: &quot;kg&quot;,
+      &quot;estoque_minimo&quot;: 2,
+      &quot;ativo&quot;: true,
+      &quot;versao_cadastro&quot;: &quot;fd4bb587-e8a6-4d77-b019-8cfef5067dbe&quot;
+    }
+  ]
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 17 Atualizar insumo com versão atual · HTTP 200 · 645 ms</summary><p><code>PATCH /v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72</code></p><ul><li>passed: HTTP 200 </li><li>passed: Estoque mínimo atualizado </li></ul><pre>{
+  &quot;supply&quot;: {
+    &quot;id&quot;: &quot;4bc19ce0-3a57-43bb-8ee9-f3def5e2af72&quot;,
+    &quot;empresa_id&quot;: &quot;7c773bbb-625d-4cf3-a9c9-e7a1512c8259&quot;,
+    &quot;nome&quot;: &quot;Insumo QA 47308b36-6891-4035-9a3f-7d9f771fc432&quot;,
+    &quot;unidade_medida&quot;: &quot;kg&quot;,
+    &quot;estoque_minimo&quot;: 3,
+    &quot;ativo&quot;: true,
+    &quot;criado_em&quot;: &quot;2026-11-07T17:09:53.991575+00:00&quot;,
+    &quot;atualizado_em&quot;: &quot;2026-11-07T17:09:55.663779+00:00&quot;,
+    &quot;versao_cadastro&quot;: &quot;cfb7d9a7-a06f-4f8e-acc6-697db4cf7ff3&quot;
+  }
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 18 Impedir sobrescrita com versão antiga · HTTP 409 · 639 ms</summary><p><code>PATCH /v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72</code></p><ul><li>passed: HTTP 409 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;O insumo mudou. Atualize a lista.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 19 Insumo com estoque mínimo negativo é recusado · HTTP 400 · 474 ms</summary><p><code>POST /v1/supplies</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 20 Registrar compra manual de insumo · HTTP 201 · 701 ms</summary><p><code>POST /v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72/prices</code></p><ul><li>passed: HTTP 201 </li><li>passed: Compra registrada </li></ul><pre>{
+  &quot;success&quot;: true
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 21 Histórico de compra mantém preço e unidade · HTTP 200 · 880 ms</summary><p><code>GET /v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72/prices</code></p><ul><li>passed: HTTP 200 </li><li>passed: Preço médio exato </li><li>passed: Unidade preservada </li><li>passed: Uma compra registrada </li></ul><pre>{
+  &quot;supply&quot;: {
+    &quot;id&quot;: &quot;4bc19ce0-3a57-43bb-8ee9-f3def5e2af72&quot;,
+    &quot;nome&quot;: &quot;Insumo QA 47308b36-6891-4035-9a3f-7d9f771fc432&quot;,
+    &quot;unidade_medida&quot;: &quot;kg&quot;,
+    &quot;estoque_minimo&quot;: 3,
+    &quot;ativo&quot;: true,
+    &quot;versao_cadastro&quot;: &quot;cfb7d9a7-a06f-4f8e-acc6-697db4cf7ff3&quot;
+  },
+  &quot;units&quot;: [
+    &quot;kg&quot;
+  ],
+  &quot;unit&quot;: &quot;kg&quot;,
+  &quot;points&quot;: [
+    {
+      &quot;id&quot;: &quot;f842c0fa-b90e-4bd8-8067-3b3115ddcc12&quot;,
+      &quot;date&quot;: &quot;2026-11-07&quot;,
+      &quot;value&quot;: 6,
+      &quot;unit&quot;: &quot;kg&quot;,
+      &quot;supplier&quot;: &quot;Fornecedor fictício Postman&quot;,
+      &quot;source&quot;: &quot;manual&quot;
+    }
+  ],
+  &quot;minimum&quot;: {
+    &quot;id&quot;: &quot;f842c0fa-b90e-4bd8-8067-3b3115ddcc12&quot;,
+    &quot;date&quot;: &quot;2026-11-07&quot;,
+    &quot;value&quot;: 6,
+    &quot;unit&quot;: &quot;kg&quot;,
+    &quot;supplier&quot;: &quot;Fornecedor fictício Postman&quot;,
+    &quot;source&quot;: &quot;manual&quot;
+  },
+  &quot;maximum&quot;: {
+    &quot;id&quot;: &quot;f842c0fa-b90e-4bd8-8067-3b3115ddcc12&quot;,
+    &quot;date&quot;: &quot;2026-11-07&quot;,
+    &quot;value&quot;: 6,
+    &quot;unit&quot;: &quot;kg&quot;,
+    &quot;supplier&quot;: &quot;Fornecedor fictício Postman&quot;,
+    &quot;source&quot;: &quot;manual&quot;
+  },
+  &quot;average&quot;: 6
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 22 Calcular preço por custo base · HTTP 200 · 643 ms</summary><p><code>POST /v1/pricing/quote</code></p><ul><li>passed: HTTP 200 </li><li>passed: Custo de R$20 </li><li>passed: Preço com markup 100% </li><li>passed: Margem de 50% </li></ul><pre>{
+  &quot;tax&quot;: 0,
+  &quot;cost&quot;: 20,
+  &quot;lines&quot;: [],
+  &quot;margin&quot;: 50,
+  &quot;profit&quot;: 20,
+  &quot;taxCost&quot;: 0,
+  &quot;inputCost&quot;: 0,
+  &quot;monthlyRevenue&quot;: 400,
+  &quot;suggestedPrice&quot;: 40,
+  &quot;revenueDifference&quot;: 100
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 23 Calcular preço com insumo comprado · HTTP 200 · 628 ms</summary><p><code>POST /v1/pricing/quote</code></p><ul><li>passed: HTTP 200 </li><li>passed: Custo base + compra = R$26 </li><li>passed: Preço sugerido = R$52 </li></ul><pre>{
+  &quot;tax&quot;: 0,
+  &quot;cost&quot;: 26,
+  &quot;lines&quot;: [
+    {
+      &quot;cost&quot;: 6,
+      &quot;name&quot;: &quot;Insumo QA 47308b36-6891-4035-9a3f-7d9f771fc432&quot;,
+      &quot;unit&quot;: &quot;kg&quot;,
+      &quot;price&quot;: 6,
+      &quot;quantity&quot;: 1
+    }
+  ],
+  &quot;margin&quot;: 50,
+  &quot;profit&quot;: 26,
+  &quot;taxCost&quot;: 0,
+  &quot;inputCost&quot;: 6,
+  &quot;monthlyRevenue&quot;: 520,
+  &quot;suggestedPrice&quot;: 52,
+  &quot;revenueDifference&quot;: 220
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 24 Salvar produto precificado · HTTP 200 · 643 ms</summary><p><code>POST /v1/pricing/products</code></p><ul><li>passed: HTTP 200 </li><li>passed: ID salvo </li></ul><pre>{
+  &quot;id&quot;: &quot;bb3ab033-8fc6-48a5-885c-86504a152bb8&quot;,
+  &quot;quote&quot;: {
+    &quot;tax&quot;: 0,
+    &quot;cost&quot;: 20,
+    &quot;lines&quot;: [],
+    &quot;margin&quot;: 50,
+    &quot;profit&quot;: 20,
+    &quot;taxCost&quot;: 0,
+    &quot;inputCost&quot;: 0,
+    &quot;monthlyRevenue&quot;: 400,
+    &quot;suggestedPrice&quot;: 40,
+    &quot;revenueDifference&quot;: 100
+  },
+  &quot;version&quot;: &quot;92d2bcf0-66c5-4037-ac3d-cb7f26400983&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 25 Consultar produto salvo · HTTP 200 · 662 ms</summary><p><code>GET /v1/pricing</code></p><ul><li>passed: HTTP 200 </li><li>passed: Produto persistido encontrado </li></ul><pre>{
+  &quot;tax&quot;: 0,
+  &quot;products&quot;: [
+    {
+      &quot;id&quot;: &quot;bb3ab033-8fc6-48a5-885c-86504a152bb8&quot;,
+      &quot;name&quot;: &quot;Produto QA 47308b36-6891-4035-9a3f-7d9f771fc432&quot;,
+      &quot;active&quot;: true,
+      &quot;markup&quot;: 100,
+      &quot;version&quot;: &quot;92d2bcf0-66c5-4037-ac3d-cb7f26400983&quot;,
+      &quot;baseCost&quot;: 20,
+      &quot;ingredients&quot;: [],
+      &quot;currentPrice&quot;: 30,
+      &quot;monthlyUnits&quot;: 10,
+      &quot;referenceCost&quot;: 20
+    }
+  ],
+  &quot;supplies&quot;: [
+    {
+      &quot;id&quot;: &quot;4bc19ce0-3a57-43bb-8ee9-f3def5e2af72&quot;,
+      &quot;date&quot;: &quot;2026-11-07&quot;,
+      &quot;name&quot;: &quot;Insumo QA 47308b36-6891-4035-9a3f-7d9f771fc432&quot;,
+      &quot;unit&quot;: &quot;kg&quot;,
+      &quot;price&quot;: 6,
+      &quot;active&quot;: true
+    }
+  ]
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 26 Impedir edição de produto com versão errada · HTTP 409 · 665 ms</summary><p><code>POST /v1/pricing/products</code></p><ul><li>passed: HTTP 409 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;O produto mudou. Atualize os dados antes de salvar.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 27 Rejeitar valores monetários com três casas · HTTP 400 · 515 ms</summary><p><code>POST /v1/pricing/quote</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Use até duas casas decimais nos valores e três nas quantidades.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 28 Consultar notas de custos · HTTP 200 · 694 ms</summary><p><code>GET /v1/invoices</code></p><ul><li>passed: HTTP 200 </li><li>passed: Lista de notas válida </li></ul><pre>{
+  &quot;invoices&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 29 Rejeitar arquivo de tipo não permitido · HTTP 400 · 566 ms</summary><p><code>POST /v1/invoices</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 30 Exigir justificativa suficiente para exclusão · HTTP 400 · 465 ms</summary><p><code>DELETE /v1/invoices/00000000-0000-4000-8000-000000000001</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Dados inválidos. Confira os filtros e valores informados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 31 Consultar disponibilidade de e-mail · HTTP 200 · 463 ms</summary><p><code>GET /v1/reports/options</code></p><ul><li>passed: HTTP 200 </li><li>passed: Configuração de e-mail informada </li></ul><pre>{
+  &quot;emailConfigured&quot;: false
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 32 Exportar relatório PDF · HTTP 200 · 785 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 200 </li><li>passed: Tipo de arquivo correto </li><li>passed: Assinatura binária válida </li><li>passed: Download com nome e proteção MIME </li></ul><p><a href="amostras/real-relatorio.pdf">Baixar arquivo efetivamente retornado pela API</a> (1984 bytes)</p></details><details><summary><span class="ok">PASSOU</span> · 33 Exportar relatório XLSX · HTTP 200 · 890 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 200 </li><li>passed: Tipo de arquivo correto </li><li>passed: Assinatura binária válida </li><li>passed: Download com nome e proteção MIME </li></ul><p><a href="amostras/real-relatorio.xlsx">Baixar arquivo efetivamente retornado pela API</a> (8514 bytes)</p></details><details><summary><span class="ok">PASSOU</span> · 34 Exportar relatório BOTH · HTTP 200 · 815 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 200 </li><li>passed: Tipo de arquivo correto </li><li>passed: Assinatura binária válida </li><li>passed: Download com nome e proteção MIME </li></ul><p><a href="amostras/real-relatorio.zip">Baixar arquivo efetivamente retornado pela API</a> (9595 bytes)</p></details><details><summary><span class="ok">PASSOU</span> · 35 Rejeitar relatório com período invertido · HTTP 400 · 473 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 400 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Selecione um período válido de até 367 dias.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 36 Relatório sem dados informa vazio · HTTP 422 · 788 ms</summary><p><code>POST /v1/reports/download</code></p><ul><li>passed: HTTP 422 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Nada para exportar: não foram encontrados registros no período e filtros selecionados.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 37 Login de uma segunda empresa isolada · HTTP 200 · 288 ms</summary><p><code>POST /auth/v1/token</code></p><ul><li>passed: HTTP 200 </li><li>passed: Segunda sessão recebida </li></ul><pre>{
+  &quot;access_token&quot;: &quot;[REMOVIDO]&quot;,
+  &quot;token_type&quot;: &quot;bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;expires_at&quot;: 1794075012,
+  &quot;refresh_token&quot;: &quot;[REMOVIDO]&quot;,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;19046479-a44c-45ac-a793-dedcd82be668&quot;,
+    &quot;aud&quot;: &quot;authenticated&quot;,
+    &quot;role&quot;: &quot;authenticated&quot;,
+    &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-b@example.com&quot;,
+    &quot;email_confirmed_at&quot;: &quot;2026-11-07T17:09:29.461742Z&quot;,
+    &quot;phone&quot;: &quot;&quot;,
+    &quot;confirmed_at&quot;: &quot;2026-11-07T17:09:29.461742Z&quot;,
+    &quot;last_sign_in_at&quot;: &quot;2026-11-07T17:10:12.398665738Z&quot;,
+    &quot;app_metadata&quot;: {
+      &quot;provider&quot;: &quot;email&quot;,
+      &quot;providers&quot;: [
+        &quot;email&quot;
+      ]
+    },
+    &quot;user_metadata&quot;: {
+      &quot;cnpj&quot;: &quot;84107632000149&quot;,
+      &quot;data_nascimento&quot;: &quot;1990-01-01&quot;,
+      &quot;email_verified&quot;: true,
+      &quot;nome_completo&quot;: &quot;Teste Postman B&quot;,
+      &quot;razao_social&quot;: &quot;TESTE POSTMAN 47308b36-6891-4035-9a3f-7d9f771fc432 B&quot;,
+      &quot;telefone&quot;: &quot;61900000000&quot;
+    },
+    &quot;identities&quot;: [
+      {
+        &quot;identity_id&quot;: &quot;c9d8b21f-3e9c-450f-83f9-5044df74cb50&quot;,
+        &quot;id&quot;: &quot;19046479-a44c-45ac-a793-dedcd82be668&quot;,
+        &quot;user_id&quot;: &quot;19046479-a44c-45ac-a793-dedcd82be668&quot;,
+        &quot;identity_data&quot;: {
+          &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-b@example.com&quot;,
+          &quot;email_verified&quot;: false,
+          &quot;phone_verified&quot;: false,
+          &quot;sub&quot;: &quot;19046479-a44c-45ac-a793-dedcd82be668&quot;
+        },
+        &quot;provider&quot;: &quot;email&quot;,
+        &quot;last_sign_in_at&quot;: &quot;2026-11-07T17:09:29.459949Z&quot;,
+        &quot;created_at&quot;: &quot;2026-11-07T17:09:29.460041Z&quot;,
+        &quot;updated_at&quot;: &quot;2026-11-07T17:09:29.460041Z&quot;,
+        &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-b@example.com&quot;
+      }
+    ],
+    &quot;created_at&quot;: &quot;2026-11-07T17:09:29.45796Z&quot;,
+    &quot;updated_at&quot;: &quot;2026-11-07T17:10:12.401501Z&quot;,
+    &quot;is_anonymous&quot;: false
+  },
+  &quot;weak_password&quot;: &quot;[REMOVIDO]&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 38 Outra empresa não lista o insumo criado · HTTP 200 · 681 ms</summary><p><code>GET /v1/supplies</code></p><ul><li>passed: HTTP 200 </li><li>passed: Lista vazia na segunda empresa </li></ul><pre>{
+  &quot;supplies&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 39 Outra empresa não consulta histórico por ID · HTTP 404 · 618 ms</summary><p><code>GET /v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72/prices</code></p><ul><li>passed: HTTP 404 </li><li>passed: Erro seguro sem stack trace </li></ul><pre>{
+  &quot;message&quot;: &quot;Insumo não encontrado.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 40 RLS impede leitura direta do insumo alheio · HTTP 200 · 160 ms</summary><p><code>GET /rest/v1/insumos</code></p><ul><li>passed: HTTP 200 </li><li>passed: Nenhuma linha vaza pela API do banco </li></ul><pre>[]</pre></details><details><summary><span class="ok">PASSOU</span> · 41 RPC rejeita empresa de outro usuário · HTTP 403 · 172 ms</summary><p><code>POST /rest/v1/rpc/dados_configuracoes</code></p><ul><li>passed: HTTP 403 </li><li>passed: PostgreSQL rejeita acesso </li></ul><pre>{
+  &quot;code&quot;: &quot;42501&quot;,
+  &quot;details&quot;: null,
+  &quot;hint&quot;: null,
+  &quot;message&quot;: &quot;Acesso negado.&quot;
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 42 Dashboard da segunda empresa continua zerado · HTTP 200 · 1147 ms</summary><p><code>GET /v1/dashboard</code></p><ul><li>passed: HTTP 200 </li><li>passed: Receita de outra conta não vaza </li></ul><pre>{
+  &quot;filter&quot;: {
+    &quot;month&quot;: &quot;2026-11&quot;,
+    &quot;months&quot;: 6,
+    &quot;scope&quot;: &quot;professional&quot;
+  },
+  &quot;companyName&quot;: &quot;TESTE POSTMAN 47308b36-6891-4035-9a3f-7d9f771fc432 B&quot;,
+  &quot;canEditGoal&quot;: true,
+  &quot;empty&quot;: true,
+  &quot;updatedAt&quot;: &quot;2026-11-07T17:10:15.646Z&quot;,
+  &quot;insight&quot;: &quot;Sem base suficiente no mês anterior para comparar receita e custos.&quot;,
+  &quot;marginTarget&quot;: null,
+  &quot;pending&quot;: {
+    &quot;count&quot;: 0,
+    &quot;revenue&quot;: 0,
+    &quot;costs&quot;: 0
+  },
+  &quot;metrics&quot;: {
+    &quot;revenue&quot;: 0,
+    &quot;costs&quot;: 0,
+    &quot;profit&quot;: 0,
+    &quot;withdrawals&quot;: 0,
+    &quot;margin&quot;: null,
+    &quot;revenueChange&quot;: null,
+    &quot;costChange&quot;: null,
+    &quot;profitChange&quot;: null
+  },
+  &quot;goal&quot;: {
+    &quot;value&quot;: 0,
+    &quot;percentage&quot;: null,
+    &quot;projection&quot;: null,
+    &quot;projectedToReach&quot;: null,
+    &quot;daysWithSales&quot;: 0
+  },
+  &quot;evolution&quot;: [
+    {
+      &quot;month&quot;: &quot;2026-06&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-07&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-08&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-09&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-10&quot;,
+      &quot;value&quot;: 0
+    },
+    {
+      &quot;month&quot;: &quot;2026-11&quot;,
+      &quot;value&quot;: 0
+    }
+  ],
+  &quot;distribution&quot;: [],
+  &quot;alerts&quot;: []
+}</pre></details><details><summary><span class="ok">PASSOU</span> · 43 Perfil da segunda conta permanece intacto · HTTP 200 · 631 ms</summary><p><code>GET /v1/settings</code></p><ul><li>passed: HTTP 200 </li><li>passed: Nome não alterado em outra empresa </li></ul><pre>{
+  &quot;cnpj&quot;: &quot;84107632000149&quot;,
+  &quot;email&quot;: &quot;qa-postman-47308b36-6891-4035-9a3f-7d9f771fc432-b@example.com&quot;,
+  &quot;phone&quot;: &quot;61900000000&quot;,
+  &quot;fullName&quot;: &quot;Teste Postman B&quot;,
+  &quot;timeZone&quot;: &quot;America/Sao_Paulo&quot;,
+  &quot;emailAlerts&quot;: false,
+  &quot;lowStockAlerts&quot;: true,
+  &quot;invoiceReminders&quot;: true,
+  &quot;pendingEmail&quot;: null
+}</pre></details><h2>Limpeza e limites</h2><p>As duas contas sintéticas finais e seus dados foram removidos em 2026-11-07T17:11:19.627Z. A primeira rodada também foi limpa. As operações foram limitadas às empresas registradas no manifesto de teste.</p><ul><li>Não comprova entrega real de e-mails, confirmação de cadastro ou alteração real de endereço.</li><li>Não testa provedores externos de IA, qualidade do OCR, upload/lançamento/exclusão completos de notas, carga ou interface visual.</li><li>A venda real de R$150 é uma pré-condição sintética inserida para testar leitura financeira e exportação; não foi criada pelo fluxo de notas.</li><li>Testes reais usam o backend local com Auth e banco reais. O navegador, BFF e login por CNPJ não fazem parte desta coleção.</li></ul><p><a href="historico/execucoes.json">Histórico das tentativas iniciais</a> · <a href="validacao-arquivos.json">Conferência dos arquivos exportados</a> · <a href="real-cleanup.json">Comprovação da limpeza</a></p><p><small>Senhas, chaves e tokens foram removidos. O resumo não substitui uma auditoria de segurança ou teste de carga.</small></p></main></html>

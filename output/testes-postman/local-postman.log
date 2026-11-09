@@ -1,0 +1,309 @@
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+IntegraMEI - Local com serviços simulados
+
+Root 01 Saúde da API
+
+  GET http://127.0.0.1:3337/health [200 OK, 958 B, 21 ms]
+  Pass  HTTP 200
+  Pass  Serviço disponível
+
+Root 02 Dashboard exige autenticação
+
+  GET http://127.0.0.1:3337/v1/dashboard [401 Unauthorized, 933 B, 3 ms]
+  Pass  HTTP 401
+  Pass  Erro seguro sem stack trace
+
+Root 03 Token inválido é recusado
+
+  GET http://127.0.0.1:3337/v1/settings [401 Unauthorized, 929 B, 19 ms]
+  Pass  HTTP 401
+  Pass  Erro seguro sem stack trace
+
+Root 04 Login com conta exclusiva de teste
+
+  POST http://127.0.0.1:39401/auth/v1/token?grant_type=password [200 OK, 821 B, 3 ms]
+  Pass  HTTP 200
+  Pass  Token de acesso recebido
+
+Root 05 Configurações pertencem à conta logada
+
+  GET http://127.0.0.1:3337/v1/settings [200 OK, 1.14 KB, 17 ms]
+  Pass  HTTP 200
+  Pass  Nome da conta
+  Pass  E-mail da conta
+  Pass  Resposta não armazenada em cache
+
+Root 06 Salvar nome, telefone e preferências
+
+  PATCH http://127.0.0.1:3337/v1/settings [200 OK, 1.16 KB, 9 ms]
+  Pass  HTTP 200
+  Pass  Nome salvo
+
+Root 07 Ler novamente as configurações salvas
+
+  GET http://127.0.0.1:3337/v1/settings [200 OK, 1.16 KB, 6 ms]
+  Pass  HTTP 200
+  Pass  Persistência de todos os campos
+
+Root 08 Telefone inválido é recusado
+
+  PATCH http://127.0.0.1:3337/v1/settings [400 Bad Request, 1 KB, 5 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 09 Alteração direta de e-mail no perfil é recusada
+
+  PATCH http://127.0.0.1:3337/v1/settings [400 Bad Request, 1 KB, 6 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 10 Dashboard reflete os lançamentos conhecidos
+
+  GET http://127.0.0.1:3337/v1/dashboard?month=2026-11&months=3&scope=professional [200 OK, 1.74 KB, 34 ms]
+  Pass  HTTP 200
+  Pass  Receita exata
+  Pass  Custos exatos
+  Pass  Lucro = receita - custos
+  Pass  Gráfico de despesas tem três meses e custo final correto
+
+Root 11 Mês inválido é recusado
+
+  GET http://127.0.0.1:3337/v1/dashboard?month=2026-13 [400 Bad Request, 1 KB, 4 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 12 Salvar meta da empresa de teste
+
+  PATCH http://127.0.0.1:3337/v1/dashboard/goal [204 No Content, 884 B, 6 ms]
+  Pass  HTTP 204
+
+Root 13 Meta aparece no dashboard
+
+  GET http://127.0.0.1:3337/v1/dashboard?month=2026-11 [200 OK, 1.83 KB, 11 ms]
+  Pass  HTTP 200
+  Pass  Meta persistida
+  Pass  Meta de margem persistida
+
+Root 14 Listar insumos da empresa
+
+  GET http://127.0.0.1:3337/v1/supplies [200 OK, 1.16 KB, 7 ms]
+  Pass  HTTP 200
+  Pass  Lista de insumos válida
+
+Root 15 Cadastrar insumo manualmente
+
+  POST http://127.0.0.1:3337/v1/supplies [201 Created, 1.2 KB, 5 ms]
+  Pass  HTTP 201
+  Pass  Identificador e versão recebidos
+
+Root 16 Pesquisa encontra o insumo salvo
+
+  GET http://127.0.0.1:3337/v1/supplies?q=43d2761b-795e-4375-aed5-b6ef3bf71f1f [200 OK, 1.19 KB, 4 ms]
+  Pass  HTTP 200
+  Pass  Registro recém-criado encontrado
+
+Root 17 Atualizar insumo com versão atual
+
+  PATCH http://127.0.0.1:3337/v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b [200 OK, 1.19 KB, 5 ms]
+  Pass  HTTP 200
+  Pass  Estoque mínimo atualizado
+
+Root 18 Impedir sobrescrita com versão antiga
+
+  PATCH http://127.0.0.1:3337/v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b [409 Conflict, 1 KB, 4 ms]
+  Pass  HTTP 409
+  Pass  Erro seguro sem stack trace
+
+Root 19 Insumo com estoque mínimo negativo é recusado
+
+  POST http://127.0.0.1:3337/v1/supplies [400 Bad Request, 1 KB, 4 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 20 Registrar compra manual de insumo
+
+  POST http://127.0.0.1:3337/v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b/prices [201 Created, 964 B, 6 ms]
+  Pass  HTTP 201
+  Pass  Compra registrada
+
+Root 21 Histórico de compra mantém preço e unidade
+
+  GET http://127.0.0.1:3337/v1/supplies/6eace110-c2d4-4e5b-8148-b2c5b508e71b/prices?start=2026-11-01&end=2026-11-07 [200 OK, 1.69 KB, 7 ms]
+  Pass  HTTP 200
+  Pass  Preço médio exato
+  Pass  Unidade preservada
+  Pass  Uma compra registrada
+
+Root 22 Calcular preço por custo base
+
+  POST http://127.0.0.1:3337/v1/pricing/quote [200 OK, 1.06 KB, 5 ms]
+  Pass  HTTP 200
+  Pass  Custo de R$20
+  Pass  Preço com markup 100%
+  Pass  Margem de 50%
+
+Root 23 Calcular preço com insumo comprado
+
+  POST http://127.0.0.1:3337/v1/pricing/quote [200 OK, 1.16 KB, 5 ms]
+  Pass  HTTP 200
+  Pass  Custo base + compra = R$26
+  Pass  Preço sugerido = R$52
+
+Root 24 Salvar produto precificado
+
+  POST http://127.0.0.1:3337/v1/pricing/products [200 OK, 1.16 KB, 5 ms]
+  Pass  HTTP 200
+  Pass  ID salvo
+
+Root 25 Consultar produto salvo
+
+  GET http://127.0.0.1:3337/v1/pricing [200 OK, 1.48 KB, 5 ms]
+  Pass  HTTP 200
+  Pass  Produto persistido encontrado
+
+Root 26 Impedir edição de produto com versão errada
+
+  POST http://127.0.0.1:3337/v1/pricing/products [409 Conflict, 1013 B, 5 ms]
+  Pass  HTTP 409
+  Pass  Erro seguro sem stack trace
+
+Root 27 Rejeitar valores monetários com três casas
+
+  POST http://127.0.0.1:3337/v1/pricing/quote [400 Bad Request, 1.01 KB, 6 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 28 Consultar notas de custos
+
+  GET http://127.0.0.1:3337/v1/invoices?kind=cost&period=all [200 OK, 957 B, 5 ms]
+  Pass  HTTP 200
+  Pass  Lista de notas válida
+
+Root 29 Rejeitar arquivo de tipo não permitido
+
+  POST http://127.0.0.1:3337/v1/invoices [400 Bad Request, 1021 B, 4 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 30 Exigir justificativa suficiente para exclusão
+
+  DELETE http://127.0.0.1:3337/v1/invoices/00000000-0000-4000-8000-000000000001 [400 Bad Request, 1023 B, 4 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 31 Consultar disponibilidade de e-mail
+
+  GET http://127.0.0.1:3337/v1/reports/options [200 OK, 966 B, 4 ms]
+  Pass  HTTP 200
+  Pass  Configuração de e-mail informada
+
+Root 32 Exportar relatório PDF
+
+  POST http://127.0.0.1:3337/v1/reports/download [200 OK, 2.99 KB, 39 ms]
+  Pass  HTTP 200
+  Pass  Tipo de arquivo correto
+  Pass  Assinatura binária válida
+  Pass  Download com nome e proteção MIME
+
+Root 33 Exportar relatório XLSX
+
+  POST http://127.0.0.1:3337/v1/reports/download [200 OK, 9.35 KB, 25 ms]
+  Pass  HTTP 200
+  Pass  Tipo de arquivo correto
+  Pass  Assinatura binária válida
+  Pass  Download com nome e proteção MIME
+
+Root 34 Exportar relatório BOTH
+
+  POST http://127.0.0.1:3337/v1/reports/download [200 OK, 10.41 KB, 17 ms]
+  Pass  HTTP 200
+  Pass  Tipo de arquivo correto
+  Pass  Assinatura binária válida
+  Pass  Download com nome e proteção MIME
+
+Root 35 Rejeitar relatório com período invertido
+
+  POST http://127.0.0.1:3337/v1/reports/download [400 Bad Request, 1010 B, 6 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 36 Relatório sem dados informa vazio
+
+  POST http://127.0.0.1:3337/v1/reports/download [422 Unprocessable Entity, 1.04 KB, 4 ms]
+  Pass  HTTP 422
+  Pass  Erro seguro sem stack trace
+
+Root 37 E-mail PDF com transporte simulado
+
+  POST http://127.0.0.1:3337/v1/reports/email [200 OK, 1.03 KB, 13 ms]
+  Pass  HTTP 200
+  Pass  Aceite informado
+
+Root 38 E-mail XLSX com transporte simulado
+
+  POST http://127.0.0.1:3337/v1/reports/email [200 OK, 1.03 KB, 12 ms]
+  Pass  HTTP 200
+  Pass  Aceite informado
+
+Root 39 Repetição do e-mail não dispara novo envio
+
+  POST http://127.0.0.1:3337/v1/reports/email [200 OK, 1.02 KB, 9 ms]
+  Pass  HTTP 200
+  Pass  Repetição identificada
+
+Root 40 Recuperação exige senha atual correta
+
+  POST http://127.0.0.1:3337/v1/settings/password-reset [400 Bad Request, 1 KB, 5 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 41 Recuperação de senha com provedor simulado
+
+  POST http://127.0.0.1:3337/v1/settings/password-reset [200 OK, 1.03 KB, 6 ms]
+  Pass  HTTP 200
+  Pass  Solicitação aceita
+
+Root 42 Alteração de e-mail aguarda confirmação simulada
+
+  POST http://127.0.0.1:3337/v1/settings/email [200 OK, 1.09 KB, 6 ms]
+  Pass  HTTP 200
+
+Root 43 E-mail pendente não substitui identidade confirmada
+
+  GET http://127.0.0.1:3337/v1/settings [200 OK, 1.17 KB, 5 ms]
+  Pass  HTTP 200
+  Pass  E-mail confirmado preservado
+  Pass  Novo e-mail permanece pendente
+Generating run report [json]...
+Saving run report [json]...
+Generating run report [junit]...
+Saving run report [junit]...
+Report created successfully! Saved to: D:\dev\integraMEI\tmp\postman-private\local-2026-11-07T17-09-39-700Z\raw.xml
+Report created successfully! Saved to: D:\dev\integraMEI\tmp\postman-private\local-2026-11-07T17-09-39-700Z\raw.json
+
+-------------------------------------------------------------------
+|                         |          executed |            failed |
+--------------------------+-------------------+--------------------
+|              iterations |                 1 |                 0 |
+--------------------------+-------------------+--------------------
+|                requests |                43 |                 0 |
+--------------------------+-------------------+--------------------
+|            test-scripts |                43 |                 0 |
+--------------------------+-------------------+--------------------
+|      prerequest-scripts |                 0 |                 0 |
+--------------------------+-------------------+--------------------
+|              assertions |               102 |                 0 |
+-------------------------------------------------------------------
+| total run duration: 9.4 s                                       |
+-------------------------------------------------------------------
+| total data received: 27.69 KB (approx)                          |
+-------------------------------------------------------------------
+| average response time: 8 ms [min: 3 ms, max: 39 ms, s.d.: 7 ms] |
+-------------------------------------------------------------------
+Postman credentials are required for publishing run details to Postman cloud.
+Please specify it by using the `postman login` command

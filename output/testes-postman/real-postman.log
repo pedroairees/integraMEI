@@ -1,0 +1,309 @@
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+IntegraMEI - Supabase real
+
+Root 01 Saúde da API
+
+  GET http://127.0.0.1:3338/health [200 OK, 958 B, 13 ms]
+  Pass  HTTP 200
+  Pass  Serviço disponível
+
+Root 02 Dashboard exige autenticação
+
+  GET http://127.0.0.1:3338/v1/dashboard [401 Unauthorized, 933 B, 3 ms]
+  Pass  HTTP 401
+  Pass  Erro seguro sem stack trace
+
+Root 03 Token inválido é recusado
+
+  GET http://127.0.0.1:3338/v1/settings [401 Unauthorized, 929 B, 216 ms]
+  Pass  HTTP 401
+  Pass  Erro seguro sem stack trace
+
+Root 04 Login com conta exclusiva de teste
+
+  POST https://smetijbqfigxnxodxgph.supabase.co/auth/v1/token?grant_type=password [200 OK, 2.35 KB, 387 ms]
+  Pass  HTTP 200
+  Pass  Token de acesso recebido
+
+Root 05 Configurações pertencem à conta logada
+
+  GET http://127.0.0.1:3338/v1/settings [200 OK, 1.18 KB, 762 ms]
+  Pass  HTTP 200
+  Pass  Nome da conta
+  Pass  E-mail da conta
+  Pass  Resposta não armazenada em cache
+
+Root 06 Salvar nome, telefone e preferências
+
+  PATCH http://127.0.0.1:3338/v1/settings [200 OK, 1.19 KB, 692 ms]
+  Pass  HTTP 200
+  Pass  Nome salvo
+
+Root 07 Ler novamente as configurações salvas
+
+  GET http://127.0.0.1:3338/v1/settings [200 OK, 1.19 KB, 646 ms]
+  Pass  HTTP 200
+  Pass  Persistência de todos os campos
+
+Root 08 Telefone inválido é recusado
+
+  PATCH http://127.0.0.1:3338/v1/settings [400 Bad Request, 1 KB, 479 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 09 Alteração direta de e-mail no perfil é recusada
+
+  PATCH http://127.0.0.1:3338/v1/settings [400 Bad Request, 1 KB, 470 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 10 Dashboard reflete os lançamentos conhecidos
+
+  GET http://127.0.0.1:3338/v1/dashboard?month=2026-11&months=3&scope=professional [200 OK, 1.62 KB, 882 ms]
+  Pass  HTTP 200
+  Pass  Receita exata
+  Pass  Custos exatos
+  Pass  Lucro = receita - custos
+  Pass  Gráfico de despesas tem três meses e custo final correto
+
+Root 11 Mês inválido é recusado
+
+  GET http://127.0.0.1:3338/v1/dashboard?month=2026-13 [400 Bad Request, 1 KB, 490 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 12 Salvar meta da empresa de teste
+
+  PATCH http://127.0.0.1:3338/v1/dashboard/goal [204 No Content, 884 B, 901 ms]
+  Pass  HTTP 204
+
+Root 13 Meta aparece no dashboard
+
+  GET http://127.0.0.1:3338/v1/dashboard?month=2026-11 [200 OK, 1.71 KB, 844 ms]
+  Pass  HTTP 200
+  Pass  Meta persistida
+  Pass  Meta de margem persistida
+
+Root 14 Listar insumos da empresa
+
+  GET http://127.0.0.1:3338/v1/supplies [200 OK, 958 B, 875 ms]
+  Pass  HTTP 200
+  Pass  Lista de insumos válida
+
+Root 15 Cadastrar insumo manualmente
+
+  POST http://127.0.0.1:3338/v1/supplies [201 Created, 1.29 KB, 646 ms]
+  Pass  HTTP 201
+  Pass  Identificador e versão recebidos
+
+Root 16 Pesquisa encontra o insumo salvo
+
+  GET http://127.0.0.1:3338/v1/supplies?q=47308b36-6891-4035-9a3f-7d9f771fc432 [200 OK, 1.14 KB, 616 ms]
+  Pass  HTTP 200
+  Pass  Registro recém-criado encontrado
+
+Root 17 Atualizar insumo com versão atual
+
+  PATCH http://127.0.0.1:3338/v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72 [200 OK, 1.29 KB, 645 ms]
+  Pass  HTTP 200
+  Pass  Estoque mínimo atualizado
+
+Root 18 Impedir sobrescrita com versão antiga
+
+  PATCH http://127.0.0.1:3338/v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72 [409 Conflict, 996 B, 639 ms]
+  Pass  HTTP 409
+  Pass  Erro seguro sem stack trace
+
+Root 19 Insumo com estoque mínimo negativo é recusado
+
+  POST http://127.0.0.1:3338/v1/supplies [400 Bad Request, 1 KB, 474 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 20 Registrar compra manual de insumo
+
+  POST http://127.0.0.1:3338/v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72/prices [201 Created, 964 B, 701 ms]
+  Pass  HTTP 201
+  Pass  Compra registrada
+
+Root 21 Histórico de compra mantém preço e unidade
+
+  GET http://127.0.0.1:3338/v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72/prices?start=2026-11-01&end=2026-11-07 [200 OK, 1.64 KB, 880 ms]
+  Pass  HTTP 200
+  Pass  Preço médio exato
+  Pass  Unidade preservada
+  Pass  Uma compra registrada
+
+Root 22 Calcular preço por custo base
+
+  POST http://127.0.0.1:3338/v1/pricing/quote [200 OK, 1.06 KB, 643 ms]
+  Pass  HTTP 200
+  Pass  Custo de R$20
+  Pass  Preço com markup 100%
+  Pass  Margem de 50%
+
+Root 23 Calcular preço com insumo comprado
+
+  POST http://127.0.0.1:3338/v1/pricing/quote [200 OK, 1.16 KB, 628 ms]
+  Pass  HTTP 200
+  Pass  Custo base + compra = R$26
+  Pass  Preço sugerido = R$52
+
+Root 24 Salvar produto precificado
+
+  POST http://127.0.0.1:3338/v1/pricing/products [200 OK, 1.16 KB, 643 ms]
+  Pass  HTTP 200
+  Pass  ID salvo
+
+Root 25 Consultar produto salvo
+
+  GET http://127.0.0.1:3338/v1/pricing [200 OK, 1.37 KB, 662 ms]
+  Pass  HTTP 200
+  Pass  Produto persistido encontrado
+
+Root 26 Impedir edição de produto com versão errada
+
+  POST http://127.0.0.1:3338/v1/pricing/products [409 Conflict, 1013 B, 665 ms]
+  Pass  HTTP 409
+  Pass  Erro seguro sem stack trace
+
+Root 27 Rejeitar valores monetários com três casas
+
+  POST http://127.0.0.1:3338/v1/pricing/quote [400 Bad Request, 1.01 KB, 515 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 28 Consultar notas de custos
+
+  GET http://127.0.0.1:3338/v1/invoices?kind=cost&period=all [200 OK, 957 B, 694 ms]
+  Pass  HTTP 200
+  Pass  Lista de notas válida
+
+Root 29 Rejeitar arquivo de tipo não permitido
+
+  POST http://127.0.0.1:3338/v1/invoices [400 Bad Request, 1021 B, 566 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 30 Exigir justificativa suficiente para exclusão
+
+  DELETE http://127.0.0.1:3338/v1/invoices/00000000-0000-4000-8000-000000000001 [400 Bad Request, 1023 B, 465 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 31 Consultar disponibilidade de e-mail
+
+  GET http://127.0.0.1:3338/v1/reports/options [200 OK, 967 B, 463 ms]
+  Pass  HTTP 200
+  Pass  Configuração de e-mail informada
+
+Root 32 Exportar relatório PDF
+
+  POST http://127.0.0.1:3338/v1/reports/download [200 OK, 2.93 KB, 785 ms]
+  Pass  HTTP 200
+  Pass  Tipo de arquivo correto
+  Pass  Assinatura binária válida
+  Pass  Download com nome e proteção MIME
+
+Root 33 Exportar relatório XLSX
+
+  POST http://127.0.0.1:3338/v1/reports/download [200 OK, 9.35 KB, 890 ms]
+  Pass  HTTP 200
+  Pass  Tipo de arquivo correto
+  Pass  Assinatura binária válida
+  Pass  Download com nome e proteção MIME
+
+Root 34 Exportar relatório BOTH
+
+  POST http://127.0.0.1:3338/v1/reports/download [200 OK, 10.35 KB, 815 ms]
+  Pass  HTTP 200
+  Pass  Tipo de arquivo correto
+  Pass  Assinatura binária válida
+  Pass  Download com nome e proteção MIME
+
+Root 35 Rejeitar relatório com período invertido
+
+  POST http://127.0.0.1:3338/v1/reports/download [400 Bad Request, 1010 B, 473 ms]
+  Pass  HTTP 400
+  Pass  Erro seguro sem stack trace
+
+Root 36 Relatório sem dados informa vazio
+
+  POST http://127.0.0.1:3338/v1/reports/download [422 Unprocessable Entity, 1.04 KB, 788 ms]
+  Pass  HTTP 422
+  Pass  Erro seguro sem stack trace
+
+Root 37 Login de uma segunda empresa isolada
+
+  POST https://smetijbqfigxnxodxgph.supabase.co/auth/v1/token?grant_type=password [200 OK, 2.35 KB, 288 ms]
+  Pass  HTTP 200
+  Pass  Segunda sessão recebida
+
+Root 38 Outra empresa não lista o insumo criado
+
+  GET http://127.0.0.1:3338/v1/supplies [200 OK, 957 B, 681 ms]
+  Pass  HTTP 200
+  Pass  Lista vazia na segunda empresa
+
+Root 39 Outra empresa não consulta histórico por ID
+
+  GET http://127.0.0.1:3338/v1/supplies/4bc19ce0-3a57-43bb-8ee9-f3def5e2af72/prices?start=2026-11-01&end=2026-11-07 [404 Not Found, 986 B, 618 ms]
+  Pass  HTTP 404
+  Pass  Erro seguro sem stack trace
+
+Root 40 RLS impede leitura direta do insumo alheio
+
+  GET https://smetijbqfigxnxodxgph.supabase.co/rest/v1/insumos?id=eq.4bc19ce0-3a57-43bb-8ee9-f3def5e2af72&select=id,nome [200 OK, 1.11 KB, 160 ms]
+  Pass  HTTP 200
+  Pass  Nenhuma linha vaza pela API do banco
+
+Root 41 RPC rejeita empresa de outro usuário
+
+  POST https://smetijbqfigxnxodxgph.supabase.co/rest/v1/rpc/dados_configuracoes [403 Forbidden, 1.11 KB, 172 ms]
+  Pass  HTTP 403
+  Pass  PostgreSQL rejeita acesso
+
+Root 42 Dashboard da segunda empresa continua zerado
+
+  GET http://127.0.0.1:3338/v1/dashboard?month=2026-11 [200 OK, 1.71 KB, 1147 ms]
+  Pass  HTTP 200
+  Pass  Receita de outra conta não vaza
+
+Root 43 Perfil da segunda conta permanece intacto
+
+  GET http://127.0.0.1:3338/v1/settings [200 OK, 1.18 KB, 631 ms]
+  Pass  HTTP 200
+  Pass  Nome não alterado em outra empresa
+Generating run report [json]...
+Saving run report [json]...
+Generating run report [junit]...
+Saving run report [junit]...
+Report created successfully! Saved to: D:\dev\integraMEI\tmp\postman-private\real-2026-11-07T17-09-40-288Z\raw.xml
+Report created successfully! Saved to: D:\dev\integraMEI\tmp\postman-private\real-2026-11-07T17-09-40-288Z\raw.json
+
+-------------------------------------------------------------------------
+|                         |             executed |               failed |
+--------------------------+----------------------+-----------------------
+|              iterations |                    1 |                    0 |
+--------------------------+----------------------+-----------------------
+|                requests |                   43 |                    0 |
+--------------------------+----------------------+-----------------------
+|            test-scripts |                   43 |                    0 |
+--------------------------+----------------------+-----------------------
+|      prerequest-scripts |                    0 |                    0 |
+--------------------------+----------------------+-----------------------
+|              assertions |                  102 |                    0 |
+-------------------------------------------------------------------------
+| total run duration: 34.4 s                                            |
+-------------------------------------------------------------------------
+| total data received: 29.39 KB (approx)                                |
+-------------------------------------------------------------------------
+| average response time: 596 ms [min: 3 ms, max: 1147 ms, s.d.: 238 ms] |
+-------------------------------------------------------------------------
+Postman credentials are required for publishing run details to Postman cloud.
+Please specify it by using the `postman login` command

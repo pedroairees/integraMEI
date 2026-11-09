@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="IntegraMEI - Local com serviços simulados" tests="43" time="0.381">
+  <testsuite name="01 Saúde da API" id="0eda3993-54dd-4aec-859e-64275197f600" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.021">
+    <testcase name="HTTP 200" time="0.021" classname="01SaudeDaApi"/>
+    <testcase name="Serviço disponível" time="0.021" classname="01SaudeDaApi"/>
+  </testsuite>
+  <testsuite name="02 Dashboard exige autenticação" id="64932999-8f8c-48c0-a5a6-c3bac89ed4c9" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 401" time="0.003" classname="02DashboardExigeAutenticacao"/>
+    <testcase name="Erro seguro sem stack trace" time="0.003" classname="02DashboardExigeAutenticacao"/>
+  </testsuite>
+  <testsuite name="03 Token inválido é recusado" id="7ae13445-d8d6-4d44-920e-550e29d55a20" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.019">
+    <testcase name="HTTP 401" time="0.019" classname="03TokenInvalidoERecusado"/>
+    <testcase name="Erro seguro sem stack trace" time="0.019" classname="03TokenInvalidoERecusado"/>
+  </testsuite>
+  <testsuite name="04 Login com conta exclusiva de teste" id="a9c532b6-8050-4330-947f-d7037d535a91" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 200" time="0.003" classname="04LoginComContaExclusivaDeTeste"/>
+    <testcase name="Token de acesso recebido" time="0.003" classname="04LoginComContaExclusivaDeTeste"/>
+  </testsuite>
+  <testsuite name="05 Configurações pertencem à conta logada" id="9658cfab-0b03-422b-b041-5ab70d40b8bb" timestamp="2026-11-07T17:09:41.490Z" tests="4" failures="0" errors="0" time="0.017">
+    <testcase name="HTTP 200" time="0.017" classname="05ConfiguracoesPertencemAContaLogada"/>
+    <testcase name="Nome da conta" time="0.017" classname="05ConfiguracoesPertencemAContaLogada"/>
+    <testcase name="E-mail da conta" time="0.017" classname="05ConfiguracoesPertencemAContaLogada"/>
+    <testcase name="Resposta não armazenada em cache" time="0.017" classname="05ConfiguracoesPertencemAContaLogada"/>
+  </testsuite>
+  <testsuite name="06 Salvar nome, telefone e preferências" id="a7d8291e-81d5-4883-a487-dad0c2e4fc4a" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.009">
+    <testcase name="HTTP 200" time="0.009" classname="06SalvarNomeTelefoneEPreferencias"/>
+    <testcase name="Nome salvo" time="0.009" classname="06SalvarNomeTelefoneEPreferencias"/>
+  </testsuite>
+  <testsuite name="07 Ler novamente as configurações salvas" id="da13feef-d003-49ae-ab38-8abd5c3b09ed" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 200" time="0.006" classname="07LerNovamenteAsConfiguracoesSalvas"/>
+    <testcase name="Persistência de todos os campos" time="0.006" classname="07LerNovamenteAsConfiguracoesSalvas"/>
+  </testsuite>
+  <testsuite name="08 Telefone inválido é recusado" id="0641019f-3a34-404c-b3ff-a3098c3d7598" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 400" time="0.005" classname="08TelefoneInvalidoERecusado"/>
+    <testcase name="Erro seguro sem stack trace" time="0.005" classname="08TelefoneInvalidoERecusado"/>
+  </testsuite>
+  <testsuite name="09 Alteração direta de e-mail no perfil é recusada" id="56ad6ef0-09ad-445e-bd75-52cfa4ccaf99" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 400" time="0.006" classname="09AlteracaoDiretaDeEMailNoPerfilERecusada"/>
+    <testcase name="Erro seguro sem stack trace" time="0.006" classname="09AlteracaoDiretaDeEMailNoPerfilERecusada"/>
+  </testsuite>
+  <testsuite name="10 Dashboard reflete os lançamentos conhecidos" id="98fa6cda-e414-496f-bed8-6658e243b975" timestamp="2026-11-07T17:09:41.490Z" tests="5" failures="0" errors="0" time="0.034">
+    <testcase name="HTTP 200" time="0.034" classname="10DashboardRefleteOsLancamentosConhecidos"/>
+    <testcase name="Receita exata" time="0.034" classname="10DashboardRefleteOsLancamentosConhecidos"/>
+    <testcase name="Custos exatos" time="0.034" classname="10DashboardRefleteOsLancamentosConhecidos"/>
+    <testcase name="Lucro = receita - custos" time="0.034" classname="10DashboardRefleteOsLancamentosConhecidos"/>
+    <testcase name="Gráfico de despesas tem três meses e custo final correto" time="0.034" classname="10DashboardRefleteOsLancamentosConhecidos"/>
+  </testsuite>
+  <testsuite name="11 Mês inválido é recusado" id="cdb5bf40-4960-4729-b651-0d27cd6c2128" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 400" time="0.004" classname="11MesInvalidoERecusado"/>
+    <testcase name="Erro seguro sem stack trace" time="0.004" classname="11MesInvalidoERecusado"/>
+  </testsuite>
+  <testsuite name="12 Salvar meta da empresa de teste" id="5b295370-d87e-4ff3-b200-63992bd78157" timestamp="2026-11-07T17:09:41.490Z" tests="1" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 204" time="0.006" classname="12SalvarMetaDaEmpresaDeTeste"/>
+  </testsuite>
+  <testsuite name="13 Meta aparece no dashboard" id="5dfdfdbb-9b13-46f4-9f71-dbe6c2bed895" timestamp="2026-11-07T17:09:41.490Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="HTTP 200" time="0.011" classname="13MetaApareceNoDashboard"/>
+    <testcase name="Meta persistida" time="0.011" classname="13MetaApareceNoDashboard"/>
+    <testcase name="Meta de margem persistida" time="0.011" classname="13MetaApareceNoDashboard"/>
+  </testsuite>
+  <testsuite name="14 Listar insumos da empresa" id="d4763622-c7fa-4310-9a0e-5b4624e44461" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="HTTP 200" time="0.007" classname="14ListarInsumosDaEmpresa"/>
+    <testcase name="Lista de insumos válida" time="0.007" classname="14ListarInsumosDaEmpresa"/>
+  </testsuite>
+  <testsuite name="15 Cadastrar insumo manualmente" id="ed8f5b38-cb44-494a-bfc8-5a3dbb0358f0" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 201" time="0.005" classname="15CadastrarInsumoManualmente"/>
+    <testcase name="Identificador e versão recebidos" time="0.005" classname="15CadastrarInsumoManualmente"/>
+  </testsuite>
+  <testsuite name="16 Pesquisa encontra o insumo salvo" id="1bd81a06-95fb-445f-9294-a90c8df29056" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 200" time="0.004" classname="16PesquisaEncontraOInsumoSalvo"/>
+    <testcase name="Registro recém-criado encontrado" time="0.004" classname="16PesquisaEncontraOInsumoSalvo"/>
+  </testsuite>
+  <testsuite name="17 Atualizar insumo com versão atual" id="de56b7f6-1f63-432c-95b0-5d741a824b5a" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="17AtualizarInsumoComVersaoAtual"/>
+    <testcase name="Estoque mínimo atualizado" time="0.005" classname="17AtualizarInsumoComVersaoAtual"/>
+  </testsuite>
+  <testsuite name="18 Impedir sobrescrita com versão antiga" id="01d196ca-7c65-4a82-b9f9-756c9a6da7b1" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 409" time="0.004" classname="18ImpedirSobrescritaComVersaoAntiga"/>
+    <testcase name="Erro seguro sem stack trace" time="0.004" classname="18ImpedirSobrescritaComVersaoAntiga"/>
+  </testsuite>
+  <testsuite name="19 Insumo com estoque mínimo negativo é recusado" id="ff93af02-2ef6-46f7-b439-f3617a2bbdc3" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 400" time="0.004" classname="19InsumoComEstoqueMinimoNegativoERecusado"/>
+    <testcase name="Erro seguro sem stack trace" time="0.004" classname="19InsumoComEstoqueMinimoNegativoERecusado"/>
+  </testsuite>
+  <testsuite name="20 Registrar compra manual de insumo" id="296988c5-c050-42b3-b476-8a40909a390a" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 201" time="0.006" classname="20RegistrarCompraManualDeInsumo"/>
+    <testcase name="Compra registrada" time="0.006" classname="20RegistrarCompraManualDeInsumo"/>
+  </testsuite>
+  <testsuite name="21 Histórico de compra mantém preço e unidade" id="c2562a64-8577-4520-89a8-f7e0f5195faa" timestamp="2026-11-07T17:09:41.490Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="HTTP 200" time="0.007" classname="21HistoricoDeCompraMantemPrecoEUnidade"/>
+    <testcase name="Preço médio exato" time="0.007" classname="21HistoricoDeCompraMantemPrecoEUnidade"/>
+    <testcase name="Unidade preservada" time="0.007" classname="21HistoricoDeCompraMantemPrecoEUnidade"/>
+    <testcase name="Uma compra registrada" time="0.007" classname="21HistoricoDeCompraMantemPrecoEUnidade"/>
+  </testsuite>
+  <testsuite name="22 Calcular preço por custo base" id="2659e2cd-cf34-4209-8d2c-57a2a06d09bd" timestamp="2026-11-07T17:09:41.490Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="22CalcularPrecoPorCustoBase"/>
+    <testcase name="Custo de R$20" time="0.005" classname="22CalcularPrecoPorCustoBase"/>
+    <testcase name="Preço com markup 100%" time="0.005" classname="22CalcularPrecoPorCustoBase"/>
+    <testcase name="Margem de 50%" time="0.005" classname="22CalcularPrecoPorCustoBase"/>
+  </testsuite>
+  <testsuite name="23 Calcular preço com insumo comprado" id="06485134-f836-490c-830e-180ff14c3562" timestamp="2026-11-07T17:09:41.490Z" tests="3" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="23CalcularPrecoComInsumoComprado"/>
+    <testcase name="Custo base + compra = R$26" time="0.005" classname="23CalcularPrecoComInsumoComprado"/>
+    <testcase name="Preço sugerido = R$52" time="0.005" classname="23CalcularPrecoComInsumoComprado"/>
+  </testsuite>
+  <testsuite name="24 Salvar produto precificado" id="f80b2027-ac5c-458e-b4f6-cda0cfca25de" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="24SalvarProdutoPrecificado"/>
+    <testcase name="ID salvo" time="0.005" classname="24SalvarProdutoPrecificado"/>
+  </testsuite>
+  <testsuite name="25 Consultar produto salvo" id="dfe55d7e-2ee3-4eca-834d-0bbad1f33d8e" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="25ConsultarProdutoSalvo"/>
+    <testcase name="Produto persistido encontrado" time="0.005" classname="25ConsultarProdutoSalvo"/>
+  </testsuite>
+  <testsuite name="26 Impedir edição de produto com versão errada" id="68983fe3-68dd-4556-9a7c-92c0b6de06a2" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 409" time="0.005" classname="26ImpedirEdicaoDeProdutoComVersaoErrada"/>
+    <testcase name="Erro seguro sem stack trace" time="0.005" classname="26ImpedirEdicaoDeProdutoComVersaoErrada"/>
+  </testsuite>
+  <testsuite name="27 Rejeitar valores monetários com três casas" id="576d8557-d2c4-470e-81cd-8a253644da02" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 400" time="0.006" classname="27RejeitarValoresMonetariosComTresCasas"/>
+    <testcase name="Erro seguro sem stack trace" time="0.006" classname="27RejeitarValoresMonetariosComTresCasas"/>
+  </testsuite>
+  <testsuite name="28 Consultar notas de custos" id="e8100db1-5cb9-4751-bd11-98cd439c44a1" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="28ConsultarNotasDeCustos"/>
+    <testcase name="Lista de notas válida" time="0.005" classname="28ConsultarNotasDeCustos"/>
+  </testsuite>
+  <testsuite name="29 Rejeitar arquivo de tipo não permitido" id="b44ac960-7e4c-4446-9f2d-67b6fdf81e0e" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 400" time="0.004" classname="29RejeitarArquivoDeTipoNaoPermitido"/>
+    <testcase name="Erro seguro sem stack trace" time="0.004" classname="29RejeitarArquivoDeTipoNaoPermitido"/>
+  </testsuite>
+  <testsuite name="30 Exigir justificativa suficiente para exclusão" id="4a358c82-034b-4485-a750-ed413ac8af15" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 400" time="0.004" classname="30ExigirJustificativaSuficienteParaExclusao"/>
+    <testcase name="Erro seguro sem stack trace" time="0.004" classname="30ExigirJustificativaSuficienteParaExclusao"/>
+  </testsuite>
+  <testsuite name="31 Consultar disponibilidade de e-mail" id="b1ffb426-5448-46d0-9fa7-d7237c4bac41" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 200" time="0.004" classname="31ConsultarDisponibilidadeDeEMail"/>
+    <testcase name="Configuração de e-mail informada" time="0.004" classname="31ConsultarDisponibilidadeDeEMail"/>
+  </testsuite>
+  <testsuite name="32 Exportar relatório PDF" id="f1ff77e3-4561-4fcd-9489-204bf32b5216" timestamp="2026-11-07T17:09:41.490Z" tests="4" failures="0" errors="0" time="0.039">
+    <testcase name="HTTP 200" time="0.039" classname="32ExportarRelatorioPdf"/>
+    <testcase name="Tipo de arquivo correto" time="0.039" classname="32ExportarRelatorioPdf"/>
+    <testcase name="Assinatura binária válida" time="0.039" classname="32ExportarRelatorioPdf"/>
+    <testcase name="Download com nome e proteção MIME" time="0.039" classname="32ExportarRelatorioPdf"/>
+  </testsuite>
+  <testsuite name="33 Exportar relatório XLSX" id="ec0fd60c-a42c-45d8-8f04-8db73c816631" timestamp="2026-11-07T17:09:41.490Z" tests="4" failures="0" errors="0" time="0.025">
+    <testcase name="HTTP 200" time="0.025" classname="33ExportarRelatorioXlsx"/>
+    <testcase name="Tipo de arquivo correto" time="0.025" classname="33ExportarRelatorioXlsx"/>
+    <testcase name="Assinatura binária válida" time="0.025" classname="33ExportarRelatorioXlsx"/>
+    <testcase name="Download com nome e proteção MIME" time="0.025" classname="33ExportarRelatorioXlsx"/>
+  </testsuite>
+  <testsuite name="34 Exportar relatório BOTH" id="36712d3f-4e5d-442a-8bc6-4bf36a1af1db" timestamp="2026-11-07T17:09:41.490Z" tests="4" failures="0" errors="0" time="0.017">
+    <testcase name="HTTP 200" time="0.017" classname="34ExportarRelatorioBoth"/>
+    <testcase name="Tipo de arquivo correto" time="0.017" classname="34ExportarRelatorioBoth"/>
+    <testcase name="Assinatura binária válida" time="0.017" classname="34ExportarRelatorioBoth"/>
+    <testcase name="Download com nome e proteção MIME" time="0.017" classname="34ExportarRelatorioBoth"/>
+  </testsuite>
+  <testsuite name="35 Rejeitar relatório com período invertido" id="200d82d0-453b-4e88-a3a8-aab55f81faf7" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 400" time="0.006" classname="35RejeitarRelatorioComPeriodoInvertido"/>
+    <testcase name="Erro seguro sem stack trace" time="0.006" classname="35RejeitarRelatorioComPeriodoInvertido"/>
+  </testsuite>
+  <testsuite name="36 Relatório sem dados informa vazio" id="00b4153c-7ddc-47be-9b76-770fa9317f23" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 422" time="0.004" classname="36RelatorioSemDadosInformaVazio"/>
+    <testcase name="Erro seguro sem stack trace" time="0.004" classname="36RelatorioSemDadosInformaVazio"/>
+  </testsuite>
+  <testsuite name="37 E-mail PDF com transporte simulado" id="ab2498a6-ebd5-4779-bcd9-9d473f6bf2f5" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.013">
+    <testcase name="HTTP 200" time="0.013" classname="37EMailPdfComTransporteSimulado"/>
+    <testcase name="Aceite informado" time="0.013" classname="37EMailPdfComTransporteSimulado"/>
+  </testsuite>
+  <testsuite name="38 E-mail XLSX com transporte simulado" id="4a7e29b7-2360-4bed-9920-6ac8e89d4d9b" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.012">
+    <testcase name="HTTP 200" time="0.012" classname="38EMailXlsxComTransporteSimulado"/>
+    <testcase name="Aceite informado" time="0.012" classname="38EMailXlsxComTransporteSimulado"/>
+  </testsuite>
+  <testsuite name="39 Repetição do e-mail não dispara novo envio" id="5c1eb4c0-a2eb-4cc1-9e93-49a414875ba0" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.009">
+    <testcase name="HTTP 200" time="0.009" classname="39RepeticaoDoEMailNaoDisparaNovoEnvio"/>
+    <testcase name="Repetição identificada" time="0.009" classname="39RepeticaoDoEMailNaoDisparaNovoEnvio"/>
+  </testsuite>
+  <testsuite name="40 Recuperação exige senha atual correta" id="133f01ed-989d-4853-9c40-44ee36b691ab" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 400" time="0.005" classname="40RecuperacaoExigeSenhaAtualCorreta"/>
+    <testcase name="Erro seguro sem stack trace" time="0.005" classname="40RecuperacaoExigeSenhaAtualCorreta"/>
+  </testsuite>
+  <testsuite name="41 Recuperação de senha com provedor simulado" id="8e7dae82-9f11-4126-9d8e-1a039f685029" timestamp="2026-11-07T17:09:41.490Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 200" time="0.006" classname="41RecuperacaoDeSenhaComProvedorSimulado"/>
+    <testcase name="Solicitação aceita" time="0.006" classname="41RecuperacaoDeSenhaComProvedorSimulado"/>
+  </testsuite>
+  <testsuite name="42 Alteração de e-mail aguarda confirmação simulada" id="0a51aeb9-7556-4eaa-9c3a-213de978701f" timestamp="2026-11-07T17:09:41.490Z" tests="1" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 200" time="0.006" classname="42AlteracaoDeEMailAguardaConfirmacaoSimulada"/>
+  </testsuite>
+  <testsuite name="43 E-mail pendente não substitui identidade confirmada" id="d76c14f6-fca3-4be7-9f4e-f3886a81d164" timestamp="2026-11-07T17:09:41.490Z" tests="3" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="43EMailPendenteNaoSubstituiIdentidadeConfirmada"/>
+    <testcase name="E-mail confirmado preservado" time="0.005" classname="43EMailPendenteNaoSubstituiIdentidadeConfirmada"/>
+    <testcase name="Novo e-mail permanece pendente" time="0.005" classname="43EMailPendenteNaoSubstituiIdentidadeConfirmada"/>
+  </testsuite>
+</testsuites>

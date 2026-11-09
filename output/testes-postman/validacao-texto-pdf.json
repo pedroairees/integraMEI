@@ -1,0 +1,18 @@
+[
+  {
+    "mode": "local",
+    "artifact": "local-relatorio.pdf",
+    "check": "PDF contém faturamento esperado",
+    "expected": "1.200,00",
+    "passed": true,
+    "pages": 1
+  },
+  {
+    "mode": "real",
+    "artifact": "real-relatorio.pdf",
+    "check": "PDF contém faturamento esperado",
+    "expected": "150,00",
+    "passed": true,
+    "pages": 1
+  }
+]

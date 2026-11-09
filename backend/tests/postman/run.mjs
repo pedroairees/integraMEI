@@ -1,0 +1,24 @@
+import { spawn } from 'node:child_process';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { root, privateDir, artifactDir, collectionDir, json } from './support.mjs';
+const mode = process.argv[2];
+if (!['local', 'real'].includes(mode)) throw Error('Use local ou real.');
+const cli = resolve(root, 'tmp/postman-runtime/node_modules/postman-cli/bin/postman.js');
+if (!existsSync(cli)) throw Error('Instale postman-cli em tmp/postman-runtime conforme INSTRUCOES.md.');
+const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+const runDir = resolve(privateDir, `${mode}-${stamp}`);
+mkdirSync(runDir, { recursive: true });
+const args = [cli, 'collection', 'run', resolve(collectionDir, `${mode}.postman_collection.json`), '-e', resolve(privateDir, `${mode}.environment.json`), '--no-report-events', '--reporters', 'cli,json,junit', '--reporter-json-export', resolve(runDir, 'raw.json'), '--reporter-junit-export', resolve(runDir, 'raw.xml'), '--timeout-request', '25000', '--timeout', '600000', '--delay-request', '100', '--disable-unicode'];
+const start = new Date().toISOString();
+const child = spawn(process.execPath, args, { cwd: root, env: { ...process.env, NO_COLOR: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
+let output = '';
+child.stdout.on('data', data => { output += data; });
+child.stderr.on('data', data => { output += data; });
+const exitCode = await new Promise((res, rej) => { child.on('error', rej); child.on('exit', res); });
+writeFileSync(resolve(runDir, 'raw-cli.txt'), output);
+json(resolve(privateDir, `${mode}-run-location.json`), { mode, startedAt: start, finishedAt: new Date().toISOString(), exitCode, privateRunDirectory: runDir });
+// Never print raw request/response output: login reports contain credentials/tokens.
+console.log(JSON.stringify({ mode, exitCode, reportCreated: existsSync(resolve(runDir, 'raw.json')), startedAt: start, finishedAt: new Date().toISOString() }));
+if (!existsSync(resolve(runDir, 'raw.json'))) console.log(output.replace(/\x1b\[[0-9;]*m/g, '').slice(-3000));
+process.exitCode = exitCode ?? 1;

@@ -1,0 +1,55 @@
+{
+  "runId": "4b4309d9-c59c-4bcc-a3f1-5e0550e03011",
+  "cleanedAt": "2026-11-07T17:08:54.691Z",
+  "actions": [
+    {
+      "tenant": "A",
+      "table": "insumos_precos_registrados",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "produtos",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "insumos",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "table": "vendas",
+      "remaining": 0
+    },
+    {
+      "tenant": "A",
+      "authDeleted": true
+    },
+    {
+      "tenant": "B",
+      "table": "insumos_precos_registrados",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "produtos",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "insumos",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "table": "vendas",
+      "remaining": 0
+    },
+    {
+      "tenant": "B",
+      "authDeleted": true
+    }
+  ],
+  "existingAccountsModified": false
+}

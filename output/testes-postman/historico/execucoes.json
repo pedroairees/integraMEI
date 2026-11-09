@@ -1,0 +1,1963 @@
+{
+  "notes": [
+    "Duas tentativas locais não alcançaram a API por restrição de conexão (EACCES/ETIMEDOUT); não são resultados da aplicação.",
+    "Na primeira rodada real, 101/102 verificações passaram. A asserção do gráfico comparava despesas com receita. Foi corrigida conforme o contrato existente; a aplicação não foi alterada. A coleção completa foi repetida com novas contas."
+  ],
+  "runs": [
+    {
+      "run": "local-2026-11-07T17-06-35-480Z",
+      "startedAt": "2026-11-07T17:06:40.710Z",
+      "summary": {
+        "iterations": {
+          "executed": 1,
+          "errors": 0
+        },
+        "executedRequests": {
+          "executed": 43,
+          "errors": 43
+        },
+        "prerequestScripts": {
+          "executed": 0,
+          "errors": 0
+        },
+        "postresponseScripts": {
+          "executed": 43,
+          "errors": 0
+        },
+        "tests": {
+          "executed": 102,
+          "failed": 102,
+          "passed": 0,
+          "skipped": 0
+        },
+        "timeStats": {
+          "responseAverage": 0,
+          "responseMin": 0,
+          "responseMax": 0,
+          "responseStandardDeviation": 0
+        }
+      },
+      "rawReportSha256": "24330d567356a9e0427ebed0b4e2988be099f9251e4fa2b7ca14bba640fd1970",
+      "failures": [
+        {
+          "name": "01 Saúde da API",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Serviço disponível",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "02 Dashboard exige autenticação",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 401",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "03 Token inválido é recusado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 401",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "04 Login com conta exclusiva de teste",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:39401"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Token de acesso recebido",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "05 Configurações pertencem à conta logada",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Nome da conta",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "E-mail da conta",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Resposta não armazenada em cache",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            }
+          ]
+        },
+        {
+          "name": "06 Salvar nome, telefone e preferências",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Nome salvo",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "07 Ler novamente as configurações salvas",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Persistência de todos os campos",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "08 Telefone inválido é recusado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "09 Alteração direta de e-mail no perfil é recusada",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "10 Dashboard reflete os lançamentos conhecidos",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Receita exata",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Custos exatos",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Lucro = receita - custos",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Gráfico tem três meses e valor final correto",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "11 Mês inválido é recusado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "12 Salvar meta da empresa de teste",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 204",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            }
+          ]
+        },
+        {
+          "name": "13 Meta aparece no dashboard",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Meta persistida",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Meta de margem persistida",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "14 Listar insumos da empresa",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Lista de insumos válida",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "15 Cadastrar insumo manualmente",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 201",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Identificador e versão recebidos",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "16 Pesquisa encontra o insumo salvo",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Registro recém-criado encontrado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "17 Atualizar insumo com versão atual",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Estoque mínimo atualizado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "18 Impedir sobrescrita com versão antiga",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 409",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "19 Insumo com estoque mínimo negativo é recusado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "20 Registrar compra manual de insumo",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 201",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Compra registrada",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "21 Histórico de compra mantém preço e unidade",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Preço médio exato",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Unidade preservada",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Uma compra registrada",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "22 Calcular preço por custo base",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Custo de R$20",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Preço com markup 100%",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Margem de 50%",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "23 Calcular preço com insumo comprado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Custo base + compra = R$26",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Preço sugerido = R$52",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "24 Salvar produto precificado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "ID salvo",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "25 Consultar produto salvo",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Produto persistido encontrado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "26 Impedir edição de produto com versão errada",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 409",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "27 Rejeitar valores monetários com três casas",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "28 Consultar notas de custos",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Lista de notas válida",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "29 Rejeitar arquivo de tipo não permitido",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "30 Exigir justificativa suficiente para exclusão",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "31 Consultar disponibilidade de e-mail",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Configuração de e-mail informada",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "32 Exportar relatório PDF",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Tipo de arquivo correto",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            },
+            {
+              "name": "Assinatura binária válida",
+              "message": "Cannot read properties of undefined (reading 'slice')"
+            },
+            {
+              "name": "Download com nome e proteção MIME",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            }
+          ]
+        },
+        {
+          "name": "33 Exportar relatório XLSX",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Tipo de arquivo correto",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            },
+            {
+              "name": "Assinatura binária válida",
+              "message": "Cannot read properties of undefined (reading 'slice')"
+            },
+            {
+              "name": "Download com nome e proteção MIME",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            }
+          ]
+        },
+        {
+          "name": "34 Exportar relatório BOTH",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Tipo de arquivo correto",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            },
+            {
+              "name": "Assinatura binária válida",
+              "message": "Cannot read properties of undefined (reading 'slice')"
+            },
+            {
+              "name": "Download com nome e proteção MIME",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            }
+          ]
+        },
+        {
+          "name": "35 Rejeitar relatório com período invertido",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "36 Relatório sem dados informa vazio",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 422",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "37 E-mail PDF com transporte simulado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Aceite informado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "38 E-mail XLSX com transporte simulado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Aceite informado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "39 Repetição do e-mail não dispara novo envio",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Repetição identificada",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "40 Recuperação exige senha atual correta",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "41 Recuperação de senha com provedor simulado",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Solicitação aceita",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "42 Alteração de e-mail aguarda confirmação simulada",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            }
+          ]
+        },
+        {
+          "name": "43 E-mail pendente não substitui identidade confirmada",
+          "errors": [
+            {
+              "code": "EACCES",
+              "message": "connect EACCES 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "E-mail confirmado preservado",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Novo e-mail permanece pendente",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "local-2026-11-07T17-07-45-104Z",
+      "startedAt": "2026-11-07T17:07:46.697Z",
+      "summary": {
+        "iterations": {
+          "executed": 1,
+          "errors": 0
+        },
+        "executedRequests": {
+          "executed": 43,
+          "errors": 43
+        },
+        "prerequestScripts": {
+          "executed": 0,
+          "errors": 0
+        },
+        "postresponseScripts": {
+          "executed": 43,
+          "errors": 0
+        },
+        "tests": {
+          "executed": 102,
+          "failed": 102,
+          "passed": 0,
+          "skipped": 0
+        },
+        "timeStats": {
+          "responseAverage": 0,
+          "responseMin": 0,
+          "responseMax": 0,
+          "responseStandardDeviation": 0
+        }
+      },
+      "rawReportSha256": "fcbc0251d415af6327270038daa927102a1e4401314fd5036118e968dfdd7d08",
+      "failures": [
+        {
+          "name": "01 Saúde da API",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Serviço disponível",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "02 Dashboard exige autenticação",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 401",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "03 Token inválido é recusado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 401",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "04 Login com conta exclusiva de teste",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:39401"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Token de acesso recebido",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "05 Configurações pertencem à conta logada",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Nome da conta",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "E-mail da conta",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Resposta não armazenada em cache",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            }
+          ]
+        },
+        {
+          "name": "06 Salvar nome, telefone e preferências",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Nome salvo",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "07 Ler novamente as configurações salvas",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Persistência de todos os campos",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "08 Telefone inválido é recusado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "09 Alteração direta de e-mail no perfil é recusada",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "10 Dashboard reflete os lançamentos conhecidos",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Receita exata",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Custos exatos",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Lucro = receita - custos",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Gráfico tem três meses e valor final correto",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "11 Mês inválido é recusado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "12 Salvar meta da empresa de teste",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 204",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            }
+          ]
+        },
+        {
+          "name": "13 Meta aparece no dashboard",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Meta persistida",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Meta de margem persistida",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "14 Listar insumos da empresa",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Lista de insumos válida",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "15 Cadastrar insumo manualmente",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 201",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Identificador e versão recebidos",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "16 Pesquisa encontra o insumo salvo",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Registro recém-criado encontrado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "17 Atualizar insumo com versão atual",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Estoque mínimo atualizado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "18 Impedir sobrescrita com versão antiga",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 409",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "19 Insumo com estoque mínimo negativo é recusado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "20 Registrar compra manual de insumo",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 201",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Compra registrada",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "21 Histórico de compra mantém preço e unidade",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Preço médio exato",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Unidade preservada",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Uma compra registrada",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "22 Calcular preço por custo base",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Custo de R$20",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Preço com markup 100%",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Margem de 50%",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "23 Calcular preço com insumo comprado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Custo base + compra = R$26",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Preço sugerido = R$52",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "24 Salvar produto precificado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "ID salvo",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "25 Consultar produto salvo",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Produto persistido encontrado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "26 Impedir edição de produto com versão errada",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 409",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "27 Rejeitar valores monetários com três casas",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "28 Consultar notas de custos",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Lista de notas válida",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "29 Rejeitar arquivo de tipo não permitido",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "30 Exigir justificativa suficiente para exclusão",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "31 Consultar disponibilidade de e-mail",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Configuração de e-mail informada",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "32 Exportar relatório PDF",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Tipo de arquivo correto",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            },
+            {
+              "name": "Assinatura binária válida",
+              "message": "Cannot read properties of undefined (reading 'slice')"
+            },
+            {
+              "name": "Download com nome e proteção MIME",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            }
+          ]
+        },
+        {
+          "name": "33 Exportar relatório XLSX",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Tipo de arquivo correto",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            },
+            {
+              "name": "Assinatura binária válida",
+              "message": "Cannot read properties of undefined (reading 'slice')"
+            },
+            {
+              "name": "Download com nome e proteção MIME",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            }
+          ]
+        },
+        {
+          "name": "34 Exportar relatório BOTH",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Tipo de arquivo correto",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            },
+            {
+              "name": "Assinatura binária válida",
+              "message": "Cannot read properties of undefined (reading 'slice')"
+            },
+            {
+              "name": "Download com nome e proteção MIME",
+              "message": "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
+            }
+          ]
+        },
+        {
+          "name": "35 Rejeitar relatório com período invertido",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "36 Relatório sem dados informa vazio",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 422",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "37 E-mail PDF com transporte simulado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Aceite informado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "38 E-mail XLSX com transporte simulado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Aceite informado",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "39 Repetição do e-mail não dispara novo envio",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Repetição identificada",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "40 Recuperação exige senha atual correta",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 400",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Erro seguro sem stack trace",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "41 Recuperação de senha com provedor simulado",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "Solicitação aceita",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        },
+        {
+          "name": "42 Alteração de e-mail aguarda confirmação simulada",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            }
+          ]
+        },
+        {
+          "name": "43 E-mail pendente não substitui identidade confirmada",
+          "errors": [
+            {
+              "code": "ETIMEDOUT",
+              "message": "connect ETIMEDOUT 127.0.0.1:3337"
+            }
+          ],
+          "checks": [
+            {
+              "name": "HTTP 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'"
+            },
+            {
+              "name": "E-mail confirmado preservado",
+              "message": "\"undefined\" is not valid JSON"
+            },
+            {
+              "name": "Novo e-mail permanece pendente",
+              "message": "\"undefined\" is not valid JSON"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "local-2026-11-07T17-09-39-700Z",
+      "startedAt": "2026-11-07T17:09:41.490Z",
+      "summary": {
+        "iterations": {
+          "executed": 1,
+          "errors": 0
+        },
+        "executedRequests": {
+          "executed": 43,
+          "errors": 0
+        },
+        "prerequestScripts": {
+          "executed": 0,
+          "errors": 0
+        },
+        "postresponseScripts": {
+          "executed": 43,
+          "errors": 0
+        },
+        "tests": {
+          "executed": 102,
+          "failed": 0,
+          "passed": 102,
+          "skipped": 0
+        },
+        "timeStats": {
+          "responseAverage": 8.860465116279068,
+          "responseMin": 3,
+          "responseMax": 39,
+          "responseStandardDeviation": 7.937492414495807
+        }
+      },
+      "rawReportSha256": "e11f6bead537ad9b623f2e7828097c272c5251e5ef66310f0bc215c1f4524b80",
+      "failures": []
+    },
+    {
+      "run": "real-2026-11-07T17-06-55-851Z",
+      "startedAt": "2026-11-07T17:06:57.537Z",
+      "summary": {
+        "iterations": {
+          "executed": 1,
+          "errors": 0
+        },
+        "executedRequests": {
+          "executed": 43,
+          "errors": 0
+        },
+        "prerequestScripts": {
+          "executed": 0,
+          "errors": 0
+        },
+        "postresponseScripts": {
+          "executed": 43,
+          "errors": 0
+        },
+        "tests": {
+          "executed": 102,
+          "failed": 1,
+          "passed": 101,
+          "skipped": 0
+        },
+        "timeStats": {
+          "responseAverage": 615.6511627906978,
+          "responseMin": 4,
+          "responseMax": 1154,
+          "responseStandardDeviation": 249.6529576088254
+        }
+      },
+      "rawReportSha256": "6757b6f7d5dc8345be4a25b21aff34836ca331ead21ee277da5f60ed0ce921b0",
+      "failures": [
+        {
+          "name": "10 Dashboard reflete os lançamentos conhecidos",
+          "errors": [],
+          "checks": [
+            {
+              "name": "Gráfico tem três meses e valor final correto",
+              "message": "expected +0 to deeply equal 150"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "real-2026-11-07T17-09-40-288Z",
+      "startedAt": "2026-11-07T17:09:42.010Z",
+      "summary": {
+        "iterations": {
+          "executed": 1,
+          "errors": 0
+        },
+        "executedRequests": {
+          "executed": 43,
+          "errors": 0
+        },
+        "prerequestScripts": {
+          "executed": 0,
+          "errors": 0
+        },
+        "postresponseScripts": {
+          "executed": 43,
+          "errors": 0
+        },
+        "tests": {
+          "executed": 102,
+          "failed": 0,
+          "passed": 102,
+          "skipped": 0
+        },
+        "timeStats": {
+          "responseAverage": 596.5813953488373,
+          "responseMin": 3,
+          "responseMax": 1147,
+          "responseStandardDeviation": 238.86429275122194
+        }
+      },
+      "rawReportSha256": "d89ee87114a535962fabf2cd3cc623840ca751d9b56bb6a9e5cba2ef39731754",
+      "failures": []
+    }
+  ]
+}

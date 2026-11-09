@@ -1,0 +1,108 @@
+[
+  {
+    "mode": "local",
+    "artifact": "local-relatorio.pdf",
+    "check": "PDF abre e possui páginas",
+    "expected": true,
+    "actual": true,
+    "passed": true,
+    "pages": 1
+  },
+  {
+    "mode": "local",
+    "artifact": "local-relatorio.xlsx",
+    "check": "Resumo: faturamento",
+    "expected": 1200,
+    "actual": 1200,
+    "passed": true
+  },
+  {
+    "mode": "local",
+    "artifact": "local-relatorio.xlsx",
+    "check": "Resumo: custos",
+    "expected": 600,
+    "actual": 600,
+    "passed": true
+  },
+  {
+    "mode": "local",
+    "artifact": "local-relatorio.xlsx",
+    "check": "Resumo: lucro",
+    "expected": 600,
+    "actual": 600,
+    "passed": true
+  },
+  {
+    "mode": "local",
+    "artifact": "local-relatorio.xlsx",
+    "check": "Soma das vendas exportadas",
+    "expected": 1200,
+    "actual": 1200,
+    "passed": true
+  },
+  {
+    "mode": "local",
+    "artifact": "local-relatorio.zip",
+    "check": "ZIP abre, passa no CRC e contém PDF e XLSX",
+    "expected": true,
+    "actual": true,
+    "passed": true,
+    "files": [
+      "integramei-full-2026-11-01-2026-11-07.pdf",
+      "integramei-full-2026-11-01-2026-11-07.xlsx"
+    ]
+  },
+  {
+    "mode": "real",
+    "artifact": "real-relatorio.pdf",
+    "check": "PDF abre e possui páginas",
+    "expected": true,
+    "actual": true,
+    "passed": true,
+    "pages": 1
+  },
+  {
+    "mode": "real",
+    "artifact": "real-relatorio.xlsx",
+    "check": "Resumo: faturamento",
+    "expected": 150,
+    "actual": 150,
+    "passed": true
+  },
+  {
+    "mode": "real",
+    "artifact": "real-relatorio.xlsx",
+    "check": "Resumo: custos",
+    "expected": 0,
+    "actual": 0,
+    "passed": true
+  },
+  {
+    "mode": "real",
+    "artifact": "real-relatorio.xlsx",
+    "check": "Resumo: lucro",
+    "expected": 150,
+    "actual": 150,
+    "passed": true
+  },
+  {
+    "mode": "real",
+    "artifact": "real-relatorio.xlsx",
+    "check": "Soma das vendas exportadas",
+    "expected": 150,
+    "actual": 150,
+    "passed": true
+  },
+  {
+    "mode": "real",
+    "artifact": "real-relatorio.zip",
+    "check": "ZIP abre, passa no CRC e contém PDF e XLSX",
+    "expected": true,
+    "actual": true,
+    "passed": true,
+    "files": [
+      "integramei-full-2026-11-01-2026-11-07.pdf",
+      "integramei-full-2026-11-01-2026-11-07.xlsx"
+    ]
+  }
+]
